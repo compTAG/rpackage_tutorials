@@ -3,3 +3,5 @@ _site
 .jekyll-metadata
 tags
 tda-rips-tutorial/tda-rips-tutorial_files
+.Rproj.user
+.Rhistory
