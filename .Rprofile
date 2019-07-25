@@ -14,8 +14,8 @@ serve_blog <- function (input = c(".", list.dirs("_source")), output = c(".",
 }
 
 use_package <- function(p) {
-  if (!is.element(as.character(p), installed.packages()[, 1]))
-    install.packages(p, dep = TRUE)
+  if (!is.element(as.character(p), utils::installed.packages()[, 1]))
+    utils::install.packages(p, dep = TRUE)
 library(p, character.only = TRUE)
 }
 
