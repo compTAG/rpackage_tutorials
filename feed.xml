@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="https://comptag.github.io/rpackage_tutorials/feed.xml" rel="self" type="application/atom+xml" /><link href="https://comptag.github.io/rpackage_tutorials/" rel="alternate" type="text/html" /><updated>2019-07-25T18:52:13+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/feed.xml</id><title type="html">R Package TDA Documentation</title><subtitle>Various tutorials on important techniques in topological data analysis. Tutorials made with the final goal in mind to use the R package TDA in order to actually implement each technique.</subtitle><entry><title type="html">Rips Filtration Tutorial for the R-TDA Package</title><link href="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html" rel="alternate" type="text/html" title="Rips Filtration Tutorial for the R-TDA Package" /><published>2019-07-22T00:00:00+00:00</published><updated>2019-07-22T00:00:00+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial</id><content type="html" xml:base="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html">&lt;script src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+
+&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/jquery-sidebar/3.3.2/jquery.sidebar.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Our ultimate goal is to understand Persistent Homology and be able to compute Persistence
+Diagrams using the R-TDA package. In order to get there, we must first understand filtrations.
+In this tutorial, we will work with the Vietoris Rips Filtration, or Rips Filtration for short.
+Suppose we are given a finite set of points in &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt; denoted by &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;. The set of points,
+&lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;, is topologically uninteresting. How can we make &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; topologically interesting? Yes, you
+guessed it - we can construct a Rips complex from the points in &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;!  The Rips Filtration is a
+specific nested sequence of Rips Complexes over &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; that can be later used to compute Persistent
+Homology.&lt;/p&gt;
+
+&lt;h1 id=&quot;objectives&quot;&gt;Objectives&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;TODO: Make objectives stronger.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Gain familiarity on $n$-simplices and simplicial complexes.&lt;/li&gt;
+  &lt;li&gt;Be able to construct a Rips Complex and Rips Filtration from a finite set of points in
+&lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt;.&lt;/li&gt;
+  &lt;li&gt;Learn a few exciting applications of the Rips Filtration.&lt;/li&gt;
+  &lt;li&gt;Compute a Rips Filtration from a finite set of points in &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt; using the R-TDA package.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;theory&quot;&gt;Theory&lt;/h1&gt;
+
+&lt;p&gt;First we breifly describe the mathematical foundations behind a Rips Filtration including
+simplicial complexes, filtrations, and the Rips complex.&lt;/p&gt;
+
+&lt;h3 id=&quot;triangle-appreciation&quot;&gt;Triangle Appreciation&lt;/h3&gt;
+
+&lt;p&gt;We construct a Rips Complex from simplices of varying dimensions which are dimensional
+generalizations of triangles. More specifically, an &lt;em&gt;&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;-simplex&lt;/em&gt; is the convex hull of &lt;script type=&quot;math/tex&quot;&gt;n+1&lt;/script&gt;
+affinely independent points.&lt;/p&gt;
+
+&lt;center&gt;
+&lt;embed width=&quot;80%&quot; src=&quot;../../assets/tda-rips/simplices.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
+&lt;/center&gt;
+
+&lt;p&gt;A simplicial complex is a nice way of combining simplices. In particular, a &lt;em&gt;simplicial complex&lt;/em&gt;
+is a finite collection of simplices, &lt;script type=&quot;math/tex&quot;&gt;K&lt;/script&gt;, such that (1) if &lt;script type=&quot;math/tex&quot;&gt;\sigma \in K&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;\tau\leq \sigma&lt;/script&gt;,
+then &lt;script type=&quot;math/tex&quot;&gt;\tau \in K&lt;/script&gt;, and (2) if &lt;script type=&quot;math/tex&quot;&gt;\sigma, \sigma'\in K&lt;/script&gt;, then &lt;script type=&quot;math/tex&quot;&gt;\sigma\cap \sigma'&lt;/script&gt; is either empty
+or a face of both.&lt;/p&gt;
+
+&lt;center&gt;
+&lt;embed width=&quot;80%&quot; src=&quot;../../assets/tda-rips/simplicialcomplex.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
+&lt;/center&gt;
+
+&lt;h3 id=&quot;rips-complex&quot;&gt;Rips Complex&lt;/h3&gt;
+
+&lt;p&gt;Now we explain how to construct a Rips complex from a finite set of points. Let &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; be finite set
+of points in &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt;. Let &lt;script type=&quot;math/tex&quot;&gt;r\geq 0&lt;/script&gt;. The Rips complex of &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; is the abstract
+simplicial complex of &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(r)&lt;/script&gt;, which consists of all subsets of diameter at most &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\text{VR}(r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}.&lt;/script&gt;
+
+&lt;p&gt;&lt;strong&gt;TODO: Add definitions of ASC and faces, Change VR(r) to VR(S,r).&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Geometrically, this means we consider balls of radius, &lt;script type=&quot;math/tex&quot;&gt;\frac{r}{2}&lt;/script&gt;, centered at each point in
+&lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;. Whenever $d$ balls have pairwise intersections, we add a &lt;script type=&quot;math/tex&quot;&gt;d-1&lt;/script&gt; simplex. For this tutorial,
+we will use the standard Euclidan distance (unless stated otherwise) to compute a Rips complex. However, one could use any metric.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Many people also define &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}&lt;/script&gt;.
+However, the algorithms used in the R-TDA package use the first definition.&lt;/p&gt;
+
+&lt;center&gt;
+&lt;embed width=&quot;80%&quot; src=&quot;../../assets/tda-rips/ripscomplex.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
+&lt;/center&gt;
+
+&lt;h3 id=&quot;filtrations&quot;&gt;Filtrations&lt;/h3&gt;
+
+&lt;p&gt;A &lt;em&gt;filtration&lt;/em&gt; of a simplicial complex, &lt;script type=&quot;math/tex&quot;&gt;K&lt;/script&gt;, is a nested sequence of subcomplexes starting at the
+empty set and ending with the full simplicial complex i.e.,&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\emptyset \subset K_1 \subset K_2 \subset ... \subset K.&lt;/script&gt;
+
+&lt;center&gt;
+&lt;embed width=&quot;80%&quot; src=&quot;../../assets/tda-rips/bobcat.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
+&lt;/center&gt;
+
+&lt;p&gt;Going back to the Rips complex, we consider &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; to be a free parameter. If we vary &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;, we get
+different Rips complexes. There is often not a best choice for &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;, so why not look at all of
+them!? Observe if we increase &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;, then we get a family of nested Rips complexes which gives rise
+to the &lt;em&gt;Rips filtration&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let’s work through an example. Let &lt;script type=&quot;math/tex&quot;&gt;S:=\{(0,0),(1,0),(0,2),(1,2),(3,1)\}\subset \mathbb{R}^2&lt;/script&gt;. We
+want to compute a Rips filtration on &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; for all &lt;script type=&quot;math/tex&quot;&gt;r\geq 0&lt;/script&gt;. Observe:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;when &lt;script type=&quot;math/tex&quot;&gt;r=1&lt;/script&gt;, the balls of radius &lt;script type=&quot;math/tex&quot;&gt;\frac{1}{2}&lt;/script&gt; centered at &lt;script type=&quot;math/tex&quot;&gt;(0,0)&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;(1,0)&lt;/script&gt; intersect which
+means we add a 1-simplex between &lt;script type=&quot;math/tex&quot;&gt;(0,0)&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;(1,0)&lt;/script&gt;. Similarly, we add a 1-simplex between
+&lt;script type=&quot;math/tex&quot;&gt;(0,2)&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;(1,2)&lt;/script&gt;.&lt;/li&gt;
+  &lt;li&gt;when &lt;script type=&quot;math/tex&quot;&gt;r=2&lt;/script&gt;, we add a two more 1-simplices between &lt;script type=&quot;math/tex&quot;&gt;(0,0), (0,2)&lt;/script&gt;, and &lt;script type=&quot;math/tex&quot;&gt;(1,2), (1,0)&lt;/script&gt;.&lt;/li&gt;
+  &lt;li&gt;when &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{5}&lt;/script&gt;, we add a 3-simplex and a 2-simplex.&lt;/li&gt;
+  &lt;li&gt;when &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{10}&lt;/script&gt;, we add a 4-simplex.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here is an illustration of the Rips filtration on &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/rpackage_tutorials/figure/source/tda-rips-tutorial/2019-07-24-tda-rips-tutorial/ripsfilt2-1.png&quot; style=&quot;display: block; margin: auto;&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;applications-of-rips-complexes-and-filtrations&quot;&gt;Applications of Rips Complexes and Filtrations&lt;/h1&gt;
+
+&lt;p&gt;Now that we have discussed the theory, let’s talk about some of the applications! A Rips
+filtration is used on point cloud data. A common form of these types of data are location data.
+For example:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Galaxy Data which provides coordinates of stars in different galaxies&lt;/li&gt;
+  &lt;li&gt;GPS coordinates of Airports on Earth&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The Rips complex provides information on how close the data points are to each other. The
+topological information given by taking a Rips filtration can be studied using Persistent
+Homology (see next tutorial) which is often used to analyze these types of data.&lt;/p&gt;
+
+&lt;p&gt;Furthermore, Rips complexes are used in shape reconstruction. They are nice to use since these
+complexes do not favor a specific type of alignment of the input. &lt;strong&gt;TODO: Add citation to Attali paper.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Maybe add fractal dimension?&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;These are just a few of the applications. There are many more!&lt;/p&gt;
+
+&lt;h1 id=&quot;computing-the-rips-filtration-using-the-r-tda-package&quot;&gt;Computing the Rips Filtration using the R-TDA Package&lt;/h1&gt;
+
+&lt;h3 id=&quot;toy-example&quot;&gt;Toy Example&lt;/h3&gt;
+&lt;p&gt;First, let’s go back to the example where &lt;script type=&quot;math/tex&quot;&gt;S:=\{(0,0),(1,0),(0,2),(1,2),(3,1)\}&lt;/script&gt;. We will compute the Rips filtration using the R-TDA package.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;library&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TDA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;# upload TDA package&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cbind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;# write S into R&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;# limit of the filtration&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxdimension&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;# components , loops, and voids&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S_RipsFilt&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ripsFiltration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxdimension&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dist&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;euclidean&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Great! So how do we interpret the output?&lt;/p&gt;
+
+&lt;p&gt;The ripsFiltration function returns a list with a complex list, filtration values vector, a logical variable that states whether or not the values are in increasing order, and a matrix of the coordinates of the vertices if the Euclidean distance is used. The &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; element of the complex are the vertices of the &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; simplex. Additionally, the $i^{th}$ entry of the filtration values is the filtration value for when the &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; simplex appears. See &lt;strong&gt;TODO: reference CRAN documentation.&lt;/strong&gt; Let’s check this out.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;S_RipsFilt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cmplx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#Access vertices for the 16th simplex in the list&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;## [1] 4 3 2 1&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;S_RipsFilt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#Access filtration value for the 16th simplex in the list&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;## [1] 2.236068&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Our output tells us that we add a 3-simplex when &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{5}&lt;/script&gt;. This is exactly what we found
+when we worked through this example by hand. Accessing the other complex and filtration value elements will help us verify the rest of the filtration computation we did earlier.&lt;/p&gt;
+
+&lt;p&gt;If we want to visualize the Rips complex when &lt;script type=&quot;math/tex&quot;&gt;r = 2&lt;/script&gt;, we can run the following code.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;c1&quot;&gt;# Plot Rips Complex when r=2.&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;# limit of the filtration&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxdimension&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;# allow components, loops, and voids&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S_RipsFilt&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ripsFiltration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxdimension&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dist&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;euclidean&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;rep&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;-1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;n&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+     &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Rips Complex for r = 2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlab&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylab&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;along&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S_RipsFilt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;cmplx&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;polygon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S_RipsFilt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;cmplx&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]][[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+          &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;col&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;pink&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;NA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;along&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S_RipsFilt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;cmplx&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;polygon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S_RipsFilt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;cmplx&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]][[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+          &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;col&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;points&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pch&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;16&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;img src=&quot;/rpackage_tutorials/figure/source/tda-rips-tutorial/2019-07-24-tda-rips-tutorial/visualization-1.png&quot; alt=&quot;plot of chunk visualization&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;non-euclidean-distance-example&quot;&gt;Non Euclidean Distance Example&lt;/h3&gt;
+&lt;p&gt;Now we will compute a Rips filtration on $S$, but this time using the &lt;strong&gt;TODO&lt;/strong&gt; distance.&lt;/p&gt;
+
+&lt;h3 id=&quot;providence-coffee-shops-location-data&quot;&gt;Providence Coffee Shops Location Data&lt;/h3&gt;
+&lt;p&gt;Lastly, we will work through an example with real data!&lt;/p&gt;
+
+&lt;h1 id=&quot;references&quot;&gt;References&lt;/h1&gt;
+
+&lt;ol class=&quot;bibliography&quot;&gt;&lt;/ol&gt;</content><author><name>Robin Belton and Ben Holmgren</name></author><summary type="html"></summary></entry><entry><title type="html">Persistent Homology and Persistence Diagrams</title><link href="https://comptag.github.io/rpackage_tutorials/2019/04/persistent_homology.html" rel="alternate" type="text/html" title="Persistent Homology and Persistence Diagrams" /><published>2019-04-22T00:00:00+00:00</published><updated>2019-04-22T00:00:00+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/2019/04/persistent_homology</id><content type="html" xml:base="https://comptag.github.io/rpackage_tutorials/2019/04/persistent_homology.html">&lt;h1 id=&quot;introduction-to-persistent-homology&quot;&gt;Introduction to Persistent Homology&lt;/h1&gt;
+
+&lt;h4 id=&quot;objectives&quot;&gt;Objectives&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Understand and be able to define persistent homology&lt;/li&gt;
+  &lt;li&gt;Conceptualize the importance of persistent homology in TDA&lt;/li&gt;
+  &lt;li&gt;Be able to construct and read a persistence diagram&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;In TDA, a core approach to understanding the topological structure of data is through persistent homology, which quantifies the persistence of features in a family of nested topological spaces.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;In layman’s terms, when we are looking at a data set, most often in the form of a point cloud, it is helpful to be able to look at the ‘shape’ of that data. To do so, we can observe the persistence of features in that data as we manipulate certain parameters.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;In TDA, we use different filtrations as a means to manipulate these specific parameters. Inevitably, this will cause features in the data set to emerge (so called ‘births’) and disappear, (so called ‘deaths’). We can think of this manipulation as occurring over a time parameter t, and in plotting the times at which births and deaths occur, we gain a helpful visualization of the structure of a data set which is algebraic in nature.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;For example, imagine a point cloud along the unit circle.
+&lt;img src=&quot;/assets/ph&amp;amp;pd-images/unit_circle_pt_cloud.png&quot; alt=&quot;circular point cloud&quot; /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Then, recall a &lt;img src=&quot;https://comptag.github.io/rpackage_tutorials/2019/04/15/rips.html&quot; alt=&quot;Rips Filtration&quot; /&gt;, and imagine the simplicial complexes that would be created over time if we were to conduct the filtration on our point cloud.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;At time 0, we would only be able to see all of the vertices in the data set. Over time, higher dimensional simplices would be added, and lower dimensional simplices would disappear as a result. To visualize, we can trace these birth and death events by plotting them on a grid, with each axis devoted to equal units of time.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/ph&amp;amp;pd-images/unit_circle_rips_pd.png&quot; alt=&quot;unit circle rips pd&quot; /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Since both axes represent the same units of time, the line running through the middle of the figure is representative of the course of time; if every feature were to be born and die immediately, all of the points would lie along this line. Note that all features are born at time 0, since the Rips filtration begins with all vertices simultaneously. Features die respective to when they are engulfed by the growing simplicial complex, and one feature dies at time infinity (meaning it never dies). This is the simplex which is the final remaining feature in the simplicial complex.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;From this, we can gain the persistence of each feature in the data set. The further it is above the curve representative of time on both axes, the greater that feature’s persistence. High persistence features are generally thought to be statistically significant, while lower persistence features more representative of statistical noise.&lt;/p&gt;
+
+&lt;hr /&gt;</content><author><name>Ben Holmgren</name></author><summary type="html">Introduction to Persistent Homology</summary></entry><entry><title type="html">Kernel Density Estimation</title><link href="https://comptag.github.io/rpackage_tutorials/2019/04/kde.html" rel="alternate" type="text/html" title="Kernel Density Estimation" /><published>2019-04-15T00:00:00+00:00</published><updated>2019-04-15T00:00:00+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/2019/04/kde</id><content type="html" xml:base="https://comptag.github.io/rpackage_tutorials/2019/04/kde.html">&lt;h1 id=&quot;tutorial-on-kernel-density-estimation&quot;&gt;Tutorial on Kernel Density Estimation&lt;/h1&gt;
+
+&lt;hr /&gt;
+&lt;h3 id=&quot;objectives&quot;&gt;Objectives&lt;/h3&gt;
+&lt;p&gt;We want to be able to understand the questions:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;What is a kernel? Not that of your pre popped corn, nor a high ranking military officer, the kind that’s useful when thinking about data.&lt;/li&gt;
+  &lt;li&gt;How can kernels be of use to understand a set of data?&lt;/li&gt;
+  &lt;li&gt;What are a few exciting applications of kernel density estimation?&lt;/li&gt;
+  &lt;li&gt;Every year in Bozeman, Montana, an epic trail race kown as the Bridger Ridge Run takes place in which runners test themselves for 20 grueling miles to see who can most quickly traverse the Bridger Ridge. The citizens of Bozeman, Montana, or “Bozemanites” as they often refer to themselves, carry with them a serious level of pride in their ability to complete these sorts of challenges better than people throughout the rest of the world. As the Bridger Ridge Run has grown into a widely famous race around the country, the superiority of Bozemanites at traversing their beloved ridge is being tested like never before. By the end of this tutorial, we will use Kernel Density Estimation to decide, is there merit to the longheld Bozemanite belief of their ridge traversing superiority, or have the proud people of Bozeman been surpassed by nonlocal runners in this famous ridge traverse?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+&lt;h1 id=&quot;what-is-a-kernel&quot;&gt;What is a kernel?&lt;/h1&gt;
+&lt;p&gt;To begin, visualize a number line with points lying along it, as follows:&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;img src=&quot;/rpackage_tutorials/assets/kde-images/kdeNumberLine.png&quot; alt=&quot;Number Line&quot; /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Now, recall a Gaussian curve, the “bell curve” which portrays a normal distribution. The Gaussian curve is visualized by:
+&lt;img src=&quot;/rpackage_tutorials/assets/kde-images/Gaussian.png&quot; alt=&quot;Gaussian Ex&quot; /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;With this in mind, visualize the insertion of a Gaussian curve above each point on our data set on the number line:&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;img src=&quot;/rpackage_tutorials/assets/kde-images/kdeKernelsonLine.png&quot; alt=&quot;Kernels on line&quot; /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;We call the curves inserted above these points kernels. In this example, we’ve chosen to use Gaussian curves as kernels,
+though other implementations include:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Rectangular kernels&lt;/li&gt;
+  &lt;li&gt;Triangular kernels&lt;/li&gt;
+  &lt;li&gt;Biweight kernels&lt;/li&gt;
+  &lt;li&gt;Uniform kernels&lt;/li&gt;
+  &lt;li&gt;Cosine kernels&lt;/li&gt;
+  &lt;li&gt;Epanechnikov kernels&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;however-for-functional-purposes-we-are-primarily-concerned-with-gaussian-and-epanechnikov-kernels-specifically-weve-seen-some-exposure-to-gaussian-kernels-and-epanechnikov-kernels-are-conceptually-quite-similar-but-are-parabolic-rather-than-normally-distributed-in-nature&quot;&gt;However, for functional purposes we are primarily concerned with Gaussian and Epanechnikov kernels specifically. We’ve seen some exposure to Gaussian kernels, and Epanechnikov kernels are conceptually quite similar but are parabolic rather than normally distributed in nature.&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Gaussian kernels are specifically useful since they are naturally distributed. This yields a natural sort of probability in location for each data point, and when taken as a sum of all the points in a data set is actually quite effective in representing the data. A Gaussian kernel K(u) is defined to be:&lt;/p&gt;
+
+    &lt;h2&gt;&lt;img src=&quot;/rpackage_tutorials/assets/kde-images/kdeGaussianformula.png&quot; alt=&quot;Gaussian formula&quot; /&gt;&lt;/h2&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Epanechnikov kernels are useful in their own right, and are representative of data in a manner similar to Gaussian kernels. However, the difference in Epanechnikov kernels lies in their parabolic structure. This is useful for data in which we need to take into account areas with zero density. More formally, this is referred to as &lt;em&gt;compact support&lt;/em&gt;, having a closed and bounded domain. When using Gaussian curves, there will always be a nonzero kernel value occupying the space, since Gaussian curves never reach zero. The function for an Epanechnikov kernel K(u) is defined as:&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/rpackage_tutorials/assets/kde-images/kdeEpanechnikovformula.png&quot; alt=&quot;Epanechnikov formula&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+&lt;p&gt;Summing all of our Gaussian kernels together, we gain a nice visualization of the densities of the original points on the number line&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;img src=&quot;/rpackage_tutorials/assets/kde-images/kdeKernelSum.png&quot; alt=&quot;Kernel Sum&quot; /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Conceptually, this is the central goal of kernel density estimation. In order to understand sets of data, it is incredibly useful to project their densities in some manner above a set in order to view similarities in their values and to view data in a more probabilistic manner. Adding dimensions, for an n dimensional set of data, we find an n + 1 dimensional kernel density estimate. Thus, for a set of 2 dimensional data, we can construct a similar density visualization in R&lt;sup&gt;3&lt;/sup&gt;.&lt;/p&gt;
+
+&lt;p&gt;Consider the position of some occurance of data on a plane. We can visualize the density of that data positionally by different 3 dimensional plots of kernel density, each plot referring to a specific variable which we are concerned with positionally. This graph comes from a paper on geolocation, considering the densities of particular words geographically on Twitter.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/rpackage_tutorials/assets/kde-images/wordDensities.png&quot; alt=&quot;Word Densities&quot; /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;applications-of-kde&quot;&gt;Applications of kde&lt;/h2&gt;
+&lt;p&gt;Kernel density estimation is widely applicable as a relatively intuitive, nonparametric method to model the structure of a data set. Below are just a few of countless applications kde can have when interpreting data.&lt;/p&gt;
+&lt;h3 id=&quot;ai&quot;&gt;AI&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;Image Classification: Unsurprisingly, kernel density estimation is incredibly useful when trying to categorize images. &lt;a href=&quot;http://www.gatsby.ucl.ac.uk/~dougals/papers/cvpr-12.pdf&quot; title=&quot;kde in image classification&quot;&gt;“Nonparametric Kernel Density Estimators for Image Classification”&lt;/a&gt; gives a good overview of kernel density estimators for image classification as well as proposing new, nonparametric methods to do so which improve upon existing methods.&lt;/li&gt;
+  &lt;li&gt;Geolocation: Kernel density estimation is immediately applicable to any sort of map, as it is an easy way to understand the densities of a particular phenomenon in a space. One pertinent example comes with the graph included above, when considering the densities of word use on Twitter in specific regions.
+This instance brought up in &lt;a href=&quot;https://www.aaai.org/ocs/index.php/AAAI/AAAI15/paper/view/10034&quot; title=&quot;kde in geolocation&quot;&gt;“Kernel Density Estimation for Text-Based Geolocation”&lt;/a&gt; is easily extended to countless data distributed geographically.
+    &lt;h3 id=&quot;econometrics&quot;&gt;Econometrics&lt;/h3&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Understanding the probability involved with economic data. Econometricians can utilize kde in order to understand the overall trends in economic data, in hopes to explain the root causes of economic trends. For more information, see
+&lt;a href=&quot;https://arxiv.org/abs/1212.2812&quot; title=&quot;kde in econometrics&quot;&gt;“kde in econometrics”&lt;/a&gt;.
+—
+    &lt;h2 id=&quot;kde-in-the-r-package-tda&quot;&gt;kde in the R package ‘TDA’&lt;/h2&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.rdocumentation.org/packages/TDA/versions/1.6.2/topics/kde&quot; title=&quot;kde R Documentation&quot;&gt;R package&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+&lt;p&gt;Kernel density estimation can be accomplished by use of the R package ‘TDA’ through the kde function. By this means, it is possible to input data and recieve an actual numerical assessment of kernel density on that data.&lt;/p&gt;
+
+&lt;p&gt;The kde function considers:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Two input matrices, one corresponding to each point in a data set of concern, and the other corresponding to a base grid from which the matrix refers to.&lt;/li&gt;
+  &lt;li&gt;A smoothing parameter in order to mitigate some level of statistical noise in the data if necessary.&lt;/li&gt;
+  &lt;li&gt;The type of kernel desired- allowed to be either Gaussian or Epanechnikov&lt;/li&gt;
+  &lt;li&gt;A weight parameter which allows certain data points to be weighted more or less in the kernel density, prioritizing or deprioritizing aspects of the data if useful&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;And then returns a vector containing the value of the kernel density estimator at each point in the base grid. This provides a rough quantification of kernel density at each point in a considered space, which is very useful in order to actually use the values associated with a kernel density estimate.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/rpackage_tutorials/assets/kde-images/Rlogo.jpeg&quot; alt=&quot;R&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;generic-example-using-points-along-the-unit-circle&quot;&gt;Generic example using points along the unit circle:&lt;/h1&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;library&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TDA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#Generate Data from the unit circle&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TDA&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;circleUnif&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#Construct a grid of points over which we evaluate the function&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.065&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Xseq&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;-1.6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1.6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Yseq&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;-1.7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1.7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Grid&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;expand.grid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Xseq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Yseq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#kernel density estimator&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.3&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;KDE&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TDA&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kde&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Grid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;hr /&gt;
+&lt;h1 id=&quot;kernel-density-estimation-to-settle-the-superiority-of-bozemanites-in-the-bridger-ridge-run&quot;&gt;Kernel Density Estimation to settle the superiority of Bozemanites in the Bridger Ridge Run:&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src=&quot;/rpackage_tutorials/assets/kde-images/bridgerRidge.png&quot; alt=&quot;Bridger Run&quot; /&gt;
+&lt;!-- &lt;img src=&quot;briedgerridge.png&quot; width=&quot;700&quot; height=&quot;656.25&quot; /&gt; --&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;the-bridger-ridge-as-seen-from-just-below-the-summit-of-naya-nuki&quot;&gt;The Bridger Ridge, as seen from just below the summit of Naya Nuki.&lt;/h2&gt;
+&lt;p&gt;To settle once and for all the Bozemanite supremacy in traversing mountain ridges, we can take a look at a kernel density estimation using the times in the 2018 &lt;a href=&quot;https://winddrinkers.org/trailhead/races/ridge-run/&quot; title=&quot;Ed Anacker Bridger Ridge Run&quot;&gt;Ridge Run&lt;/a&gt; in seconds. The kernel density is constructed with the following code in the R package ‘TDA’.&lt;/p&gt;
+
+&lt;h4 id=&quot;sample-code&quot;&gt;Sample Code:&lt;/h4&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#Times of Bozeman runners in top 30 of Ridge Run (in seconds)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RTBOZE&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;matrix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;12909&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;13204&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;13268&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;14497&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;14964&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;15304&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;15350&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;15437&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;15751&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;15752&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;15804&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;15842&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;16754&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;16780&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;16877&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;16978&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xseq&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;12900&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;17000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;by&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Grid&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;expand.grid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xseq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;KDEBOZE&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kde&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RTBOZE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Grid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;#Kernel Density Estimator of Bozeman Runners&lt;/p&gt;
+
+&lt;p&gt;#Times of runners in top 30 of Ridge Run from outside of Bozeman (in seconds)&lt;/p&gt;
+
+&lt;p&gt;RTOTHER &amp;lt;- matrix(c(14096, 14391, 14678, 14792, 14811, 14940, 15343, 15777, 15797, 15811, 15968, 16605, 16660, 16761))&lt;/p&gt;
+
+&lt;p&gt;KDEOTHER &amp;lt;- kde(RTOTHER, Grid, h)
+```&lt;/p&gt;
+&lt;h2 id=&quot;outcome&quot;&gt;Outcome:&lt;/h2&gt;
+&lt;p&gt;While not by any means a complete picture, by considering the kernel density estimation of Bozeman runners vs. runners from outside of Bozeman in the top 30 places in the 2018 Bridger Ridge Run, we can see a slight disparity between the outcomes, which of course, favors Bozemanites.&lt;/p&gt;
+
+&lt;p&gt;//TODO: Display findings of estimation graphically, ask Dave
+// GGPLOT&lt;/p&gt;
+
+&lt;hr /&gt;
+&lt;h2 id=&quot;works-cited&quot;&gt;Works cited:&lt;/h2&gt;
+
+&lt;p&gt;Hulden, Mans, et al. “Kernel Density Estimation for Text-Based Geolocation.” AAAI Publications, Twenty-Ninth AAAI Conference on Artificial Intelligence, AAAI Conference on Artificial Intelligence, 9 Feb. 2015, www.aaai.org/ocs/index.php/AAAI/AAAI15/paper/view/10034.&lt;/p&gt;
+
+&lt;p&gt;Rhodes, Anthony, et al. “Fast On-Line Kernel Density Estimation for Active Object Localization.” ArXiv.org, Cornell University, 16 Nov. 2016, arxiv.org/abs/1611.05369.&lt;/p&gt;
+
+&lt;p&gt;Zanin, Adriano, and Ronaldo Dias. “A Review of Kernel Density Estimation with Applications to Econometrics.” ArXiv.org, Cornell University, 12 Dec. 2012, arxiv.org/abs/1212.2812.&lt;/p&gt;
+
+&lt;p&gt;All images created with Desmos online calculator&lt;/p&gt;</content><author><name>Ben Holmgren</name></author><summary type="html">Tutorial on Kernel Density Estimation</summary></entry><entry><title type="html">Rips Filtration</title><link href="https://comptag.github.io/rpackage_tutorials/2019/04/rips.html" rel="alternate" type="text/html" title="Rips Filtration" /><published>2019-04-15T00:00:00+00:00</published><updated>2019-04-15T00:00:00+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/2019/04/rips</id><content type="html" xml:base="https://comptag.github.io/rpackage_tutorials/2019/04/rips.html">&lt;h1 id=&quot;tutorial-on-rips-filtrations&quot;&gt;Tutorial on Rips Filtrations&lt;/h1&gt;
+&lt;hr /&gt;
+
+&lt;h4 id=&quot;objectives&quot;&gt;Objectives&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Gain familiarity with simplices and simplicial complexes&lt;/li&gt;
+  &lt;li&gt;Be able to conceptualize a rips filtration, and understand what a rips filtration tells us about a set of data&lt;/li&gt;
+  &lt;li&gt;Learn about a few exciting applications of the Rips filtration&lt;/li&gt;
+  &lt;li&gt;Utilize the R package TDA to conduct a rips filtration on a miniature bobcat.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+&lt;h4 id=&quot;triangle-appreciation&quot;&gt;Triangle Appreciation&lt;/h4&gt;
+&lt;p&gt;Of course we are all familiar with triangles, and to understand the Rips filtration, we must first conceptualize triangles of differing dimensions. that is triangles of increasing dimension ranging from 0 to n. (The -1nth dimensional triangle being a null value).
+&lt;img src=&quot;https://i.stack.imgur.com/O6xtg.png&quot; alt=&quot;n dimensional triangles&quot; /&gt;
+A simplex is synonymous with an n dimensional triangle, that is it is just a triangle of any dimension.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Now, consider a set of vertices, each of which being the center of a circle of some generic, fixed radius, as follows:
+&lt;img src=&quot;/assets/rips-images/vertices.svg&quot; alt=&quot;vertices&quot; /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;If we were to generate a simplex between each set of vertices whose circles intersect, we can visualize the result in this data as primarily being 1 simplices, with one 0 simplex, one 2 simplex, and one 3 simplex.
+&lt;img src=&quot;/assets/rips-images/verticesandedges.png&quot; alt=&quot;simplicial complex&quot; /&gt;
+The term for this creation is a simplicial complex, and it can actually tell us quite a lot about a set of data.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Now, visualize a similar set of data, but with circles whose radii simultaneously change over time. Every point has a circle with an equivalent radius, but the entire set of radii changes constantly over time. Features will emerge and disappear as the universal radius changes.
+&lt;img src=&quot;https://aqjaffe.github.io/VRPolygons/assets/CechFiltration.gif&quot; alt=&quot;rips gif&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Finally, the process will terminate over a data set of n points once an n - 1 dimensional simplex has been created (this is a simplex connecting all of the points).&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;We refer to the emergence of features as “births,” and the disappearance of features as “deaths” in the data set. Over time, we can trace births and deaths of features through something called a persistence diagram.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Persistence diagrams allow us to pick up on trends in data that could be of importance. We can track the lifespan of features throughout the filtration in order to separate high persistence, theoretically more important features in a data set from low persistence features, thought to be statistical noise.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Persistence diagrams simply operate with one axis dedicated to birth time and one axis dedicated to death time. As time passes, we can visualize data points who immediately die upon being born as falling along the line y = x, if y were to represent time along the death axis and x were to represent time along the birth axis. Features of higher persistence are born and remain for longer periods of time, so their points can be plotted above this line. Features that never die are plotted at time = infinity on the death axis. To visualize:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://www.researchgate.net/profile/Yasumasa_Nishiura/publication/270905875/figure/fig4/AS:669381596020788@1536604417711/From-the-definition-of-the-persistence-diagram-the-birth-scale-indicates-the-maximum.png&quot; alt=&quot;persistence diagram&quot; /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Rips filtrations are especially useful because they can indicate meaning in data without depending on a direction to consider the persistent homology of a data set.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Rips filtration as a technique certainly has benefits, however a major shortcoming of using a rips filtration is that rips filtrations can get very large very quickly.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;One pertinent example of utilizing a rips filtration as a useful tool to understand data comes in &lt;a href=&quot;https://www.sciencedirect.com/science/article/pii/S0925772112001423&quot;&gt;shape reconstruction&lt;/a&gt;; the ability to categorize matching complex shapes mathematically. This often arises in graphics and machine learning, in order for a machine to more effectively understand an nature of its surroundings. Because rips filtrations take into account the entire data set simultaneously, they are advantageous in categorizing shapes which could be rotated, since the rips filtration doesn’t favor any specific direction.&lt;/p&gt;
+
+&lt;p&gt;Because the major shortcoming of using rips filtration is its time complexity, a current important source of progress in the topological data analysis community is coming from groups attempting to approximate the rips filtration effectively with more efficient methods. One &lt;a href=&quot;http://web.cse.ohio-state.edu/~dey.8/paper/SimBa/SimBa.pdf&quot;&gt;interesting paper&lt;/a&gt; came out of Ohio State in 2016, which gives a good overview of various techniques to estimate a rips filtration and proposes a new, efficient method which retains most of the original information in a proper rips filtration.&lt;/p&gt;
+
+&lt;hr /&gt;
+&lt;h2 id=&quot;rips-filtration-in-the-r-package-tda&quot;&gt;Rips Filtration in the R Package ‘TDA’&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.rdocumentation.org/packages/TDA/versions/1.6.2/topics/kde&quot; title=&quot;kde R Documentation&quot;&gt;R package&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/kde-images/Rlogo.jpeg&quot; alt=&quot;R&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Works Cited:
+https://aqjaffe.github.io/VRPolygons/assets/CechFiltration.gif&lt;/p&gt;</content><author><name>Ben Holmgren</name></author><summary type="html">Tutorial on Rips Filtrations</summary></entry></feed>

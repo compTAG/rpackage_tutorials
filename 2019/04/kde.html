@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Kernel Density Estimation | R Package TDA Documentation</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Kernel Density Estimation" />
+<meta name="author" content="Ben Holmgren" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Tutorial on Kernel Density Estimation" />
+<meta property="og:description" content="Tutorial on Kernel Density Estimation" />
+<link rel="canonical" href="https://comptag.github.io/rpackage_tutorials/2019/04/kde.html" />
+<meta property="og:url" content="https://comptag.github.io/rpackage_tutorials/2019/04/kde.html" />
+<meta property="og:site_name" content="R Package TDA Documentation" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-04-15T00:00:00+00:00" />
+<script type="application/ld+json">
+{"description":"Tutorial on Kernel Density Estimation","mainEntityOfPage":{"@type":"WebPage","@id":"https://comptag.github.io/rpackage_tutorials/2019/04/kde.html"},"@type":"BlogPosting","url":"https://comptag.github.io/rpackage_tutorials/2019/04/kde.html","headline":"Kernel Density Estimation","dateModified":"2019-04-15T00:00:00+00:00","datePublished":"2019-04-15T00:00:00+00:00","author":{"@type":"Person","name":"Ben Holmgren"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/rpackage_tutorials/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://comptag.github.io/rpackage_tutorials/feed.xml" title="R Package TDA Documentation" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/rpackage_tutorials/">R Package TDA Documentation</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/rpackage_tutorials/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Kernel Density Estimation</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2019-04-15T00:00:00+00:00" itemprop="datePublished">Apr 15, 2019
+      </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Ben Holmgren</span></span></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h1 id="tutorial-on-kernel-density-estimation">Tutorial on Kernel Density Estimation</h1>
+
+<hr />
+<h3 id="objectives">Objectives</h3>
+<p>We want to be able to understand the questions:</p>
+<ul>
+  <li>What is a kernel? Not that of your pre popped corn, nor a high ranking military officer, the kind that’s useful when thinking about data.</li>
+  <li>How can kernels be of use to understand a set of data?</li>
+  <li>What are a few exciting applications of kernel density estimation?</li>
+  <li>Every year in Bozeman, Montana, an epic trail race kown as the Bridger Ridge Run takes place in which runners test themselves for 20 grueling miles to see who can most quickly traverse the Bridger Ridge. The citizens of Bozeman, Montana, or “Bozemanites” as they often refer to themselves, carry with them a serious level of pride in their ability to complete these sorts of challenges better than people throughout the rest of the world. As the Bridger Ridge Run has grown into a widely famous race around the country, the superiority of Bozemanites at traversing their beloved ridge is being tested like never before. By the end of this tutorial, we will use Kernel Density Estimation to decide, is there merit to the longheld Bozemanite belief of their ridge traversing superiority, or have the proud people of Bozeman been surpassed by nonlocal runners in this famous ridge traverse?</li>
+</ul>
+
+<hr />
+<h1 id="what-is-a-kernel">What is a kernel?</h1>
+<p>To begin, visualize a number line with points lying along it, as follows:</p>
+
+<hr />
+
+<p><img src="/rpackage_tutorials/assets/kde-images/kdeNumberLine.png" alt="Number Line" /></p>
+
+<hr />
+
+<p>Now, recall a Gaussian curve, the “bell curve” which portrays a normal distribution. The Gaussian curve is visualized by:
+<img src="/rpackage_tutorials/assets/kde-images/Gaussian.png" alt="Gaussian Ex" /></p>
+
+<hr />
+
+<p>With this in mind, visualize the insertion of a Gaussian curve above each point on our data set on the number line:</p>
+
+<hr />
+
+<p><img src="/rpackage_tutorials/assets/kde-images/kdeKernelsonLine.png" alt="Kernels on line" /></p>
+
+<hr />
+
+<p>We call the curves inserted above these points kernels. In this example, we’ve chosen to use Gaussian curves as kernels,
+though other implementations include:</p>
+<ul>
+  <li>Rectangular kernels</li>
+  <li>Triangular kernels</li>
+  <li>Biweight kernels</li>
+  <li>Uniform kernels</li>
+  <li>Cosine kernels</li>
+  <li>Epanechnikov kernels</li>
+</ul>
+
+<h4 id="however-for-functional-purposes-we-are-primarily-concerned-with-gaussian-and-epanechnikov-kernels-specifically-weve-seen-some-exposure-to-gaussian-kernels-and-epanechnikov-kernels-are-conceptually-quite-similar-but-are-parabolic-rather-than-normally-distributed-in-nature">However, for functional purposes we are primarily concerned with Gaussian and Epanechnikov kernels specifically. We’ve seen some exposure to Gaussian kernels, and Epanechnikov kernels are conceptually quite similar but are parabolic rather than normally distributed in nature.</h4>
+<ul>
+  <li>
+    <p>Gaussian kernels are specifically useful since they are naturally distributed. This yields a natural sort of probability in location for each data point, and when taken as a sum of all the points in a data set is actually quite effective in representing the data. A Gaussian kernel K(u) is defined to be:</p>
+
+    <h2><img src="/rpackage_tutorials/assets/kde-images/kdeGaussianformula.png" alt="Gaussian formula" /></h2>
+  </li>
+  <li>
+    <p>Epanechnikov kernels are useful in their own right, and are representative of data in a manner similar to Gaussian kernels. However, the difference in Epanechnikov kernels lies in their parabolic structure. This is useful for data in which we need to take into account areas with zero density. More formally, this is referred to as <em>compact support</em>, having a closed and bounded domain. When using Gaussian curves, there will always be a nonzero kernel value occupying the space, since Gaussian curves never reach zero. The function for an Epanechnikov kernel K(u) is defined as:</p>
+
+    <p><img src="/rpackage_tutorials/assets/kde-images/kdeEpanechnikovformula.png" alt="Epanechnikov formula" /></p>
+  </li>
+</ul>
+
+<hr />
+<p>Summing all of our Gaussian kernels together, we gain a nice visualization of the densities of the original points on the number line</p>
+
+<hr />
+
+<p><img src="/rpackage_tutorials/assets/kde-images/kdeKernelSum.png" alt="Kernel Sum" /></p>
+
+<hr />
+
+<p>Conceptually, this is the central goal of kernel density estimation. In order to understand sets of data, it is incredibly useful to project their densities in some manner above a set in order to view similarities in their values and to view data in a more probabilistic manner. Adding dimensions, for an n dimensional set of data, we find an n + 1 dimensional kernel density estimate. Thus, for a set of 2 dimensional data, we can construct a similar density visualization in R<sup>3</sup>.</p>
+
+<p>Consider the position of some occurance of data on a plane. We can visualize the density of that data positionally by different 3 dimensional plots of kernel density, each plot referring to a specific variable which we are concerned with positionally. This graph comes from a paper on geolocation, considering the densities of particular words geographically on Twitter.</p>
+
+<p><img src="/rpackage_tutorials/assets/kde-images/wordDensities.png" alt="Word Densities" /></p>
+
+<hr />
+
+<h2 id="applications-of-kde">Applications of kde</h2>
+<p>Kernel density estimation is widely applicable as a relatively intuitive, nonparametric method to model the structure of a data set. Below are just a few of countless applications kde can have when interpreting data.</p>
+<h3 id="ai">AI</h3>
+<ul>
+  <li>Image Classification: Unsurprisingly, kernel density estimation is incredibly useful when trying to categorize images. <a href="http://www.gatsby.ucl.ac.uk/~dougals/papers/cvpr-12.pdf" title="kde in image classification">“Nonparametric Kernel Density Estimators for Image Classification”</a> gives a good overview of kernel density estimators for image classification as well as proposing new, nonparametric methods to do so which improve upon existing methods.</li>
+  <li>Geolocation: Kernel density estimation is immediately applicable to any sort of map, as it is an easy way to understand the densities of a particular phenomenon in a space. One pertinent example comes with the graph included above, when considering the densities of word use on Twitter in specific regions.
+This instance brought up in <a href="https://www.aaai.org/ocs/index.php/AAAI/AAAI15/paper/view/10034" title="kde in geolocation">“Kernel Density Estimation for Text-Based Geolocation”</a> is easily extended to countless data distributed geographically.
+    <h3 id="econometrics">Econometrics</h3>
+  </li>
+  <li>Understanding the probability involved with economic data. Econometricians can utilize kde in order to understand the overall trends in economic data, in hopes to explain the root causes of economic trends. For more information, see
+<a href="https://arxiv.org/abs/1212.2812" title="kde in econometrics">“kde in econometrics”</a>.
+—
+    <h2 id="kde-in-the-r-package-tda">kde in the R package ‘TDA’</h2>
+  </li>
+</ul>
+
+<p><a href="https://www.rdocumentation.org/packages/TDA/versions/1.6.2/topics/kde" title="kde R Documentation">R package</a></p>
+
+<hr />
+<p>Kernel density estimation can be accomplished by use of the R package ‘TDA’ through the kde function. By this means, it is possible to input data and recieve an actual numerical assessment of kernel density on that data.</p>
+
+<p>The kde function considers:</p>
+<ul>
+  <li>Two input matrices, one corresponding to each point in a data set of concern, and the other corresponding to a base grid from which the matrix refers to.</li>
+  <li>A smoothing parameter in order to mitigate some level of statistical noise in the data if necessary.</li>
+  <li>The type of kernel desired- allowed to be either Gaussian or Epanechnikov</li>
+  <li>A weight parameter which allows certain data points to be weighted more or less in the kernel density, prioritizing or deprioritizing aspects of the data if useful</li>
+</ul>
+
+<p>And then returns a vector containing the value of the kernel density estimator at each point in the base grid. This provides a rough quantification of kernel density at each point in a considered space, which is very useful in order to actually use the values associated with a kernel density estimate.</p>
+
+<p><img src="/rpackage_tutorials/assets/kde-images/Rlogo.jpeg" alt="R" /></p>
+
+<h1 id="generic-example-using-points-along-the-unit-circle">Generic example using points along the unit circle:</h1>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">library</span><span class="p">(</span><span class="n">TDA</span><span class="p">)</span><span class="w">
+</span><span class="c1">#Generate Data from the unit circle</span><span class="w">
+
+</span><span class="n">n</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">300</span><span class="w">
+</span><span class="n">X</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">TDA</span><span class="o">::</span><span class="n">circleUnif</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">#Construct a grid of points over which we evaluate the function</span><span class="w">
+
+</span><span class="n">by</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.065</span><span class="w">
+</span><span class="n">Xseq</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">seq</span><span class="p">(</span><span class="m">-1.6</span><span class="p">,</span><span class="w"> </span><span class="m">1.6</span><span class="p">,</span><span class="w"> </span><span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">)</span><span class="w">
+</span><span class="n">Yseq</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">seq</span><span class="p">(</span><span class="m">-1.7</span><span class="p">,</span><span class="w"> </span><span class="m">1.7</span><span class="p">,</span><span class="w"> </span><span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">)</span><span class="w">
+</span><span class="n">Grid</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">expand.grid</span><span class="p">(</span><span class="n">Xseq</span><span class="p">,</span><span class="n">Yseq</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">#kernel density estimator</span><span class="w">
+
+</span><span class="n">h</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.3</span><span class="w">
+
+</span><span class="n">KDE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">TDA</span><span class="o">::</span><span class="n">kde</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="w"> </span><span class="n">Grid</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span></code></pre></figure>
+
+<hr />
+<h1 id="kernel-density-estimation-to-settle-the-superiority-of-bozemanites-in-the-bridger-ridge-run">Kernel Density Estimation to settle the superiority of Bozemanites in the Bridger Ridge Run:</h1>
+
+<p><img src="/rpackage_tutorials/assets/kde-images/bridgerRidge.png" alt="Bridger Run" />
+<!-- <img src="briedgerridge.png" width="700" height="656.25" /> --></p>
+
+<h2 id="the-bridger-ridge-as-seen-from-just-below-the-summit-of-naya-nuki">The Bridger Ridge, as seen from just below the summit of Naya Nuki.</h2>
+<p>To settle once and for all the Bozemanite supremacy in traversing mountain ridges, we can take a look at a kernel density estimation using the times in the 2018 <a href="https://winddrinkers.org/trailhead/races/ridge-run/" title="Ed Anacker Bridger Ridge Run">Ridge Run</a> in seconds. The kernel density is constructed with the following code in the R package ‘TDA’.</p>
+
+<h4 id="sample-code">Sample Code:</h4>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#Times of Bozeman runners in top 30 of Ridge Run (in seconds)</span><span class="w">
+</span><span class="n">RTBOZE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">matrix</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">12909</span><span class="p">,</span><span class="w"> </span><span class="m">13204</span><span class="p">,</span><span class="w"> </span><span class="m">13268</span><span class="p">,</span><span class="w"> </span><span class="m">14497</span><span class="p">,</span><span class="w"> </span><span class="m">14964</span><span class="p">,</span><span class="w"> </span><span class="m">15304</span><span class="p">,</span><span class="w"> </span><span class="m">15350</span><span class="p">,</span><span class="w"> </span><span class="m">15437</span><span class="p">,</span><span class="w"> </span><span class="m">15751</span><span class="p">,</span><span class="w"> </span><span class="m">15752</span><span class="p">,</span><span class="w"> </span><span class="m">15804</span><span class="p">,</span><span class="w"> </span><span class="m">15842</span><span class="p">,</span><span class="w"> </span><span class="m">16754</span><span class="p">,</span><span class="w"> </span><span class="m">16780</span><span class="p">,</span><span class="w"> </span><span class="m">16877</span><span class="p">,</span><span class="w"> </span><span class="m">16978</span><span class="p">))</span><span class="w">
+</span><span class="n">by</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">1</span><span class="w">
+</span><span class="n">xseq</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">seq</span><span class="p">(</span><span class="m">12900</span><span class="p">,</span><span class="w"> </span><span class="m">17000</span><span class="p">,</span><span class="w"> </span><span class="n">by</span><span class="p">)</span><span class="w">
+</span><span class="n">Grid</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">expand.grid</span><span class="p">(</span><span class="n">xseq</span><span class="p">)</span><span class="w">
+</span><span class="n">h</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">1</span><span class="w">
+
+</span><span class="n">KDEBOZE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">kde</span><span class="p">(</span><span class="n">RTBOZE</span><span class="p">,</span><span class="w"> </span><span class="n">Grid</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span></code></pre></figure>
+
+<p>#Kernel Density Estimator of Bozeman Runners</p>
+
+<p>#Times of runners in top 30 of Ridge Run from outside of Bozeman (in seconds)</p>
+
+<p>RTOTHER &lt;- matrix(c(14096, 14391, 14678, 14792, 14811, 14940, 15343, 15777, 15797, 15811, 15968, 16605, 16660, 16761))</p>
+
+<p>KDEOTHER &lt;- kde(RTOTHER, Grid, h)
+```</p>
+<h2 id="outcome">Outcome:</h2>
+<p>While not by any means a complete picture, by considering the kernel density estimation of Bozeman runners vs. runners from outside of Bozeman in the top 30 places in the 2018 Bridger Ridge Run, we can see a slight disparity between the outcomes, which of course, favors Bozemanites.</p>
+
+<p>//TODO: Display findings of estimation graphically, ask Dave
+// GGPLOT</p>
+
+<hr />
+<h2 id="works-cited">Works cited:</h2>
+
+<p>Hulden, Mans, et al. “Kernel Density Estimation for Text-Based Geolocation.” AAAI Publications, Twenty-Ninth AAAI Conference on Artificial Intelligence, AAAI Conference on Artificial Intelligence, 9 Feb. 2015, www.aaai.org/ocs/index.php/AAAI/AAAI15/paper/view/10034.</p>
+
+<p>Rhodes, Anthony, et al. “Fast On-Line Kernel Density Estimation for Active Object Localization.” ArXiv.org, Cornell University, 16 Nov. 2016, arxiv.org/abs/1611.05369.</p>
+
+<p>Zanin, Adriano, and Ronaldo Dias. “A Review of Kernel Density Estimation with Applications to Econometrics.” ArXiv.org, Cornell University, 12 Dec. 2012, arxiv.org/abs/1212.2812.</p>
+
+<p>All images created with Desmos online calculator</p>
+
+  </div><a class="u-url" href="/rpackage_tutorials/2019/04/kde.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/rpackage_tutorials/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">R Package TDA Documentation</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">R Package TDA Documentation</li><li><a class="u-email" href="mailto:benjamin.holmgren1@students.montana.edu">benjamin.holmgren1@students.montana.edu</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/benholmgren"><svg class="svg-icon"><use xlink:href="/rpackage_tutorials/assets/minima-social-icons.svg#github"></use></svg> <span class="username">benholmgren</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Various tutorials on important techniques in topological data analysis. Tutorials made with the final goal in mind to use the R package TDA in order to actually implement each technique.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.0 -->
+<title>Rips Filtration Tutorial for the R-TDA Package | R Package TDA Documentation</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Rips Filtration Tutorial for the R-TDA Package" />
+<meta name="author" content="Robin Belton and Ben Holmgren" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Various tutorials on important techniques in topological data analysis. Tutorials made with the final goal in mind to use the R package TDA in order to actually implement each technique." />
+<meta property="og:description" content="Various tutorials on important techniques in topological data analysis. Tutorials made with the final goal in mind to use the R package TDA in order to actually implement each technique." />
+<link rel="canonical" href="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html" />
+<meta property="og:url" content="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html" />
+<meta property="og:site_name" content="R Package TDA Documentation" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-07-22T00:00:00+00:00" />
+<script type="application/ld+json">
+{"description":"Various tutorials on important techniques in topological data analysis. Tutorials made with the final goal in mind to use the R package TDA in order to actually implement each technique.","mainEntityOfPage":{"@type":"WebPage","@id":"https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html"},"@type":"BlogPosting","url":"https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html","headline":"Rips Filtration Tutorial for the R-TDA Package","dateModified":"2019-07-22T00:00:00+00:00","datePublished":"2019-07-22T00:00:00+00:00","author":{"@type":"Person","name":"Robin Belton and Ben Holmgren"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/rpackage_tutorials/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://comptag.github.io/rpackage_tutorials/feed.xml" title="R Package TDA Documentation" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/rpackage_tutorials/">R Package TDA Documentation</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/rpackage_tutorials/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Rips Filtration Tutorial for the R-TDA Package</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2019-07-22T00:00:00+00:00" itemprop="datePublished">Jul 22, 2019
+      </time>• <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Robin Belton and Ben Holmgren</span></span></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sidebar/3.3.2/jquery.sidebar.min.js"></script>
+
+<h1 id="introduction">Introduction</h1>
+<p>Our ultimate goal is to understand Persistent Homology and be able to compute Persistence
+Diagrams using the R-TDA package. In order to get there, we must first understand filtrations.
+In this tutorial, we will work with the Vietoris Rips Filtration, or Rips Filtration for short.
+Suppose we are given a finite set of points in <script type="math/tex">\mathbb{R}^n</script> denoted by <script type="math/tex">S</script>. The set of points,
+<script type="math/tex">S</script>, is topologically uninteresting. How can we make <script type="math/tex">S</script> topologically interesting? Yes, you
+guessed it - we can construct a Rips complex from the points in <script type="math/tex">S</script>!  The Rips Filtration is a
+specific nested sequence of Rips Complexes over <script type="math/tex">S</script> that can be later used to compute Persistent
+Homology.</p>
+
+<h1 id="objectives">Objectives</h1>
+<p><strong>TODO: Make objectives stronger.</strong></p>
+
+<ul>
+  <li>Gain familiarity on $n$-simplices and simplicial complexes.</li>
+  <li>Be able to construct a Rips Complex and Rips Filtration from a finite set of points in
+<script type="math/tex">\mathbb{R}^n</script>.</li>
+  <li>Learn a few exciting applications of the Rips Filtration.</li>
+  <li>Compute a Rips Filtration from a finite set of points in <script type="math/tex">\mathbb{R}^n</script> using the R-TDA package.</li>
+</ul>
+
+<h1 id="theory">Theory</h1>
+
+<p>First we breifly describe the mathematical foundations behind a Rips Filtration including
+simplicial complexes, filtrations, and the Rips complex.</p>
+
+<h3 id="triangle-appreciation">Triangle Appreciation</h3>
+
+<p>We construct a Rips Complex from simplices of varying dimensions which are dimensional
+generalizations of triangles. More specifically, an <em><script type="math/tex">n</script>-simplex</em> is the convex hull of <script type="math/tex">n+1</script>
+affinely independent points.</p>
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/simplices.svg" type="image/svg+xml" />
+</center>
+
+<p>A simplicial complex is a nice way of combining simplices. In particular, a <em>simplicial complex</em>
+is a finite collection of simplices, <script type="math/tex">K</script>, such that (1) if <script type="math/tex">\sigma \in K</script> and <script type="math/tex">\tau\leq \sigma</script>,
+then <script type="math/tex">\tau \in K</script>, and (2) if <script type="math/tex">\sigma, \sigma'\in K</script>, then <script type="math/tex">\sigma\cap \sigma'</script> is either empty
+or a face of both.</p>
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/simplicialcomplex.svg" type="image/svg+xml" />
+</center>
+
+<h3 id="rips-complex">Rips Complex</h3>
+
+<p>Now we explain how to construct a Rips complex from a finite set of points. Let <script type="math/tex">S</script> be finite set
+of points in <script type="math/tex">\mathbb{R}^n</script>. Let <script type="math/tex">r\geq 0</script>. The Rips complex of <script type="math/tex">S</script> and <script type="math/tex">r</script> is the abstract
+simplicial complex of <script type="math/tex">\text{VR}(r)</script>, which consists of all subsets of diameter at most <script type="math/tex">r</script>:</p>
+
+<script type="math/tex; mode=display">\text{VR}(r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}.</script>
+
+<p><strong>TODO: Add definitions of ASC and faces, Change VR(r) to VR(S,r).</strong></p>
+
+<p>Geometrically, this means we consider balls of radius, <script type="math/tex">\frac{r}{2}</script>, centered at each point in
+<script type="math/tex">S</script>. Whenever $d$ balls have pairwise intersections, we add a <script type="math/tex">d-1</script> simplex. For this tutorial,
+we will use the standard Euclidan distance (unless stated otherwise) to compute a Rips complex. However, one could use any metric.</p>
+
+<p><strong>Note:</strong> Many people also define <script type="math/tex">\text{VR}(r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}</script>.
+However, the algorithms used in the R-TDA package use the first definition.</p>
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/ripscomplex.svg" type="image/svg+xml" />
+</center>
+
+<h3 id="filtrations">Filtrations</h3>
+
+<p>A <em>filtration</em> of a simplicial complex, <script type="math/tex">K</script>, is a nested sequence of subcomplexes starting at the
+empty set and ending with the full simplicial complex i.e.,</p>
+
+<script type="math/tex; mode=display">\emptyset \subset K_1 \subset K_2 \subset ... \subset K.</script>
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/bobcat.svg" type="image/svg+xml" />
+</center>
+
+<p>Going back to the Rips complex, we consider <script type="math/tex">r</script> to be a free parameter. If we vary <script type="math/tex">r</script>, we get
+different Rips complexes. There is often not a best choice for <script type="math/tex">r</script>, so why not look at all of
+them!? Observe if we increase <script type="math/tex">r</script>, then we get a family of nested Rips complexes which gives rise
+to the <em>Rips filtration</em>.</p>
+
+<p>Let’s work through an example. Let <script type="math/tex">S:=\{(0,0),(1,0),(0,2),(1,2),(3,1)\}\subset \mathbb{R}^2</script>. We
+want to compute a Rips filtration on <script type="math/tex">S</script> for all <script type="math/tex">r\geq 0</script>. Observe:</p>
+
+<ul>
+  <li>when <script type="math/tex">r=1</script>, the balls of radius <script type="math/tex">\frac{1}{2}</script> centered at <script type="math/tex">(0,0)</script> and <script type="math/tex">(1,0)</script> intersect which
+means we add a 1-simplex between <script type="math/tex">(0,0)</script> and <script type="math/tex">(1,0)</script>. Similarly, we add a 1-simplex between
+<script type="math/tex">(0,2)</script> and <script type="math/tex">(1,2)</script>.</li>
+  <li>when <script type="math/tex">r=2</script>, we add a two more 1-simplices between <script type="math/tex">(0,0), (0,2)</script>, and <script type="math/tex">(1,2), (1,0)</script>.</li>
+  <li>when <script type="math/tex">r=\sqrt{5}</script>, we add a 3-simplex and a 2-simplex.</li>
+  <li>when <script type="math/tex">r=\sqrt{10}</script>, we add a 4-simplex.</li>
+</ul>
+
+<p>Here is an illustration of the Rips filtration on <script type="math/tex">S</script>.</p>
+
+<p><img src="/rpackage_tutorials/figure/source/tda-rips-tutorial/2019-07-24-tda-rips-tutorial/ripsfilt2-1.png" style="display: block; margin: auto;" /></p>
+
+<h1 id="applications-of-rips-complexes-and-filtrations">Applications of Rips Complexes and Filtrations</h1>
+
+<p>Now that we have discussed the theory, let’s talk about some of the applications! A Rips
+filtration is used on point cloud data. A common form of these types of data are location data.
+For example:</p>
+
+<ul>
+  <li>Galaxy Data which provides coordinates of stars in different galaxies</li>
+  <li>GPS coordinates of Airports on Earth</li>
+</ul>
+
+<p>The Rips complex provides information on how close the data points are to each other. The
+topological information given by taking a Rips filtration can be studied using Persistent
+Homology (see next tutorial) which is often used to analyze these types of data.</p>
+
+<p>Furthermore, Rips complexes are used in shape reconstruction. They are nice to use since these
+complexes do not favor a specific type of alignment of the input. <strong>TODO: Add citation to Attali paper.</strong></p>
+
+<p><strong>Maybe add fractal dimension?</strong></p>
+
+<p>These are just a few of the applications. There are many more!</p>
+
+<h1 id="computing-the-rips-filtration-using-the-r-tda-package">Computing the Rips Filtration using the R-TDA Package</h1>
+
+<h3 id="toy-example">Toy Example</h3>
+<p>First, let’s go back to the example where <script type="math/tex">S:=\{(0,0),(1,0),(0,2),(1,2),(3,1)\}</script>. We will compute the Rips filtration using the R-TDA package.</p>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">library</span><span class="p">(</span><span class="n">TDA</span><span class="p">)</span><span class="w"> </span><span class="c1"># upload TDA package</span><span class="w">
+
+</span><span class="n">S</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">cbind</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">3</span><span class="p">),</span><span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">0</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">1</span><span class="p">))</span><span class="w"> </span><span class="c1"># write S into R</span><span class="w">
+
+</span><span class="n">r</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="c1"># limit of the filtration</span><span class="w">
+
+</span><span class="n">maxdimension</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="c1"># components , loops, and voids</span><span class="w">
+
+</span><span class="n">S_RipsFilt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ripsFiltration</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">maxdimension</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"euclidean"</span><span class="p">)</span></code></pre></figure>
+
+<p>Great! So how do we interpret the output?</p>
+
+<p>The ripsFiltration function returns a list with a complex list, filtration values vector, a logical variable that states whether or not the values are in increasing order, and a matrix of the coordinates of the vertices if the Euclidean distance is used. The <script type="math/tex">i^{th}</script> element of the complex are the vertices of the <script type="math/tex">i^{th}</script> simplex. Additionally, the $i^{th}$ entry of the filtration values is the filtration value for when the <script type="math/tex">i^{th}</script> simplex appears. See <strong>TODO: reference CRAN documentation.</strong> Let’s check this out.</p>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">S_RipsFilt</span><span class="o">$</span><span class="n">cmplx</span><span class="p">[[</span><span class="m">16</span><span class="p">]]</span><span class="w"> </span><span class="c1">#Access vertices for the 16th simplex in the list</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">## [1] 4 3 2 1</code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">S_RipsFilt</span><span class="o">$</span><span class="n">values</span><span class="p">[</span><span class="m">16</span><span class="p">]</span><span class="w"> </span><span class="c1">#Access filtration value for the 16th simplex in the list</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">## [1] 2.236068</code></pre></figure>
+
+<p>Our output tells us that we add a 3-simplex when <script type="math/tex">r=\sqrt{5}</script>. This is exactly what we found
+when we worked through this example by hand. Accessing the other complex and filtration value elements will help us verify the rest of the filtration computation we did earlier.</p>
+
+<p>If we want to visualize the Rips complex when <script type="math/tex">r = 2</script>, we can run the following code.</p>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1"># Plot Rips Complex when r=2.</span><span class="w">
+
+</span><span class="n">r</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="c1"># limit of the filtration</span><span class="w">
+</span><span class="n">maxdimension</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="c1"># allow components, loops, and voids</span><span class="w">
+
+</span><span class="n">S_RipsFilt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ripsFiltration</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">maxdimension</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"euclidean"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">lim</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">rep</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">-1</span><span class="p">,</span><span class="w"> </span><span class="m">4</span><span class="p">),</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="w">
+</span><span class="n">plot</span><span class="p">(</span><span class="kc">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"n"</span><span class="p">,</span><span class="w"> </span><span class="n">xlim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lim</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">],</span><span class="w"> </span><span class="n">ylim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lim</span><span class="p">[</span><span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="p">],</span><span class="w">
+     </span><span class="n">main</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Rips Complex for r = 2"</span><span class="p">,</span><span class="w"> </span><span class="n">xlab</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="n">ylab</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">""</span><span class="p">)</span><span class="w">
+</span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">seq</span><span class="p">(</span><span class="n">along</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">S_RipsFilt</span><span class="p">[[</span><span class="s2">"cmplx"</span><span class="p">]]))</span><span class="w"> </span><span class="p">{</span><span class="w">
+  </span><span class="n">polygon</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">S_RipsFilt</span><span class="p">[[</span><span class="s2">"cmplx"</span><span class="p">]][[</span><span class="n">idx</span><span class="p">]],</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">drop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">],</span><span class="w">
+          </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"pink"</span><span class="p">,</span><span class="w"> </span><span class="n">border</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">NA</span><span class="p">,</span><span class="w"> </span><span class="n">xlim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lim</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">],</span><span class="w"> </span><span class="n">ylim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lim</span><span class="p">[</span><span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="p">])</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">seq</span><span class="p">(</span><span class="n">along</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">S_RipsFilt</span><span class="p">[[</span><span class="s2">"cmplx"</span><span class="p">]]))</span><span class="w"> </span><span class="p">{</span><span class="w">
+  </span><span class="n">polygon</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">S_RipsFilt</span><span class="p">[[</span><span class="s2">"cmplx"</span><span class="p">]][[</span><span class="n">idx</span><span class="p">]],</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">drop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">],</span><span class="w">
+          </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">xlim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lim</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">],</span><span class="w"> </span><span class="n">ylim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lim</span><span class="p">[</span><span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="p">])</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="n">points</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">pch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">16</span><span class="p">)</span></code></pre></figure>
+
+<p><img src="/rpackage_tutorials/figure/source/tda-rips-tutorial/2019-07-24-tda-rips-tutorial/visualization-1.png" alt="plot of chunk visualization" /></p>
+
+<h3 id="non-euclidean-distance-example">Non Euclidean Distance Example</h3>
+<p>Now we will compute a Rips filtration on $S$, but this time using the <strong>TODO</strong> distance.</p>
+
+<h3 id="providence-coffee-shops-location-data">Providence Coffee Shops Location Data</h3>
+<p>Lastly, we will work through an example with real data!</p>
+
+<h1 id="references">References</h1>
+
+<ol class="bibliography"></ol>
+
+
+  </div><a class="u-url" href="/rpackage_tutorials/2019/07/tda-rips-tutorial.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/rpackage_tutorials/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">R Package TDA Documentation</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">R Package TDA Documentation</li><li><a class="u-email" href="mailto:benjamin.holmgren1@students.montana.edu">benjamin.holmgren1@students.montana.edu</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/benholmgren"><svg class="svg-icon"><use xlink:href="/rpackage_tutorials/assets/minima-social-icons.svg#github"></use></svg> <span class="username">benholmgren</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Various tutorials on important techniques in topological data analysis. Tutorials made with the final goal in mind to use the R package TDA in order to actually implement each technique.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
