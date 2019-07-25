@@ -13,3 +13,12 @@ serve_blog <- function (input = c(".", list.dirs("_source")), output = c(".",
                   command = command, ...)
 }
 
+use_package <- function(p) {
+  if (!is.element(as.character(p), installed.packages()[, 1]))
+    install.packages(p, dep = TRUE)
+library(p, character.only = TRUE)
+}
+
+use_package('TDA')
+use_package('servr')
+
