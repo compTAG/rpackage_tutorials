@@ -19,15 +19,20 @@ description: >- # this means to ignore newlines until "baseurl:"
   Various tutorials on important techniques in topological data analysis.
   Tutorials made with the final goal in mind to use the R package TDA in
   order to actually implement each technique.
-baseurl: /rpackage_tutorials
+baseurl: /rpackage_tutorials/
 url: https://comptag.github.io
 github_username:  benholmgren
+permalink: /:year/:month/:title.html
 
 # Build settings
 markdown: kramdown
 theme: minima
+urlimg: /images/
 plugins:
   - jekyll-feed
+
+# scholar:
+#   style: mla
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list

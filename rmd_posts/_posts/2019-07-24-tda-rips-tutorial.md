@@ -1,0 +1,149 @@
+---
+layout: post
+title: "Rips Filtration Tutorial for the R-TDA Package"
+author: "Robin Belton and Ben Holmgren"
+date: "July 22, 2019"
+---
+
+{% include lib/mathjax.html %}
+
+
+
+Introduction
+============
+Our ultimate goal is to understand Persistent Homology and be able to compute Persistence
+Diagrams using the R-TDA package. In order to get there, we must first understand filtrations.
+In this tutorial, we will work with the Vietoris Rips Filtration, or Rips Filtration for short.
+Suppose we are given a finite set of points in $$\mathbb{R}^n$$ denoted by $$S$$. The set of points,
+$$S$$, is topologically uninteresting. How can we make $$S$$ topologically interesting? Yes, you
+guessed it - we can construct a Rips complex from the points in $$S$$!  The Rips Filtration is a
+specific nested sequence of Rips Complexes over $$S$$ that can be later used to compute Persistent
+Homology.
+
+Objectives
+==========
+**Make objectives stronger.**
+
+* Gain familiarity on $$n$$-simplices and simplicial complexes.
+* Be able to construct a Rips Complex and Rips Filtration from a finite set of points in
+$$\mathbb{R}^n$$.
+* Learn a few exciting applications of the Rips Filtration.
+* Compute a Rips Filtration from a finite set of points in $$\mathbb{R}^n$$ using the R-TDA package.
+
+Theory
+======
+
+First we breifly describe the mathematical foundations behind a Rips Filtration including
+simplicial complexes, filtrations, and the Rips complex.
+
+### Triangle Appreciation
+
+We construct a Rips Complex from simplices of varying dimensions which are dimensional
+generalizations of triangles. More specifically, an *$$n$$-simplex* is the convex hull of $$n+1$$
+affinely independent points.
+
+<img src="/rpackage_tutorials/figure/source/tda-rips-tutorial/2019-07-24-tda-rips-tutorial/simplices_plot-1.png" title="plot of chunk simplices_plot" alt="plot of chunk simplices_plot" style="display: block; margin: auto;" />
+
+A simplicial complex is a nice way of combining simplices. In particular, a *simplicial complex*
+is a finite collection of simplices, $$K$$, such that (1) if $$\sigma \in K$$ and $$\tau\leq \sigma$$,
+then $$\tau \in K$$, and (2) if $$\sigma, \sigma'\in K$$, then $$\sigma\cap \sigma'$$ is either empty
+or a face of both.
+
+<img src="/rpackage_tutorials/figure/source/tda-rips-tutorial/2019-07-24-tda-rips-tutorial/simplicialcomplex-1.png" title="plot of chunk simplicialcomplex" alt="plot of chunk simplicialcomplex" style="display: block; margin: auto;" />
+
+### Rips Complex
+
+Now we explain how to construct a Rips complex from a finite set of points. Let $$S$$ be finite set
+of points in $$\mathbb{R}^n$$. Let $$r\geq 0$$. The Rips complex of $$S$$ and $$r$$ is the abstract
+simplicial complex of $$\text{VR}(r)$$, which consists of all subsets of diameter at most $$r$$:
+
+$$ \text{VR}(S, r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}. $$
+
+**TODO: Add definitions of ASC and faces.**
+
+Geometrically, this means we consider balls of radius, $$\frac{r}{2}$$, centered at each point in
+$$S$$. Whenever $d$ balls have pairwise intersections, we add a $$d-1$$ simplex. For this tutorial,
+we will use the standard Euclidan distance to compute a Rips complex. However, one could use any
+metric.
+
+**Note:** Many people also define $$\text{VR}(r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}$$.
+However, the algorithms used in the R-TDA package use the first definition.
+
+<img src="/rpackage_tutorials/figure/source/tda-rips-tutorial/2019-07-24-tda-rips-tutorial/ripscomplex-1.png" title="plot of chunk ripscomplex" alt="plot of chunk ripscomplex" style="display: block; margin: auto;" />
+
+### Filtrations
+
+A *filtration* of a simplicial complex, $$K$$, is a nested sequence of subcomplexes starting at the
+empty set and ending with the full simplicial complex i.e.,
+
+$$\emptyset \subset K_1 \subset K_2 \subset ... \subset K.$$
+
+
+<img src="/rpackage_tutorials/figure/source/tda-rips-tutorial/2019-07-24-tda-rips-tutorial/bobcat-1.png" title="plot of chunk bobcat" alt="plot of chunk bobcat" style="display: block; margin: auto;" />
+
+Going back to the Rips complex, we consider $$r$$ to be a free parameter. If we vary $$r$$, we get
+different Rips complexes. There is often not a best choice for $$r$$, so why not look at all of
+them!? Observe if we increase $$r$$, then we get a family of nested Rips complexes which gives rise
+to the *Rips filtration*.
+
+Let's work through an example. Let $$S:=\{(0,0),(1,0),(0,2),(1,2),(3,1)\}\subset \mathbb{R}^2$$. We
+want to compute a Rips filtration on $$S$$ for all $$r\geq 0$$. Observe:
+
+* when $$r=1$$, the balls of radius $$\frac{1}{2}$$ centered at $$(0,0)$$ and $$(1,0)$$ intersect which
+means we add a 1-simplex between $$(0,0)$$ and $$(1,0)$$. Similarly, we add a 1-simplex between
+$$(0,2)$$ and $$(1,2)$$.
+* when $$r=2$$, we add a two more 1-simplices between $$(0,0), (0,2)$$, and $$(1,2), (1,0)$$.
+* when $$r=\sqrt{5}$$, we add a 3-simplex and a 2-simplex.
+* when $$r=\sqrt{10}$$, we add a 4-simplex. **How to draw this? Or should I change the example to four points?**
+
+Here is an illustration of the Rips filtration on $$S$$.
+
+<img src="/rpackage_tutorials/figure/source/tda-rips-tutorial/2019-07-24-tda-rips-tutorial/ripsfilt2-1.png" title="plot of chunk ripsfilt2" alt="plot of chunk ripsfilt2" style="display: block; margin: auto;" />
+
+Applications of Rips Complexes and Filtrations
+==============================================
+
+Now that we have discussed the theory, let's talk about some of the applications! A Rips
+filtration is used on point cloud data. A common form of these types of data are location data.
+For example:
+
+* Galaxy Data which provides coordinates of stars in different galaxies
+* GPS coordinates of Airports on Earth
+* GPS coordinates of crimes in the United States
+
+The Rips complex provides information on how close the data points are to each other. The
+topological information given by taking a Rips filtration can be studied using Persistent
+Homology (see next tutorial) which is often used to analyze these types of data.
+
+Furthermore, Rips complexes are used in shape reconstruction. They are nice to use since these
+complexes do not favor a specific type of alignment of the input. **TODO: Add citation to Attali paper**
+
+**Maybe fractal dimension?**
+
+These are just a few of the applications. There are many more!
+
+Computing the Rips Filtration using the R-TDA Package
+=====================================================
+
+### Toy Example
+First, let's go back to the example where $$S:=\{(0,0),(1,0),(0,2),(1,2),(3,1)\}$$. We will compute the Rips filtration using the R-TDA package.
+
+
+{% highlight r %}
+library(TDA) # upload TDA package
+
+S <- cbind(c(0,1,0,1,3),c(0,0,2,2,1)) # write S into R
+
+maxscale <- 5 # limit of the filtration
+
+maxdimension <- 2 # components , loops, and voids
+
+S_RipsFilt <- ripsFiltration(S, maxdimension, maxscale, dist = "euclidean", printProgress = FALSE)
+{% endhighlight %}
+
+**TODO: Add example with a "weird" distance**
+
+### Providence Coffee Shop Location Data
+Lastly, we will work through an example with real data!
+
+
