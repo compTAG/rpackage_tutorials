@@ -45,17 +45,17 @@ Introduction
 Our ultimate goal is to understand Persistent Homology and be able to compute Persistence
 Diagrams using the R-TDA package. In order to get there, we must first understand filtrations.
 In this tutorial, we will work with the Vietoris Rips Filtration, or Rips Filtration for short.
-Suppose we are given a finite set of points in $$\mathbb{R}^n$$ denoted by $$S$$. The set of points,
-$$S$$, is topologically uninteresting. How can we make $$S$$ topologically interesting? Yes, you
-guessed it - we can construct a Rips complex from the points in $$S$$!  The Rips Filtration is a
-specific nested sequence of Rips Complexes over $$S$$ that can be later used to compute Persistent
-Homology.
+Suppose we are given a finite set of points in $$\mathbb{R}^n$$ denoted by $$S$$. The set of
+points, $$S$$, is topologically uninteresting. How can we make $$S$$ topologically interesting?
+Yes, you guessed it - we can construct a Rips complex from the points in $$S$$!  The Rips
+Filtration is a specific nested sequence of Rips Complexes over $$S$$ that can be later used to
+compute Persistent Homology.
 
 Objectives
 ==========
 **TODO: Make objectives stronger.**
 
-* Gain familiarity on $n$-simplices and simplicial complexes.
+* Gain familiarity on $$n$$-simplices and simplicial complexes.
 * Be able to construct a Rips Complex and Rips Filtration from a finite set of points in
 $$\mathbb{R}^n$$.
 * Learn a few exciting applications of the Rips Filtration.
@@ -101,8 +101,9 @@ $$ \text{VR}(S, r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}. $$
 
 
 Geometrically, this means we consider balls of radius, $$\frac{r}{2}$$, centered at each point in
-$$S$$. Whenever $$d$$ balls have pairwise intersections, we add a $$d-1$$ simplex. For this tutorial,
-we will use the standard Euclidan distance (unless stated otherwise) to compute a Rips complex. However, one could use any metric.
+$$S$$. Whenever $$d$$ balls have pairwise intersections, we add a $$d-1$$ simplex. For this
+tutorial, we will use the standard Euclidan distance (unless stated otherwise) to compute a Rips
+complex. However, one could use any metric.
 
 **Note:** Many people also define $$\text{VR}(S, r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}$$.
 However, the algorithms used in the R-TDA package use the first definition.
@@ -217,7 +218,7 @@ plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
      main = "Rips Complex for r = sqrt(13)", xlab = "", ylab = "")
 for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
   polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
-          col = "pink", border = NA, xlim = lim[1:2], ylim = lim[3:4])
+          col = "gray", border = NA, xlim = lim[1:2], ylim = lim[3:4])
 }
 for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
   polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
@@ -240,7 +241,7 @@ plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
      main = "Rips Complex for r = sqrt(13)", xlab = "", ylab = "")
 for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
   polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
-          col = "pink", border = NA, xlim = lim[1:2], ylim = lim[3:4])
+          col = "gray", border = NA, xlim = lim[1:2], ylim = lim[3:4])
 }
 for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
   polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
@@ -259,9 +260,6 @@ Now we will compute a Rips filtration on $$S$$, but this time using the Manhatta
 the Manhattan distance, $$d_M(\textbf{x},\textbf{y})$$ is defined as:
 
 $$d_M(\textbf{x},\textbf{y}):=\sum_{i=1}^{n}|x_i-y_i|.$$
-
-In order to compute the Rips filtration on $$S$$ for this metric, we need to create a distance
-matrix in R. We can do this using the following code. 
 
 In order to compute the Rips filtration on $$S$$ for this metric, we need to create a distance
 matrix in R. We can do this using the following code. 
@@ -297,12 +295,12 @@ lim <- rep(c(-1, 3), 2)
 svg('../../assets/tda-rips/visualization2.svg')
 plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
      main = "Rips Complex with Manhattan Distance for r = sqrt(13)", xlab = "", ylab = "")
-for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
-  polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
-          col = "pink", border = NA, xlim = lim[1:2], ylim = lim[3:4])
+for (idx in seq(along = S_RipsFilt_Manhattan[["cmplx"]])) {
+  polygon(S[S_RipsFilt_Manhattan[["cmplx"]][[idx]], , drop = FALSE],
+          col = "gray", border = NA, xlim = lim[1:2], ylim = lim[3:4])
 }
-for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
-  polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
+for (idx in seq(along = S_RipsFilt_Manhattan[["cmplx"]])) {
+  polygon(S[S_RipsFilt_Manhattan[["cmplx"]][[idx]], , drop = FALSE],
           col = NULL, xlim = lim[1:2], ylim = lim[3:4])
 }
 points(S, pch = 16)
