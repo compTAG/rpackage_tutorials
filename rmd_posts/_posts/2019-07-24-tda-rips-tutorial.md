@@ -6,7 +6,6 @@ date: "July 22, 2019"
 ---
 
 {% include lib/mathjax.html %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sidebar/3.3.2/jquery.sidebar.min.js"></script>
 
 
 
@@ -46,33 +45,37 @@ generalizations of triangles. More specifically, an *$$n$$-simplex* is the conve
 affinely independent points.
 
 <center>
-<embed width="80%" src="../../assets/tda-rips/simplices.svg" type="image/svg+xml" />
+<embed width="70%" src="../../assets/tda-rips/simplices.svg" type="image/svg+xml" />
 </center>
 
 A simplicial complex is a nice way of combining simplices. In particular, a *simplicial complex*
-is a finite collection of simplices, $$K$$, such that (1) if $$\sigma \in K$$ and $$\tau\leq \sigma$$,
-then $$\tau \in K$$, and (2) if $$\sigma, \sigma'\in K$$, then $$\sigma\cap \sigma'$$ is either empty
-or a face of both.
+is a finite collection of simplices, $$K$$, such that (1) if $$\sigma \in K$$ and $$\tau\leq \sigma$$, then $$\tau \in K$$, and (2) if $$\sigma, \sigma'\in K$$, then $$\sigma\cap \sigma'$$ is either empty or a face of both. A *face* of a simplex is the convex hull of a subset of the 
+vertices in the simplex.
 
 <center>
-<embed width="80%" src="../../assets/tda-rips/simplicialcomplex.svg" type="image/svg+xml" />
+<embed width="40%" src="../../assets/tda-rips/simplicialcomplex.svg" type="image/svg+xml" />
 </center>
 
 ### Rips Complex
 
-Now we explain how to construct a Rips complex from a finite set of points. Let $$S$$ be finite set
-of points in $$\mathbb{R}^n$$. Let $$r\geq 0$$. The Rips complex of $$S$$ and $$r$$ is the abstract
-simplicial complex of $$\text{VR}(r)$$, which consists of all subsets of diameter at most $$r$$:
+Now we explain how to construct a Rips complex from a finite set of points, but first we must
+start with some preliminary definitions. The *diameter* of a set of points is the maximum distance between any two points in the set. An *abstract simplicial complex* is a finite collection of sets, $$A$$, such that if $$a\in A$$ and $$b\subset a$$ implies $$b\in A$$. The elements $$a\in A$$ are the simplices where dim$$(a)=$$card$$(a)-1$$. 
 
-$$ \text{VR}(r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}. $$
+<center>
+<embed width="80%" src="../../assets/tda-rips/asc.svg" type="image/svg+xml" />
+</center>
 
-**TODO: Add definitions of ASC and faces, Change VR(r) to VR(S,r).**
+
+Let $$S$$ be finite set of points in $$\mathbb{R}^n$$. Let $$r\geq 0$$. The Rips complex of $$S$$ and $$r$$ is the abstract simplicial complex of $$\text{VR}(S, r)$$, which consists of all subsets of diameter at most $$r$$:
+
+$$ \text{VR}(S, r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}. $$
+
 
 Geometrically, this means we consider balls of radius, $$\frac{r}{2}$$, centered at each point in
-$$S$$. Whenever $d$ balls have pairwise intersections, we add a $$d-1$$ simplex. For this tutorial,
+$$S$$. Whenever $$d$$ balls have pairwise intersections, we add a $$d-1$$ simplex. For this tutorial,
 we will use the standard Euclidan distance (unless stated otherwise) to compute a Rips complex. However, one could use any metric.
 
-**Note:** Many people also define $$\text{VR}(r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}$$.
+**Note:** Many people also define $$\text{VR}(S, r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}$$.
 However, the algorithms used in the R-TDA package use the first definition.
 
 <center>
@@ -108,7 +111,10 @@ $$(0,2)$$ and $$(1,2)$$.
 
 Here is an illustration of the Rips filtration on $$S$$.
 
-<img src="/rpackage_tutorials/figure/source/tda-rips-tutorial/2019-07-24-tda-rips-tutorial/ripsfilt2-1.png" style="display: block; margin: auto;" />
+<center>
+<embed width="90%" src="../../assets/tda-rips/ripsfilt.svg" type="image/svg+xml" />
+</center>
+
 
 Applications of Rips Complexes and Filtrations
 ==============================================
@@ -183,6 +189,7 @@ when we worked through this example by hand. Accessing the other complex and fil
 If we want to visualize the Rips complex when $$r = 2$$, we can run the following code.
 
 
+
 {% highlight r %}
 # Plot Rips Complex when r=2.
 
@@ -205,7 +212,10 @@ for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
 points(S, pch = 16)
 {% endhighlight %}
 
-![plot of chunk visualization](/rpackage_tutorials/figure/source/tda-rips-tutorial/2019-07-24-tda-rips-tutorial/visualization-1.png)
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/visualization.svg" type="image/svg+xml" />
+</center>
 
 ### Non Euclidean Distance Example
 Now we will compute a Rips filtration on $S$, but this time using the **TODO** distance.
