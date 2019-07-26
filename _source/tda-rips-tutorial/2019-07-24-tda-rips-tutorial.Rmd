@@ -6,7 +6,6 @@ date: "July 22, 2019"
 ---
 
 {% include lib/mathjax.html %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sidebar/3.3.2/jquery.sidebar.min.js"></script>
 
 
 ```{r pkgs, echo = FALSE, message = FALSE}
@@ -16,7 +15,7 @@ date: "July 22, 2019"
 # Set CRAN location for installing packages
 ############################################
 r <- getOption("repos")
-r["CRAN"] <- "http://cran.us.r-project.org"
+r["CRAN"] <- "http://cran.wustl.edu"
 options(repos = r)
 rm(r)
 
@@ -37,7 +36,7 @@ library(grid)
 use_package('png') # For importing pngs
 use_package('gridExtra') # For grid arrange
 use_package('grImport2') # For importing svg graphics
-use_package('magick')
+use_package('TDA')
 ```
 
 
@@ -75,33 +74,37 @@ generalizations of triangles. More specifically, an *$$n$$-simplex* is the conve
 affinely independent points.
 
 <center>
-<embed width="80%" src="../../assets/tda-rips/simplices.svg" type="image/svg+xml" />
+<embed width="70%" src="../../assets/tda-rips/simplices.svg" type="image/svg+xml" />
 </center>
 
 A simplicial complex is a nice way of combining simplices. In particular, a *simplicial complex*
-is a finite collection of simplices, $$K$$, such that (1) if $$\sigma \in K$$ and $$\tau\leq \sigma$$,
-then $$\tau \in K$$, and (2) if $$\sigma, \sigma'\in K$$, then $$\sigma\cap \sigma'$$ is either empty
-or a face of both.
+is a finite collection of simplices, $$K$$, such that (1) if $$\sigma \in K$$ and $$\tau\leq \sigma$$, then $$\tau \in K$$, and (2) if $$\sigma, \sigma'\in K$$, then $$\sigma\cap \sigma'$$ is either empty or a face of both. A *face* of a simplex is the convex hull of a subset of the 
+vertices in the simplex.
 
 <center>
-<embed width="80%" src="../../assets/tda-rips/simplicialcomplex.svg" type="image/svg+xml" />
+<embed width="40%" src="../../assets/tda-rips/simplicialcomplex.svg" type="image/svg+xml" />
 </center>
 
 ### Rips Complex
 
-Now we explain how to construct a Rips complex from a finite set of points. Let $$S$$ be finite set
-of points in $$\mathbb{R}^n$$. Let $$r\geq 0$$. The Rips complex of $$S$$ and $$r$$ is the abstract
-simplicial complex of $$\text{VR}(r)$$, which consists of all subsets of diameter at most $$r$$:
+Now we explain how to construct a Rips complex from a finite set of points, but first we must
+start with some preliminary definitions. The *diameter* of a set of points is the maximum distance between any two points in the set. An *abstract simplicial complex* is a finite collection of sets, $$A$$, such that if $$a\in A$$ and $$b\subset a$$ implies $$b\in A$$. The elements $$a\in A$$ are the simplices where dim$$(a)=$$card$$(a)-1$$. 
 
-$$ \text{VR}(r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}. $$
+<center>
+<embed width="80%" src="../../assets/tda-rips/asc.svg" type="image/svg+xml" />
+</center>
 
-**TODO: Add definitions of ASC and faces, Change VR(r) to VR(S,r).**
+
+Let $$S$$ be finite set of points in $$\mathbb{R}^n$$. Let $$r\geq 0$$. The Rips complex of $$S$$ and $$r$$ is the abstract simplicial complex of $$\text{VR}(S, r)$$, which consists of all subsets of diameter at most $$r$$:
+
+$$ \text{VR}(S, r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}. $$
+
 
 Geometrically, this means we consider balls of radius, $$\frac{r}{2}$$, centered at each point in
-$$S$$. Whenever $d$ balls have pairwise intersections, we add a $$d-1$$ simplex. For this tutorial,
+$$S$$. Whenever $$d$$ balls have pairwise intersections, we add a $$d-1$$ simplex. For this tutorial,
 we will use the standard Euclidan distance (unless stated otherwise) to compute a Rips complex. However, one could use any metric.
 
-**Note:** Many people also define $$\text{VR}(r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}$$.
+**Note:** Many people also define $$\text{VR}(S, r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}$$.
 However, the algorithms used in the R-TDA package use the first definition.
 
 <center>
@@ -125,22 +128,24 @@ different Rips complexes. There is often not a best choice for $$r$$, so why not
 them!? Observe if we increase $$r$$, then we get a family of nested Rips complexes which gives rise
 to the *Rips filtration*.
 
-Let's work through an example. Let $$S:=\{(0,0),(1,0),(0,2),(1,2),(3,1)\}\subset \mathbb{R}^2$$. We
+Let's work through an example. Let $$S:=\{(0,0),(1,3),(2,-1),(3,2)\}\subset \mathbb{R}^2$$. We
 want to compute a Rips filtration on $$S$$ for all $$r\geq 0$$. Observe:
 
-* when $$r=1$$, the balls of radius $$\frac{1}{2}$$ centered at $$(0,0)$$ and $$(1,0)$$ intersect which
-means we add a 1-simplex between $$(0,0)$$ and $$(1,0)$$. Similarly, we add a 1-simplex between
-$$(0,2)$$ and $$(1,2)$$.
-* when $$r=2$$, we add a two more 1-simplices between $$(0,0), (0,2)$$, and $$(1,2), (1,0)$$.
-* when $$r=\sqrt{5}$$, we add a 3-simplex and a 2-simplex.
-* when $$r=\sqrt{10}$$, we add a 4-simplex.
+* when $$r=\sqrt{5}$$, the balls of radius $$\frac{\sqrt{5}}{2}$$ centered at $$(0,0)$$ and
+$$(2,-1)$$ intersect which means we add a 1-simplex between $$(0,0)$$ and $$(2,-1)$$. Similarly,
+we add a 1-simplex between $$(1,3)$$ and $$(3,2)$$.
+* when $$r=\sqrt{10}$$, we add a two more 1-simplices between $$(0,0), (1,3)$$, and $$(2,-1),
+(3,2)$$.
+* when $$r=\sqrt{13}$$, we add two 2-simplices between $$(0,0),(1,3),(2,-1)$$ and
+$$(1,3),(2,-1),(3,2)$$.
+* when $$r=\sqrt{17}$$, we add a 3-simplex.
 
 Here is an illustration of the Rips filtration on $$S$$.
 
-```{r ripsfilt2, fig.cap = "", echo = FALSE, fig.align = 'center'}
-fig1 <- rasterGrob(readPNG("images/ripsfilt2.png"), interpolate=TRUE)
-grid.arrange(fig1, ncol=1)
-```
+<center>
+<embed width="90%" src="../../assets/tda-rips/ripsfilt.svg" type="image/svg+xml" />
+</center>
+
 
 Applications of Rips Complexes and Filtrations
 ==============================================
@@ -172,9 +177,9 @@ First, let's go back to the example where $$S:=\{(0,0),(1,0),(0,2),(1,2),(3,1)\}
 ```{r dataset, echo = TRUE, message = TRUE}
 library(TDA) # upload TDA package
 
-S <- cbind(c(0,1,0,1,3),c(0,0,2,2,1)) # write S into R
+S <- cbind(c(0,1,2,3),c(0,3,-1,2)) # write S into R
 
-r <- 4 # limit of the filtration
+r <- 5 # limit of the filtration
 
 maxdimension <- 2 # components , loops, and voids
 
@@ -183,32 +188,56 @@ S_RipsFilt <- ripsFiltration(S, maxdimension, r, dist = "euclidean")
 
 Great! So how do we interpret the output?
 
-The ripsFiltration function returns a list with a complex list, filtration values vector, a logical variable that states whether or not the values are in increasing order, and a matrix of the coordinates of the vertices if the Euclidean distance is used. The $$i^{th}$$ element of the complex are the vertices of the $$i^{th}$$ simplex. Additionally, the $i^{th}$ entry of the filtration values is the filtration value for when the $$i^{th}$$ simplex appears. See **TODO: reference CRAN documentation.** Let's check this out.
+The ripsFiltration function returns a list with a complex list, filtration values vector, a logical variable that states whether or not the values are in increasing order, and a matrix of the coordinates of the vertices if the Euclidean distance is used. The $$i^{th}$$ element of the complex are the vertices of the $$i^{th}$$ simplex. Additionally, the $$i^{th}$$ entry of the filtration values is the filtration value for when the $$i^{th}$$ simplex appears. See **TODO: reference CRAN documentation.** Let's check this out.
 
 ```{r output, echo = TRUE, message = TRUE}
 
-S_RipsFilt$cmplx[[16]] #Access vertices for the 16th simplex in the list
+S_RipsFilt$cmplx[[10]] #Access vertices for the 16th simplex in the list
 
-S_RipsFilt$values[16] #Access filtration value for the 16th simplex in the list
+S_RipsFilt$values[10] #Access filtration value for the 16th simplex in the list
 ```
 
-Our output tells us that we add a 3-simplex when $$r=\sqrt{5}$$. This is exactly what we found
+Our output tells us that we have a 2-simplex on vertices $$(0,0),(1,3),(3,2)$$ when $$r=\sqrt{13}$$. This is exactly what we found
 when we worked through this example by hand. Accessing the other complex and filtration value elements will help us verify the rest of the filtration computation we did earlier.
 
-If we want to visualize the Rips complex when $$r = 2$$, we can run the following code.
+If we want to visualize the Rips complex when $$r = \sqrt{13}$$, we can run the following code.
 
-```{r visualization, echo = TRUE, message = TRUE}
+```{r visualization, echo = FALSE, message = FALSE, results='hide'}
 
-# Plot Rips Complex when r=2.
+# Plot Rips Complex when r=sqrt(13).
 
-r <- 2 # limit of the filtration
+r <- sqrt(13) # limit of the filtration
 maxdimension <- 2 # allow components, loops, and voids
 
 S_RipsFilt <- ripsFiltration(S, maxdimension, r, dist = "euclidean")
 
-lim <- rep(c(-1, 4), 2)
+lim <- rep(c(-1, 3), 2)
+svg('../../assets/tda-rips/visualization.svg')
 plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
-     main = "Rips Complex for r = 2", xlab = "", ylab = "")
+     main = "Rips Complex for r = sqrt(13)", xlab = "", ylab = "")
+for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
+  polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
+          col = "pink", border = NA, xlim = lim[1:2], ylim = lim[3:4])
+}
+for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
+  polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
+          col = NULL, xlim = lim[1:2], ylim = lim[3:4])
+}
+points(S, pch = 16)
+dev.off()
+```
+```{r visualization_echo, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
+
+# Plot Rips Complex when r=sqrt(13).
+
+r <- sqrt(13) # limit of the filtration
+maxdimension <- 2 # allow components, loops, and voids
+
+S_RipsFilt <- ripsFiltration(S, maxdimension, r, dist = "euclidean")
+
+lim <- rep(c(-1, 3), 2)
+plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
+     main = "Rips Complex for r = sqrt(13)", xlab = "", ylab = "")
 for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
   polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
           col = "pink", border = NA, xlim = lim[1:2], ylim = lim[3:4])
@@ -220,8 +249,69 @@ for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
 points(S, pch = 16)
 ```
 
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/visualization.svg" type="image/svg+xml" />
+</center>
+
 ### Non Euclidean Distance Example
-Now we will compute a Rips filtration on $S$, but this time using the **TODO** distance.
+Now we will compute a Rips filtration on $$S$$, but this time using the Manhattan distance or $$\ell_1$$ norm. Recall, that for points, $$\textbf{x}=(x_1,...,x_n)$$ and $$\textbf{y}=(y_1,...,y_n)\in \mathbb{R}^n$$,
+the Manhattan distance, $$d_M(\textbf{x},\textbf{y})$$ is defined as:
+
+$$d_M(\textbf{x},\textbf{y}):=\sum_{i=1}^{n}|x_i-y_i|.$$
+
+In order to compute the Rips filtration on $$S$$ for this metric, we need to create a distance
+matrix in R. We can do this using the following code. 
+
+In order to compute the Rips filtration on $$S$$ for this metric, we need to create a distance
+matrix in R. We can do this using the following code. 
+
+```{r distance, echo = TRUE, message = TRUE}
+dist_matrix <- dist(S, method = "manhattan", diag = TRUE, upper = TRUE, p = 2) 
+```
+
+Now when we use the ripsFiltration function, we will write dist_matrix as the first argument instead of $$S$$. Additionally, the fourth argument will change to dist = "arbitrary".
+
+```{r rips_manhattan, echo = TRUE, message = TRUE}
+# Compute Rips filtration on S using Manhattan distance
+
+r <- 5 # limit of the filtration
+maxdimension <- 2 # allow components, loops, and voids
+
+S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension, r, 
+                                       dist = "arbitrary") 
+``` 
+
+This time when we compute the Rips complex with $$r=\sqrt{13}$$ we get the following complex. 
+
+```{r visualization2, echo = FALSE, message = FALSE, results='hide'}
+
+# Plot Rips Complex when r=sqrt(13).
+
+r <- sqrt(13) # limit of the filtration
+maxdimension <- 2 # allow components, loops, and voids
+
+S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension, r, dist = "arbitrary")
+
+lim <- rep(c(-1, 3), 2)
+svg('../../assets/tda-rips/visualization2.svg')
+plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
+     main = "Rips Complex with Manhattan Distance for r = sqrt(13)", xlab = "", ylab = "")
+for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
+  polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
+          col = "pink", border = NA, xlim = lim[1:2], ylim = lim[3:4])
+}
+for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
+  polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
+          col = NULL, xlim = lim[1:2], ylim = lim[3:4])
+}
+points(S, pch = 16)
+dev.off()
+```
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/visualization2.svg" type="image/svg+xml" />
+</center>
 
 ### Providence Coffee Shops Location Data
 Lastly, we will work through an example with real data!
