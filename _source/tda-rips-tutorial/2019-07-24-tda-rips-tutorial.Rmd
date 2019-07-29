@@ -65,7 +65,8 @@ Theory
 ======
 
 First we breifly describe the mathematical foundations behind a Rips Filtration including
-simplicial complexes, filtrations, and the Rips complex. For more details on the theory, see {% cite edelsbrunner:2010 %}
+simplicial complexes, filtrations, and the Rips complex. For more details on the theory, 
+see {% cite edelsbrunner:2010 %}.
 
 ### Triangle Appreciation
 
@@ -162,10 +163,9 @@ The Rips complex provides information on how close the data points are to each o
 topological information given by taking a Rips filtration can be studied using Persistent
 Homology (see next tutorial) which is often used to analyze these types of data.
 
-Furthermore, Rips complexes are used in shape reconstruction. They are nice to use since these
-complexes do not favor a specific type of alignment of the input. **TODO: Add citation to Attali paper.**
+Another application is studying coverage in sensor networks. The problem is to look a set of sensors find how much coverage the sensors provide. Vin De Silva and Robert Ghrist studied this problem using Rips complexes since the complex can be determined easily from pairwise communication data. See {% cite ghrist:2007 %}.
 
-**Maybe add fractal dimension?**
+Furthermore, Rips complexes can are used in shape reconstruction in specific situations. This means in certain situations, the Rips complex of a point cloud, $$S$$, with threshold, $$r$$, has the same homotopy type as the union of balls centered around each point in $$S$$ with radius $$\frac{r}{2}$$. See {% cite attali:2013 %}. They are nice to use since these complexes do not favor a specific type of alignment of the input.
 
 These are just a few of the applications. There are many more!
 
@@ -173,7 +173,7 @@ Computing the Rips Filtration using the R-TDA Package
 =====================================================
 
 ### Toy Example
-First, let's go back to the example where $$S:=\{(0,0),(1,0),(0,2),(1,2),(3,1)\}$$. We will compute the Rips filtration using the R-TDA package.
+First, let's go back to the example where $$S:=\{(0,0),(1,3),(2,-1),(3,2)\}$$. We will compute the Rips filtration using the R-TDA package.
 
 ```{r dataset, echo = TRUE, message = TRUE}
 library(TDA) # upload TDA package
@@ -312,8 +312,66 @@ dev.off()
 <embed width="80%" src="../../assets/tda-rips/visualization2.svg" type="image/svg+xml" />
 </center>
 
-### Providence Coffee Shops Location Data
-Lastly, we will work through an example with real data!
+### Sightings of Bigfoot in Montana
+Lastly, we will work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their [website](http://www.bfro.net/). We will compute the Rips filtration for Bigfoot sightings in Montana. 
+
+```{r bigfootdataset, echo = TRUE, message = TRUE}
+
+#Latitude coordinates of Bigfoot sightings in MT
+latitude <- c(48.24750, 48.08350, 48.27750, 48.02611, 48.07834, 48.26880, 
+              48.21167, 48.12780, 48.11556, 48.26810, 48.14720, 48.93228, 
+              47.98170, 48.09853, 47.89250, 47.85730, 47.88950, 47.79111, 
+              47.78530, 48.18640, 48.07440, 48.00280, 47.85556, 47.97205, 
+              47.89010, 47.84650, 47.87725, 48.21095, 48.11509, 47.48500, 
+              47.79222, 48.22336, 47.86405, 48.10500, 48.13025, 48.02073, 
+              47.79250)
+
+#Longitude coordinates of Bigfoot sightings in MT
+longitude <- c(-121.9425, -121.9683, -121.8078, -121.6406, -121.7363, 
+               -121.7050, -121.6769, -121.7692, -122.0958, -121.3314, 
+               -121.3819, -121.9995, -122.0447, -121.8135, -122.0111, 
+               -121.6352, -121.8134, -122.1914, -121.6647, -122.2612, 
+               -121.7915, -121.9572, -121.9697, -121.4008, -121.3676, 
+               -122.1357, -121.8943, -122.0262, -121.9677, -121.5287, 
+               -121.1958, -121.5777, -121.6738, -121.9050, -121.8510, 
+               -121.3552, -122.1676)
+
+#GPS coordinates of Bigfoot sightings in MT
+bigfoot_sightingsMT <- cbind(latitude, longitude)
+
+```
+
+We can plot the data using the following code.
+
+```{r bigfootdataplot_show, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
+
+plot(bigfoot_sightingsMT[,1],bigfoot_sightingsMT[,2], xlab = "Latitude", 
+     ylab = "Longitude", main = "GPS coordinates of Bigfoot sightings 
+     in Montana", pch=16)
+```
+
+```{r bigfootdataplot_hide, echo = FALSE, message = FALSE, results = 'hide'}
+svg('../../assets/tda-rips/bigfoot.svg')
+plot(bigfoot_sightingsMT[,1],bigfoot_sightingsMT[,2], xlab = "Latitude", ylab = "Longitude",
+     main = "GPS coordinates of Bigfoot sightings in Montana", pch=16)
+```
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/bigfoot.svg" type="image/svg+xml" />
+</center>
+
+Now let's compute the filtration!
+
+```{r bigfoot_filtration, echo = TRUE, message = TRUE}
+r <- 3 #filtration limit
+
+maxdimension <- 2 #allow components, loops, and voids
+
+bigfoot_RipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension, 
+                                   r, dist = "euclidean")
+```
+
+Lastly, we can visualize the Rips complex for $$r=1$$ and see **TODO**
 
 References
 ==========
