@@ -65,7 +65,7 @@ Theory
 ======
 
 First we breifly describe the mathematical foundations behind a Rips Filtration including
-simplicial complexes, filtrations, and the Rips complex.
+simplicial complexes, filtrations, and the Rips complex. For more details on the theory, see {% cite edelsbrunner:2010 %}
 
 ### Triangle Appreciation
 
@@ -189,7 +189,8 @@ S_RipsFilt <- ripsFiltration(S, maxdimension, r, dist = "euclidean")
 
 Great! So how do we interpret the output?
 
-The ripsFiltration function returns a list with a complex list, filtration values vector, a logical variable that states whether or not the values are in increasing order, and a matrix of the coordinates of the vertices if the Euclidean distance is used. The $$i^{th}$$ element of the complex are the vertices of the $$i^{th}$$ simplex. Additionally, the $$i^{th}$$ entry of the filtration values is the filtration value for when the $$i^{th}$$ simplex appears. See **TODO: reference CRAN documentation.** Let's check this out.
+The ripsFiltration function returns a list with a complex list, filtration values vector, a logical variable that states whether or not the values are in increasing order, and a matrix of the coordinates of the vertices if the Euclidean distance is used. The $$i^{th}$$ element of the complex are the vertices of the $$i^{th}$$ simplex. Additionally, the $$i^{th}$$ entry of the filtration values is the filtration value for when the $$i^{th}$$ simplex appears. See the documentation for this function with this [link](https://rdrr.io/cran/TDA/man/ripsFiltration.html).
+ Let's check this out.
 
 ```{r output, echo = TRUE, message = TRUE}
 
