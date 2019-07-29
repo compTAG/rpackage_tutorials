@@ -121,14 +121,10 @@ empty set and ending with the full simplicial complex i.e.,
 
 $$\emptyset \subset K_1 \subset K_2 \subset ... \subset K.$$
 
-<center>
-<embed width="80%" src="../../assets/tda-rips/bobcat.svg" type="image/svg+xml" />
-</center>
-
-Going back to the Rips complex, we consider $$r$$ to be a free parameter. If we vary $$r$$, we get
-different Rips complexes. There is often not a best choice for $$r$$, so why not look at all of
-them!? Observe if we increase $$r$$, then we get a family of nested Rips complexes which gives rise
-to the *Rips filtration*.
+Going back to the Rips complex, we consider $$r$$ to be a free parameter. If we vary $$r$$, we
+get different Rips complexes. There is often not a best choice for $$r$$, so why not look at 
+all of them!? Observe if we increase $$r$$, then we get a family of nested Rips complexes which
+gives rise to the *Rips filtration*.
 
 Let's work through an example. Let $$S:=\{(0,0),(1,3),(2,-1),(3,2)\}\subset \mathbb{R}^2$$. We
 want to compute a Rips filtration on $$S$$ for all $$r\geq 0$$. Observe:
@@ -371,7 +367,87 @@ bigfoot_RipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension,
                                    r, dist = "euclidean")
 ```
 
-Lastly, we can visualize the Rips complex for $$r=1$$ and see **TODO**
+Lastly, we can visualize the Rips complex for $$r=.15$$. 
+
+```{r bigfootcomplex_show, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
+r <- .15 #filtration limit
+
+maxdimension <- 1 #allow components, loops
+
+bigfoot_RipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension, 
+                                   r, dist = "euclidean")
+filt <- bigfoot_RipsFilt
+data <- filt$coordinates
+
+xlim <- range(data[,1])
+ylim <- range(data[,2])
+
+diff <- 0.1 * (xlim[2] - xlim[1])
+
+xlim[1] <- xlim[1] - diff
+xlim[2] <- xlim[2] + diff
+
+diff <- 0.1 * (ylim[2] - ylim[1])
+
+ylim[1] <- ylim[1] - diff
+ylim[2] <- ylim[2] + diff
+
+plot(NULL, type = "n", xlim = xlim, ylim = ylim, main = "Rips Complex",
+     xlab = "", ylab = "")
+
+for (idx in seq(along = filt[["cmplx"]])) {
+  polygon(data[filt[["cmplx"]][[idx]], , drop = FALSE],
+          col = "gray", border = NA, xlim = xlim, ylim = ylim)
+}
+for (idx in seq(along = filt[["cmplx"]])) {
+  polygon(data[filt[["cmplx"]][[idx]], , drop = FALSE],
+          col = NULL, xlim = xlim, ylim = ylim)
+}
+points(data, pch = 16)
+dev.off()
+```
+
+```{r bigfootcomplex_hide, echo = FALSE, message = FALSE, results = 'hide'}
+
+filt <- bigfoot_RipsFilt
+data <- filt$coordinates
+
+xlim <- range(data[,1])
+ylim <- range(data[,2])
+
+diff <- 0.1 * (xlim[2] - xlim[1])
+
+xlim[1] <- xlim[1] - diff
+xlim[2] <- xlim[2] + diff
+
+diff <- 0.1 * (ylim[2] - ylim[1])
+
+ylim[1] <- ylim[1] - diff
+ylim[2] <- ylim[2] + diff
+
+svg('../../assets/tda-rips/bigfoot_complex.svg')
+plot(NULL, type = "n", xlim = xlim, ylim = ylim, main = "Rips Complex",
+     xlab = "", ylab = "")
+
+for (idx in seq(along = filt[["cmplx"]])) {
+  polygon(data[filt[["cmplx"]][[idx]], , drop = FALSE],
+          col = "gray", border = NA, xlim = xlim, ylim = ylim)
+}
+for (idx in seq(along = filt[["cmplx"]])) {
+  polygon(data[filt[["cmplx"]][[idx]], , drop = FALSE],
+          col = NULL, xlim = xlim, ylim = ylim)
+}
+points(data, pch = 16)
+dev.off()
+```
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/bigfoot_complex.svg" type="image/svg+xml" />
+</center>
+
+**TODO: figure out why the plot isn't showing up, add some concluding remarks on this example**
+
+
 
 References
 ==========
