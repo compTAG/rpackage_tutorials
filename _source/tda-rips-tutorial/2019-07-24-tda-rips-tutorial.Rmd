@@ -40,6 +40,60 @@ use_package('TDA')
 ```
 
 
+```{r usr_fncs, echo = FALSE}
+plot.rips_filt <- function(filt, thresh = 0.2, animate = FALSE, fn_out, lout, ...) {
+    data <- filt$coordinates
+    two_d_check <- dim(data)[2] == 2
+    # euclidean_check <- #TODO: need to pass euclidean distance into filtration object
+    
+  plot_fun <- function(filt, r) {
+    data <- filt$coordinates
+    xlim <- range(data[, 1])
+    ylim <- range(data[, 2])
+    diff <- 0.1 * (xlim[2] - xlim[1])
+    xlim[1] <- xlim[1] - diff
+    xlim[2] <- xlim[2] + diff
+    diff <- 0.1 * (ylim[2] - ylim[1])
+    ylim[1] <- ylim[1] - diff
+    ylim[2] <- ylim[2] + diff
+    xmin <- min(data[, 1])
+    xmax <- max(data[, 1])
+    ymin <- min(data[, 2])
+    ymax <- max(data[, 2])
+    max_dist <- max(dist(data))
+    xlims = c(xmin - max_dist, xmax + max_dist)
+    ylims = c(ymin - max_dist, ymax + max_dist)
+      plot(NULL, type = "n", xlim = xlims, ylim = ylims, main = "Rips Complex",
+                xlab = "", ylab = "", asp = 1)
+      for(j in 1:length(data[, 1])) {
+        draw.circle(x = data[j, 1], y = data[j, 2], radius = r / 2,
+        col = rgb(0.1, 0.6, 0.1, 0.05))
+      }
+      for (idx in seq(along = filt[["cmplx"]][filt$values < r])) {
+        polygon(data[filt[["cmplx"]][[idx]], 1], data[filt[["cmplx"]][[idx]], 2],
+                col = "pink", border = NA, lwd = 1.5)
+      }
+      for (idx in seq(along = filt[["cmplx"]][filt$values < r])) {
+        polygon(data[filt[["cmplx"]][[idx]], 1], data[filt[["cmplx"]][[idx]], 2],
+                col = NULL, lwd = 1.5)
+      }
+      points(data[,1], data[,2], pch = 16)
+  }
+  if (!two_d_check) { #todo: add euclidean check w/ && euclidean_check
+    stop("Data needs to be 2-d")
+  }
+  if (animate) {
+    saveGIF({
+             for (i in seq(0, max(dist(data))*1.1, length.out = lout)){
+               plot_fun(filt, r = i)
+             }
+            },
+            movie.name = fn_out, ...)
+  } else {
+    plot_fun(filt, r = thresh)
+  }
+}
+```
 Introduction
 ============
 Our ultimate goal is to understand Persistent Homology and be able to compute Persistence
@@ -178,7 +232,7 @@ S <- cbind(c(0,1,2,3),c(0,3,-1,2)) # write S into R
 
 r <- 5 # limit of the filtration
 
-maxdimension <- 2 # components , loops, and voids
+maxdimension <- 3 # components , loops, and voids
 
 S_RipsFilt <- ripsFiltration(S, maxdimension, r, dist = "euclidean")
 ```
@@ -198,58 +252,24 @@ S_RipsFilt$values[10] #Access filtration value for the 16th simplex in the list
 Our output tells us that we have a 2-simplex on vertices $$(0,0),(1,3),(3,2)$$ when $$r=\sqrt{13}$$. This is exactly what we found
 when we worked through this example by hand. Accessing the other complex and filtration value elements will help us verify the rest of the filtration computation we did earlier.
 
-If we want to visualize the Rips complex when $$r = \sqrt{13}$$, we can run the following code.
+If we want to visualize the Rips filtration, we can run the following code.
 
-```{r visualization, echo = FALSE, message = FALSE, results='hide'}
 
-# Plot Rips Complex when r=sqrt(13).
-
-r <- sqrt(13) # limit of the filtration
-maxdimension <- 2 # allow components, loops, and voids
-
-S_RipsFilt <- ripsFiltration(S, maxdimension, r, dist = "euclidean")
-
-lim <- rep(c(-1, 3), 2)
-svg('../../assets/tda-rips/visualization.svg')
-plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
-     main = "Rips Complex for r = sqrt(13)", xlab = "", ylab = "")
-for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
-  polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
-          col = "gray", border = NA, xlim = lim[1:2], ylim = lim[3:4])
-}
-for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
-  polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
-          col = NULL, xlim = lim[1:2], ylim = lim[3:4])
-}
-points(S, pch = 16)
-dev.off()
-```
 ```{r visualization_echo, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
 
-# Plot Rips Complex when r=sqrt(13).
+S_RipsFilt <- ripsFiltration(S, maxdimension = 2, maxscale = 4.5, dist = "euclidean")
 
-r <- sqrt(13) # limit of the filtration
-maxdimension <- 2 # allow components, loops, and voids
+class(S_RipsFilt) <- c(class(S_RipsFilt), "rips_filt")
 
-S_RipsFilt <- ripsFiltration(S, maxdimension, r, dist = "euclidean")
+plot(S_RipsFilt, animate = TRUE, 
+     fn_out = 'rips_example.gif', 
+     lout = 80, interval = 0.2)
 
-lim <- rep(c(-1, 3), 2)
-plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
-     main = "Rips Complex for r = sqrt(13)", xlab = "", ylab = "")
-for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
-  polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
-          col = "gray", border = NA, xlim = lim[1:2], ylim = lim[3:4])
-}
-for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
-  polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
-          col = NULL, xlim = lim[1:2], ylim = lim[3:4])
-}
-points(S, pch = 16)
 ```
 
 
 <center>
-<embed width="80%" src="../../assets/tda-rips/visualization.svg" type="image/svg+xml" />
+<img width="80%" src="../../assets/tda-rips/rips_example.gif"/>
 </center>
 
 ### Non Euclidean Distance Example
@@ -358,87 +378,20 @@ plot(bigfoot_sightingsMT[,1],bigfoot_sightingsMT[,2], xlab = "Latitude", ylab = 
 
 Now let's compute the filtration!
 
-```{r bigfoot_filtration, echo = TRUE, message = TRUE}
-r <- 3 #filtration limit
+Lastly, we can visualize the Rips filtration. 
 
-maxdimension <- 2 #allow components, loops, and voids
+```{r bigfootfiltration, echo = TRUE, message = FALSE, results = 'hide'}
 
-bigfoot_RipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension, 
-                                   r, dist = "euclidean")
-```
+BigfootRipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension = 2, 
+                                  maxscale = 1.6, dist = "euclidean")
 
-Lastly, we can visualize the Rips complex for $$r=.15$$. 
+class(BigfootRipsFilt) <- c(class(BigfootRipsFilt), "rips_filt")
 
-```{r bigfootcomplex_show, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
-r <- .15 #filtration limit
+plot(BigfootRipsFilt, animate = TRUE, 
+     fn_out = 'bigfoot_ex.gif', 
+     lout = 80, interval = 0.2)
 
-maxdimension <- 1 #allow components, loops
 
-bigfoot_RipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension, 
-                                   r, dist = "euclidean")
-filt <- bigfoot_RipsFilt
-data <- filt$coordinates
-
-xlim <- range(data[,1])
-ylim <- range(data[,2])
-
-diff <- 0.1 * (xlim[2] - xlim[1])
-
-xlim[1] <- xlim[1] - diff
-xlim[2] <- xlim[2] + diff
-
-diff <- 0.1 * (ylim[2] - ylim[1])
-
-ylim[1] <- ylim[1] - diff
-ylim[2] <- ylim[2] + diff
-
-plot(NULL, type = "n", xlim = xlim, ylim = ylim, main = "Rips Complex",
-     xlab = "", ylab = "")
-
-for (idx in seq(along = filt[["cmplx"]])) {
-  polygon(data[filt[["cmplx"]][[idx]], , drop = FALSE],
-          col = "gray", border = NA, xlim = xlim, ylim = ylim)
-}
-for (idx in seq(along = filt[["cmplx"]])) {
-  polygon(data[filt[["cmplx"]][[idx]], , drop = FALSE],
-          col = NULL, xlim = xlim, ylim = ylim)
-}
-points(data, pch = 16)
-dev.off()
-```
-
-```{r bigfootcomplex_hide, echo = FALSE, message = FALSE, results = 'hide'}
-
-filt <- bigfoot_RipsFilt
-data <- filt$coordinates
-
-xlim <- range(data[,1])
-ylim <- range(data[,2])
-
-diff <- 0.1 * (xlim[2] - xlim[1])
-
-xlim[1] <- xlim[1] - diff
-xlim[2] <- xlim[2] + diff
-
-diff <- 0.1 * (ylim[2] - ylim[1])
-
-ylim[1] <- ylim[1] - diff
-ylim[2] <- ylim[2] + diff
-
-svg('../../assets/tda-rips/bigfoot_complex.svg')
-plot(NULL, type = "n", xlim = xlim, ylim = ylim, main = "Rips Complex",
-     xlab = "", ylab = "")
-
-for (idx in seq(along = filt[["cmplx"]])) {
-  polygon(data[filt[["cmplx"]][[idx]], , drop = FALSE],
-          col = "gray", border = NA, xlim = xlim, ylim = ylim)
-}
-for (idx in seq(along = filt[["cmplx"]])) {
-  polygon(data[filt[["cmplx"]][[idx]], , drop = FALSE],
-          col = NULL, xlim = xlim, ylim = ylim)
-}
-points(data, pch = 16)
-dev.off()
 ```
 
 <center>
