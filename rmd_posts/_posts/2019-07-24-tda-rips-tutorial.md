@@ -1,11 +1,12 @@
 ---
 layout: post
 title: "Rips Filtration Tutorial for the R-TDA Package"
-author: "Robin Belton and Ben Holmgren"
+author: "Robin Belton, Ben Holmgren and Jordan Schupbach"
 date: "July 22, 2019"
 ---
 
 {% include lib/mathjax.html %}
+
 
 
 
@@ -16,27 +17,28 @@ Introduction
 Our ultimate goal is to understand Persistent Homology and be able to compute Persistence
 Diagrams using the R-TDA package. In order to get there, we must first understand filtrations.
 In this tutorial, we will work with the Vietoris Rips Filtration, or Rips Filtration for short.
-Suppose we are given a finite set of points in $$\mathbb{R}^n$$ denoted by $$S$$. The set of points,
-$$S$$, is topologically uninteresting. How can we make $$S$$ topologically interesting? Yes, you
-guessed it - we can construct a Rips complex from the points in $$S$$!  The Rips Filtration is a
-specific nested sequence of Rips Complexes over $$S$$ that can be later used to compute Persistent
-Homology.
+Suppose we are given a finite set of points in $$\mathbb{R}^n$$ denoted by $$S$$. The set of
+points, $$S$$, is topologically uninteresting. How can we fix this?
+Yes, you guessed it - we can construct a Rips complex from the points in $$S$$!  The Rips
+Filtration is a specific nested sequence of Rips complexes over $$S$$ that can be later used to
+compute Persistent Homology.
 
 Objectives
 ==========
-**TODO: Make objectives stronger.**
+By the end of this tutorial you will be able to:
 
-* Gain familiarity on $n$-simplices and simplicial complexes.
-* Be able to construct a Rips Complex and Rips Filtration from a finite set of points in
-$$\mathbb{R}^n$$.
-* Learn a few exciting applications of the Rips Filtration.
+* Define $$n$$-simplices and simplicial complexes.
+* Compute a Rips Complex and Rips Filtration from a finite set of points in
+$$\mathbb{R}^n$$ by hand.
+* Name a few exciting applications of the Rips complexes and filtrations.
 * Compute a Rips Filtration from a finite set of points in $$\mathbb{R}^n$$ using the R-TDA package.
 
 Theory
 ======
 
 First we breifly describe the mathematical foundations behind a Rips Filtration including
-simplicial complexes, filtrations, and the Rips complex.
+simplicial complexes, filtrations, and the Rips complex. For more details on the theory, 
+see {% cite edelsbrunner:2010 %}.
 
 ### Triangle Appreciation
 
@@ -72,8 +74,9 @@ $$ \text{VR}(S, r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}. $$
 
 
 Geometrically, this means we consider balls of radius, $$\frac{r}{2}$$, centered at each point in
-$$S$$. Whenever $$d$$ balls have pairwise intersections, we add a $$d-1$$ simplex. For this tutorial,
-we will use the standard Euclidan distance (unless stated otherwise) to compute a Rips complex. However, one could use any metric.
+$$S$$. Whenever $$d$$ balls have pairwise intersections, we add a $$d-1$$ simplex. For this
+tutorial, we will use the standard Euclidean distance (unless stated otherwise) to compute a Rips
+complex. However, one could use any metric.
 
 **Note:** Many people also define $$\text{VR}(S, r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}$$.
 However, the algorithms used in the R-TDA package use the first definition.
@@ -88,26 +91,24 @@ However, the algorithms used in the R-TDA package use the first definition.
 A *filtration* of a simplicial complex, $$K$$, is a nested sequence of subcomplexes starting at the
 empty set and ending with the full simplicial complex i.e.,
 
-$$\emptyset \subset K_1 \subset K_2 \subset ... \subset K.$$
+$$\emptyset \subset K_0 \subset K_1 \subset ... \subset K_n=K.$$
 
-<center>
-<embed width="80%" src="../../assets/tda-rips/bobcat.svg" type="image/svg+xml" />
-</center>
+Going back to the Rips complex, we consider $$r$$ to be a free parameter. If we vary $$r$$, we
+get different Rips complexes. There is often not a best choice for $$r$$, so why not look at 
+all of them!? Observe if we increase $$r$$, then we get a family of nested Rips complexes which
+gives rise to the *Rips filtration*.
 
-Going back to the Rips complex, we consider $$r$$ to be a free parameter. If we vary $$r$$, we get
-different Rips complexes. There is often not a best choice for $$r$$, so why not look at all of
-them!? Observe if we increase $$r$$, then we get a family of nested Rips complexes which gives rise
-to the *Rips filtration*.
-
-Let's work through an example. Let $$S:=\{(0,0),(1,0),(0,2),(1,2),(3,1)\}\subset \mathbb{R}^2$$. We
+Let's work through an example. Let $$S:=\{(0,0),(1,3),(2,-1),(3,2)\}\subset \mathbb{R}^2$$. We
 want to compute a Rips filtration on $$S$$ for all $$r\geq 0$$. Observe:
 
-* when $$r=1$$, the balls of radius $$\frac{1}{2}$$ centered at $$(0,0)$$ and $$(1,0)$$ intersect which
-means we add a 1-simplex between $$(0,0)$$ and $$(1,0)$$. Similarly, we add a 1-simplex between
-$$(0,2)$$ and $$(1,2)$$.
-* when $$r=2$$, we add a two more 1-simplices between $$(0,0), (0,2)$$, and $$(1,2), (1,0)$$.
-* when $$r=\sqrt{5}$$, we add a 3-simplex and a 2-simplex.
-* when $$r=\sqrt{10}$$, we add a 4-simplex.
+* when $$r=\sqrt{5}$$, the balls of radius $$\frac{\sqrt{5}}{2}$$ centered at $$(0,0)$$ and
+$$(2,-1)$$ intersect which means we add a 1-simplex between $$(0,0)$$ and $$(2,-1)$$. Similarly,
+we add a 1-simplex between $$(1,3)$$ and $$(3,2)$$.
+* when $$r=\sqrt{10}$$, we add a two more 1-simplices between $$(0,0), (1,3)$$, and $$(2,-1),
+(3,2)$$.
+* when $$r=\sqrt{13}$$, we add two 2-simplices between $$(0,0),(1,3),(2,-1)$$ and
+$$(1,3),(2,-1),(3,2)$$.
+* when $$r=\sqrt{17}$$, we add a 3-simplex.
 
 Here is an illustration of the Rips filtration on $$S$$.
 
@@ -126,14 +127,21 @@ For example:
 * Galaxy Data which provides coordinates of stars in different galaxies
 * GPS coordinates of Airports on Earth
 
-The Rips complex provides information on how close the data points are to each other. The
-topological information given by taking a Rips filtration can be studied using Persistent
-Homology (see next tutorial) which is often used to analyze these types of data.
+The Rips complex provides information on how close the data points are to each other. Furthermore, the
+holes in the complex can provide information on where data are not present. Lastly, the topological
+information given by taking a Rips filtration can be studied using Persistent Homology (see next tutorial)
+which is often used to analyze these types of data.
 
-Furthermore, Rips complexes are used in shape reconstruction. They are nice to use since these
-complexes do not favor a specific type of alignment of the input. **TODO: Add citation to Attali paper.**
+Another application is studying coverage in sensor networks. The problem is to look a set of sensors and
+find how much coverage the sensors provide. Vin De Silva and Robert Ghrist studied this problem using Rips
+complexes since the complex can be determined easily from pairwise communication data. See {% cite
+ghrist:2007 %}.
 
-**Maybe add fractal dimension?**
+Furthermore, Rips complexes can are used in shape reconstruction in specific situations. This means in
+certain situations, the Rips complex of a point cloud, $$S$$, with threshold, $$r$$, has the same homotopy
+type as the union of balls centered around each point in $$S$$ with radius $$\frac{r}{2}$$. See {% cite
+attali:2013 %}. They are nice to use since these complexes do not favor a specific type of alignment of the
+input.
 
 These are just a few of the applications. There are many more!
 
@@ -141,87 +149,188 @@ Computing the Rips Filtration using the R-TDA Package
 =====================================================
 
 ### Toy Example
-First, let's go back to the example where $$S:=\{(0,0),(1,0),(0,2),(1,2),(3,1)\}$$. We will compute the Rips filtration using the R-TDA package.
+First, let's go back to the example where $$S:=\{(0,0),(1,3),(2,-1),(3,2)\}$$. We will compute the Rips filtration using the R-TDA package.
 
 
 {% highlight r %}
 library(TDA) # upload TDA package
 
-S <- cbind(c(0,1,0,1,3),c(0,0,2,2,1)) # write S into R
+S <- cbind(c(0,1,2,3),c(0,3,-1,2)) # write S into R
 
-r <- 4 # limit of the filtration
+r <- 5 # limit of the filtration
 
-maxdimension <- 2 # components , loops, and voids
+maxdimension <- 3 # components , loops, and voids
 
 S_RipsFilt <- ripsFiltration(S, maxdimension, r, dist = "euclidean")
 {% endhighlight %}
 
-Great! So how do we interpret the output?
+Great! So how do we interpret the S_RipsFilt object?
 
-The ripsFiltration function returns a list with a complex list, filtration values vector, a logical variable that states whether or not the values are in increasing order, and a matrix of the coordinates of the vertices if the Euclidean distance is used. The $$i^{th}$$ element of the complex are the vertices of the $$i^{th}$$ simplex. Additionally, the $i^{th}$ entry of the filtration values is the filtration value for when the $$i^{th}$$ simplex appears. See **TODO: reference CRAN documentation.** Let's check this out.
+The ripsFiltration function returns a list with a complex list, filtration values vector, a logical variable that states whether or not the values are in increasing order, and a matrix of the coordinates of the vertices if the Euclidean distance is used. The $$i^{th}$$ element of the complex are the vertices of the $$i^{th}$$ simplex. Additionally, the $$i^{th}$$ entry of the filtration values is the filtration value for when the $$i^{th}$$ simplex appears. See the documentation for this function with this [link](https://rdrr.io/cran/TDA/man/ripsFiltration.html).
+ Let's check this out.
 
 
 {% highlight r %}
-S_RipsFilt$cmplx[[16]] #Access vertices for the 16th simplex in the list
+S_RipsFilt$cmplx[[10]] #Access vertices for the 10th simplex in the list
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## [1] 4 3 2 1
+## [1] 4 2 1
 {% endhighlight %}
 
 
 
 {% highlight r %}
-S_RipsFilt$values[16] #Access filtration value for the 16th simplex in the list
+S_RipsFilt$values[10] #Access filtration value for the 10th simplex in the list
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## [1] 2.236068
+## [1] 3.605551
 {% endhighlight %}
 
-Our output tells us that we add a 3-simplex when $$r=\sqrt{5}$$. This is exactly what we found
-when we worked through this example by hand. Accessing the other complex and filtration value elements will help us verify the rest of the filtration computation we did earlier.
+Our output tells us that we have a 2-simplex on vertices $$(0,0),(1,3),(3,2)$$ when $$r=\sqrt{13}$$. 
+This is exactly what we found when we worked through this example by hand. Accessing the other complex 
+and filtration value elements will help us verify the rest of the filtration computation we did earlier.
 
-If we want to visualize the Rips complex when $$r = 2$$, we can run the following code.
+If we want to see an animation of the Rips filtration, we can run the following code. Note this function only works if the data set is two dimensional and the Euclidean distance is used.
 
 
 
 {% highlight r %}
-# Plot Rips Complex when r=2.
+S_RipsFilt <- ripsFiltration(S, maxdimension = 2, 
+                             maxscale = 4.5, dist = "euclidean")
 
-r <- 2 # limit of the filtration
-maxdimension <- 2 # allow components, loops, and voids
+class(S_RipsFilt) <- c(class(S_RipsFilt), "rips_filt")
 
-S_RipsFilt <- ripsFiltration(S, maxdimension, r, dist = "euclidean")
-
-lim <- rep(c(-1, 4), 2)
-plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
-     main = "Rips Complex for r = 2", xlab = "", ylab = "")
-for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
-  polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
-          col = "pink", border = NA, xlim = lim[1:2], ylim = lim[3:4])
-}
-for (idx in seq(along = S_RipsFilt[["cmplx"]])) {
-  polygon(S[S_RipsFilt[["cmplx"]][[idx]], , drop = FALSE],
-          col = NULL, xlim = lim[1:2], ylim = lim[3:4])
-}
-points(S, pch = 16)
+plot(S_RipsFilt, animate = TRUE, 
+     fn_out = 'rips_example.gif', 
+     lout = 80, interval = 0.2)
 {% endhighlight %}
 
 
 <center>
-<embed width="80%" src="../../assets/tda-rips/visualization.svg" type="image/svg+xml" />
+<img width="80%" src="../../assets/tda-rips/rips_example.gif"/>
 </center>
 
 ### Non Euclidean Distance Example
-Now we will compute a Rips filtration on $S$, but this time using the **TODO** distance.
+Now we will compute a Rips filtration on $$S$$, but this time using the Manhattan distance or $$\ell_1$$ norm. Recall, that for points, $$\textbf{x}=(x_1,...,x_n)$$ and $$\textbf{y}=(y_1,...,y_n)\in \mathbb{R}^n$$,
+the Manhattan distance, $$d_M(\textbf{x},\textbf{y})$$ is defined as:
 
-### Providence Coffee Shops Location Data
-Lastly, we will work through an example with real data!
+$$d_M(\textbf{x},\textbf{y}):=\sum_{i=1}^{n}|x_i-y_i|.$$
+
+In order to compute the Rips filtration on $$S$$ for this metric, we need to create a distance
+matrix in R. We can do this using the following code. 
+
+
+{% highlight r %}
+dist_matrix <- dist(S, method = "manhattan", diag = TRUE, upper = TRUE, p = 2) 
+{% endhighlight %}
+
+Now when we use the ripsFiltration function, we will write dist_matrix as the first argument instead of $$S$$. Additionally, the fourth argument will change to dist = "arbitrary".
+
+
+{% highlight r %}
+S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension = 2, 
+                                       maxscale = 5, dist = "arbitrary") 
+{% endhighlight %}
+
+This time when we compute the Rips complex with $$r=\sqrt{13}$$ we get the following complex. 
+
+
+{% highlight r %}
+S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension = 2, 
+                                       maxscale = sqrt(13), dist = "arbitrary")
+
+lim <- rep(c(-1, 3), 2)
+plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
+     main = "Rips Complex with Manhattan Distance for r = sqrt(13)", 
+     xlab = "", ylab = "")
+for (idx in seq(along = S_RipsFilt_Manhattan[["cmplx"]])) {
+  polygon(S[S_RipsFilt_Manhattan[["cmplx"]][[idx]], , drop = FALSE],
+          col = "gray", border = NA, xlim = lim[1:2], ylim = lim[3:4])
+}
+for (idx in seq(along = S_RipsFilt_Manhattan[["cmplx"]])) {
+  polygon(S[S_RipsFilt_Manhattan[["cmplx"]][[idx]], , drop = FALSE],
+          col = NULL, xlim = lim[1:2], ylim = lim[3:4])
+}
+points(S, pch = 16)
+dev.off()
+{% endhighlight %}
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/visualization2.svg" type="image/svg+xml" />
+</center>
+
+Hence VR$$(S, \sqrt{13})$$ with the Manhattan distance is a simplicial complex two edges, while with the Euclidean distance is a simplicial complex with two 2-simplices. 
+
+### Sightings of Bigfoot in Montana
+Lastly, we will work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their [website](http://www.bfro.net/). We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the dead zones where bigfoot has not been sighted in order to keep hikers safe from potential encounters.
+
+
+{% highlight r %}
+#Latitude coordinates of Bigfoot sightings in MT
+latitude <- c(48.24750, 48.08350, 48.27750, 48.02611, 48.07834, 48.26880, 
+              48.21167, 48.12780, 48.11556, 48.26810, 48.14720, 48.93228, 
+              47.98170, 48.09853, 47.89250, 47.85730, 47.88950, 47.79111, 
+              47.78530, 48.18640, 48.07440, 48.00280, 47.85556, 47.97205, 
+              47.89010, 47.84650, 47.87725, 48.21095, 48.11509, 47.48500, 
+              47.79222, 48.22336, 47.86405, 48.10500, 48.13025, 48.02073, 
+              47.79250)
+
+#Longitude coordinates of Bigfoot sightings in MT
+longitude <- c(-121.9425, -121.9683, -121.8078, -121.6406, -121.7363, 
+               -121.7050, -121.6769, -121.7692, -122.0958, -121.3314, 
+               -121.3819, -121.9995, -122.0447, -121.8135, -122.0111, 
+               -121.6352, -121.8134, -122.1914, -121.6647, -122.2612, 
+               -121.7915, -121.9572, -121.9697, -121.4008, -121.3676, 
+               -122.1357, -121.8943, -122.0262, -121.9677, -121.5287, 
+               -121.1958, -121.5777, -121.6738, -121.9050, -121.8510, 
+               -121.3552, -122.1676)
+
+#GPS coordinates of Bigfoot sightings in MT
+bigfoot_sightingsMT <- cbind(latitude, longitude)
+{% endhighlight %}
+
+We can plot the data using the following code.
+
+
+{% highlight r %}
+plot(bigfoot_sightingsMT[,1],bigfoot_sightingsMT[,2], xlab = "Latitude", 
+     ylab = "Longitude", main = "GPS coordinates of Bigfoot sightings 
+     in Montana", pch=16)
+{% endhighlight %}
+
+
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/bigfoot.svg" type="image/svg+xml" />
+</center>
+
+Now let's compute the filtration and visualize it with an animation. 
+
+
+{% highlight r %}
+BigfootRipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension = 2, 
+                                  maxscale = 1.6, dist = "euclidean")
+
+class(BigfootRipsFilt) <- c(class(BigfootRipsFilt), "rips_filt")
+
+plot(BigfootRipsFilt, animate = TRUE, 
+     fn_out = 'bigfoot_ex.gif', 
+     lout = 80, interval = 0.2)
+{% endhighlight %}
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/bigfoot_ex.gif" type="image/svg+xml" />
+</center>
+
+**TODO: find which areas in Montana correspond to the dead zones and add a concluding remark.**
+
+
 
 References
 ==========
