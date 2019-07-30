@@ -244,9 +244,9 @@ The ripsFiltration function returns a list with a complex list, filtration value
 
 ```{r output, echo = TRUE, message = TRUE}
 
-S_RipsFilt$cmplx[[10]] #Access vertices for the 16th simplex in the list
+S_RipsFilt$cmplx[[10]] #Access vertices for the 10th simplex in the list
 
-S_RipsFilt$values[10] #Access filtration value for the 16th simplex in the list
+S_RipsFilt$values[10] #Access filtration value for the 10th simplex in the list
 ```
 
 Our output tells us that we have a 2-simplex on vertices $$(0,0),(1,3),(3,2)$$ when $$r=\sqrt{13}$$. This is exactly what we found
@@ -257,7 +257,8 @@ If we want to visualize the Rips filtration, we can run the following code.
 
 ```{r visualization_echo, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
 
-S_RipsFilt <- ripsFiltration(S, maxdimension = 2, maxscale = 4.5, dist = "euclidean")
+S_RipsFilt <- ripsFiltration(S, maxdimension = 2, 
+                             maxscale = 4.5, dist = "euclidean")
 
 class(S_RipsFilt) <- c(class(S_RipsFilt), "rips_filt")
 
@@ -299,14 +300,10 @@ S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension, r,
 
 This time when we compute the Rips complex with $$r=\sqrt{13}$$ we get the following complex. 
 
-```{r visualization2, echo = FALSE, message = FALSE, results='hide'}
+```{r visualization2, echo = TRUE, message = FALSE, results='hide'}
 
-# Plot Rips Complex when r=sqrt(13).
-
-r <- sqrt(13) # limit of the filtration
-maxdimension <- 2 # allow components, loops, and voids
-
-S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension, r, dist = "arbitrary")
+S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension = 2, 
+                                       maxscale = sqrt(13), dist = "arbitrary")
 
 lim <- rep(c(-1, 3), 2)
 svg('../../assets/tda-rips/visualization2.svg')
@@ -395,7 +392,7 @@ plot(BigfootRipsFilt, animate = TRUE,
 ```
 
 <center>
-<embed width="80%" src="../../assets/tda-rips/bigfoot_complex.svg" type="image/svg+xml" />
+<embed width="80%" src="../../assets/tda-rips/bigfoot_ex.gif" type="image/svg+xml" />
 </center>
 
 **TODO: figure out why the plot isn't showing up, add some concluding remarks on this example**
