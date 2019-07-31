@@ -48,15 +48,22 @@
   <div class="post-content e-content" itemprop="articleBody">
     <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
+<figure class="highlight"><pre><code class="language-text" data-lang="text">## Warning in install.packages(p, dep = TRUE): installation of package
+## 'magick' had non-zero exit status</code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">## Warning in install.packages(p, dep = TRUE): installation of package
+## 'animation' had non-zero exit status</code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">## Error in library(p, character.only = TRUE): there is no package called 'animation'</code></pre></figure>
+
 <h1 id="introduction">Introduction</h1>
 <p>Our ultimate goal is to understand Persistent Homology and be able to compute Persistence
 Diagrams using the R-TDA package. In order to get there, we must first understand filtrations.
 In this tutorial, we will work with the Vietoris Rips Filtration, or Rips Filtration for short.
 Suppose we are given a finite set of points in <script type="math/tex">\mathbb{R}^n</script> denoted by <script type="math/tex">S</script>. The set of
-points, <script type="math/tex">S</script>, is topologically uninteresting. How can we fix this?
-Yes, you guessed it - we can construct a Rips complex from the points in <script type="math/tex">S</script>!  The Rips
-Filtration is a specific nested sequence of Rips complexes over <script type="math/tex">S</script> that can be later used to
-compute Persistent Homology.</p>
+points, <script type="math/tex">S</script>, is topologically uninteresting. How can we fix this? Yes, you guessed it - we 
+can construct a Rips complex from the points in <script type="math/tex">S</script>! The Rips Filtration is a specific nested 
+sequence of Rips complexes over <script type="math/tex">S</script> that can be later used to compute Persistent Homology.</p>
 
 <h1 id="objectives">Objectives</h1>
 <p>By the end of this tutorial you will be able to:</p>
@@ -186,11 +193,8 @@ input.</p>
 
 </span><span class="n">S</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">cbind</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">),</span><span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">-1</span><span class="p">,</span><span class="m">2</span><span class="p">))</span><span class="w"> </span><span class="c1"># write S into R</span><span class="w">
 
-</span><span class="n">r</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="c1"># limit of the filtration</span><span class="w">
-
-</span><span class="n">maxdimension</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="c1"># components , loops, and voids</span><span class="w">
-
-</span><span class="n">S_RipsFilt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ripsFiltration</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">maxdimension</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"euclidean"</span><span class="p">)</span></code></pre></figure>
+</span><span class="n">S_RipsFilt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ripsFiltration</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">maxdimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">maxscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> 
+                             </span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"euclidean"</span><span class="p">)</span></code></pre></figure>
 
 <p>Great! So how do we interpret the S_RipsFilt object?</p>
 
@@ -216,8 +220,7 @@ and filtration value elements will help us verify the rest of the filtration com
 
 </span><span class="nf">class</span><span class="p">(</span><span class="n">S_RipsFilt</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="nf">class</span><span class="p">(</span><span class="n">S_RipsFilt</span><span class="p">),</span><span class="w"> </span><span class="s2">"rips_filt"</span><span class="p">)</span><span class="w">
 
-</span><span class="n">plot</span><span class="p">(</span><span class="n">S_RipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> 
-     </span><span class="n">fn_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'rips_example.gif'</span><span class="p">,</span><span class="w"> 
+</span><span class="n">plot</span><span class="p">(</span><span class="n">S_RipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">fn_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'rips_example.gif'</span><span class="p">,</span><span class="w"> 
      </span><span class="n">lout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">80</span><span class="p">,</span><span class="w"> </span><span class="n">interval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.2</span><span class="p">)</span></code></pre></figure>
 
 <center>
@@ -308,12 +311,11 @@ matrix in R. We can do this using the following code.</p>
 
 </span><span class="nf">class</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="nf">class</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">),</span><span class="w"> </span><span class="s2">"rips_filt"</span><span class="p">)</span><span class="w">
 
-</span><span class="n">plot</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> 
-     </span><span class="n">fn_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'bigfoot_ex.gif'</span><span class="p">,</span><span class="w"> 
+</span><span class="n">plot</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">fn_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'bigfoot_ex.gif'</span><span class="p">,</span><span class="w"> 
      </span><span class="n">lout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">80</span><span class="p">,</span><span class="w"> </span><span class="n">interval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.2</span><span class="p">)</span></code></pre></figure>
 
 <center>
-<embed width="80%" src="../../assets/tda-rips/bigfoot_ex.gif" type="image/svg+xml" />
+<embed width="70%" height="auto" src="../../assets/tda-rips/bigfoot_ex.gif" />
 </center>
 
 <p><strong>TODO: find which areas in Montana correspond to the dead zones and add a concluding remark.</strong></p>
