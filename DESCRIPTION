@@ -7,5 +7,5 @@ Imports:
     servr,
     knitr,
     formatR,
-    TDA,
+    TDA
 Remotes: jordans1882/jas
