@@ -4,6 +4,7 @@ pandoc_version: 1.19.2.1
 
 before_install:
   - sudo apt-get install ruby-full build-essential zlib1g-dev
+  - sudo apt-get install libmpfr-dev libmpfr-doc libmpfr4 libmpfr4-dbg
   - sudo apt-get install libgmp3-dev
   - gem install jekyll bundler
   - bundle install
