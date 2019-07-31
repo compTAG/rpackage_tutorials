@@ -2,4 +2,4 @@
 
 set -ev
 
-Rscript -e "JAS::gen_blog()"
+Rscript -e "gen_blog()"
