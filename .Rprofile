@@ -19,6 +19,11 @@ use_package <- function(p) {
 library(p, character.only = TRUE)
 }
 
+r <- getOption("repos")
+r["CRAN"] <- "http://cran.wustl.edu/"
+options(repos = r)
+rm(r)
+
+
 use_package('TDA')
 use_package('servr')
-
