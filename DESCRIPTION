@@ -6,5 +6,6 @@ Imports:
     JAS,
     servr,
     knitr,
-    formatR
+    formatR,
+    TDA
 Remotes: jordans1882/jas
