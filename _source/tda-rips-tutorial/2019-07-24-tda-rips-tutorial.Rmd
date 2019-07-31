@@ -100,10 +100,9 @@ Our ultimate goal is to understand Persistent Homology and be able to compute Pe
 Diagrams using the R-TDA package. In order to get there, we must first understand filtrations.
 In this tutorial, we will work with the Vietoris Rips Filtration, or Rips Filtration for short.
 Suppose we are given a finite set of points in $$\mathbb{R}^n$$ denoted by $$S$$. The set of
-points, $$S$$, is topologically uninteresting. How can we fix this?
-Yes, you guessed it - we can construct a Rips complex from the points in $$S$$!  The Rips
-Filtration is a specific nested sequence of Rips complexes over $$S$$ that can be later used to
-compute Persistent Homology.
+points, $$S$$, is topologically uninteresting. How can we fix this? Yes, you guessed it - we 
+can construct a Rips complex from the points in $$S$$! The Rips Filtration is a specific nested 
+sequence of Rips complexes over $$S$$ that can be later used to compute Persistent Homology.
 
 Objectives
 ==========
