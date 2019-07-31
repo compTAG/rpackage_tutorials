@@ -1,8 +1,8 @@
 ---
+layout: post
 title: "Persistent Homology Tutorial for the R-TDA Package"
 author: "Robin Belton"
 date: "July 29, 2019"
-output: html_document
 ---
 
 {% include lib/mathjax.html %}
@@ -76,7 +76,9 @@ $$f^{i,j}_{p}:H_p(K_i, R)\rightarrow H_p(K_j)$$, between the $$p^{th}$$ homology
 $$K_i$$ and $$K_j$$ for every dimension $$p$$. 
 Therefore, our filtration induces a sequence of homology groups:
 
+
 $$\emptyset \rightarrow H_p(K_0)\rightarrow H_p(K_1) \rightarrow ... \rightarrow H_p(K_n).$$
+
 As we travel through the sequence, new homology classes form while other homology classes merge
 with one another. In PH, the *Elder Rule* holds which states that when two homology classes merge
 to form a new homology class, the older class continues while the younger class ends.
@@ -183,11 +185,11 @@ DiagRips$diagram
 Lastly, we can plot the PD using this code:
 
 ```{r PD_hide, echo = FALSE, message = FALSE, results = 'hide'}
-svg('../../assets/tda-rips/toyPD.svg')
+svg('../../assets/tda-PH/toyPD.svg')
 plot(DiagRips[["diagram"]])
 ```
 
-```{r PD_hide, echo = FALSE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
+```{r PD_show, echo = FALSE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
 plot(DiagRips[["diagram"]])
 ```
 
@@ -198,3 +200,8 @@ We find that this is the same PD we got before!
 **TODO**
 
 ## Real World Example
+
+References
+==========
+
+{% bibliography --cited %}

@@ -37,6 +37,8 @@ use_package('png') # For importing pngs
 use_package('gridExtra') # For grid arrange
 use_package('grImport2') # For importing svg graphics
 use_package('TDA')
+use_package("plotrix")
+use_package("animation")
 ```
 
 
@@ -237,7 +239,8 @@ library(TDA) # upload TDA package
 
 S <- cbind(c(0,1,2,3),c(0,3,-1,2)) # write S into R
 
-S_RipsFilt <- ripsFiltration(S, maxdimension = 2, maxscale = 5, dist = "euclidean")
+S_RipsFilt <- ripsFiltration(S, maxdimension = 2, maxscale = 5, 
+                             dist = "euclidean")
 ```
 
 Great! So how do we interpret the S_RipsFilt object?
@@ -266,8 +269,7 @@ S_RipsFilt <- ripsFiltration(S, maxdimension = 2,
 
 class(S_RipsFilt) <- c(class(S_RipsFilt), "rips_filt")
 
-plot(S_RipsFilt, animate = TRUE, 
-     fn_out = 'rips_example.gif', 
+plot(S_RipsFilt, animate = TRUE, fn_out = 'rips_example.gif', 
      lout = 80, interval = 0.2)
 
 ```
@@ -384,15 +386,14 @@ BigfootRipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension = 2,
 
 class(BigfootRipsFilt) <- c(class(BigfootRipsFilt), "rips_filt")
 
-plot(BigfootRipsFilt, animate = TRUE, 
-     fn_out = 'bigfoot_ex.gif', 
+plot(BigfootRipsFilt, animate = TRUE, fn_out = 'bigfoot_ex.gif', 
      lout = 80, interval = 0.2)
 
 
 ```
 
 <center>
-<embed width="80%" src="../../assets/tda-rips/bigfoot_ex.gif" type="image/svg+xml" />
+<embed width="70%" height="auto" src="../../assets/tda-rips/bigfoot_ex.gif"/>
 </center>
 
 **TODO: find which areas in Montana correspond to the dead zones and add a concluding remark.**
