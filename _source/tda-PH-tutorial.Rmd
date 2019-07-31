@@ -117,7 +117,7 @@ filtrations, and lower star filtrations to name a few.
 At this point you may be thinking that PH groups are cool, but how can we organize all this
 information!? This is where PDs come into play. PDs are a topological descriptor of data that
 keeps track of all the PH groups that arise from a filtrartion. More specifically, a *$$p^{th}$$
-dimensional* PD is multiset of points in the extended plane along with the diagonal where each
+dimensional* PD is a multiset of points in the extended plane along with the diagonal where each
 point on the diagonal has countably infinite multiplicity. Each PD corresponds to a filtration.
 If $$(x,y)$$ is a point in the PD, then $$x$$ denotes the filtration value for which a new
 $$p^{th}$$ dimensional homology class emerged or was *born* while $$y$$ denotes the filtration
@@ -125,7 +125,48 @@ value for when that homology class ends or *dies*. Note that some homology class
 which is denoted by taking $$y=\infty$$. The vertical distance of the point $$(x,y)$$ to the
 diagonal is the *persistence* of the homology class corresponding to $$(x,y)$$. 
 
-Let's compute the zeroth dimensional PD for Rips filtration of $$S$$.
+Let's compute the zeroth dimensional PD for the Rips filtration of $$S$$.
+
+Observe:
+
+* when $$r=0$$, four connected components emerge. 
+* when $$r=\sqrt{5}$$, the four connected components merge into two connected components. So in our 
+PD, the point $$(0,\sqrt{5})$$ has multiplicity two. 
+* when $$r=\sqrt{10}$$, the two connected components merge into one connected component. This will
+correspond to a point $$(0,\sqrt{10})$$ in the PD. 
+* For the rest of the filtration there is one connected component which means the point, $$(0,\infty)$$ 
+is in the PD. 
+
+**TODO: Insert PD figure**
+
+Similarly, let's compute the one dimensional PD for the Rips filtration of $$S$$. Observe there is only one cycle that appears throughout the filtration. The cycle appears when $$r=\sqrt{10}$$ and then merges with the 2-simplices when $$r=\sqrt{13}.$$ So the only point in the one dimensional PD besides the diagonal points is $$(\sqrt{10},\sqrt{13}).$$
+
+**TODO: Insert PD figure**
 
 
+Applications
+============
 
+Now that we have discussed the theory, let's talk about some of the applications! PH is the core of
+Topological Data Analysis (TDA) and has been extensively used to study all sorts of problems. 
+
+* **Medicine** Some medical problems are inherently geometric and topological. For example, Researchers at Tulane University and Montana State University study prostate cancer prognosis using persistent homology. The shape of the cancer cells are circular and so PH is a technique that can be used to quantify the toplogy of these cells and perhaps more accurately classify the severity of someone's prostate cancer.
+
+* **Deep Learning** Add neural network application here
+* **Shape Comparison** Talk about Kate Turner's paper
+* ** Dynamics** Find a good TDA and dynamics paper
+
+Computing the Persistence Diagrams using the R-TDA Package
+==========================================================
+
+### Toy Example
+
+First, let's go back to the example where $$S:=\{(0,0),(1,3),(2,-1),(3,2)\}$$. We will compute the 0 and 1 dimensional PDs corresponding to the Rips filtration on $$S$$. 
+
+```{r toydataset, echo = TRUE, message = TRUE}
+library(TDA) # upload TDA package
+
+S <- cbind(c(0,1,2,3),c(0,3,-1,2)) # write S into R
+
+DiagRips <- ripsDiag(X = Circles, maxdimension = 2, maxscale = 5, library = c("GUDHI", "Dionysus"), location = TRUE, printProgress = FALSE)
+```
