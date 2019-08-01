@@ -47,7 +47,7 @@ plot.rips_filt <- function(filt, thresh = 0.2, animate = FALSE, fn_out, lout, ..
     data <- filt$coordinates
     two_d_check <- dim(data)[2] == 2
     # euclidean_check <- #TODO: need to pass euclidean distance into filtration object
-    
+
   plot_fun <- function(filt, r) {
     data <- filt$coordinates
     xlim <- range(data[, 1])
@@ -63,8 +63,8 @@ plot.rips_filt <- function(filt, thresh = 0.2, animate = FALSE, fn_out, lout, ..
     ymin <- min(data[, 2])
     ymax <- max(data[, 2])
     max_dist <- max(dist(data))
-    xlims = c(xmin - max_dist, xmax + max_dist)
-    ylims = c(ymin - max_dist, ymax + max_dist)
+    xlims = c(xmin - max_dist / 2, xmax + max_dist / 2)
+    ylims = c(ymin - max_dist / 2, ymax + max_dist / 2)
       plot(NULL, type = "n", xlim = xlims, ylim = ylims, main = "Rips Complex",
                 xlab = "", ylab = "", asp = 1)
       for(j in 1:length(data[, 1])) {
@@ -102,8 +102,8 @@ Our ultimate goal is to understand Persistent Homology and be able to compute Pe
 Diagrams using the R-TDA package. In order to get there, we must first understand filtrations.
 In this tutorial, we will work with the Vietoris Rips Filtration, or Rips Filtration for short.
 Suppose we are given a finite set of points in $$\mathbb{R}^n$$ denoted by $$S$$. The set of
-points, $$S$$, is topologically uninteresting. How can we fix this? Yes, you guessed it - we 
-can construct a Rips complex from the points in $$S$$! The Rips Filtration is a specific nested 
+points, $$S$$, is topologically uninteresting. How can we fix this? Yes, you guessed it - we
+can construct a Rips complex from the points in $$S$$! The Rips Filtration is a specific nested
 sequence of Rips complexes over $$S$$ that can be later used to compute Persistent Homology.
 
 Objectives
@@ -120,7 +120,7 @@ Theory
 ======
 
 First we breifly describe the mathematical foundations behind a Rips Filtration including
-simplicial complexes, filtrations, and the Rips complex. For more details on the theory, 
+simplicial complexes, filtrations, and the Rips complex. For more details on the theory,
 see {% cite edelsbrunner:2010 %}.
 
 ### Triangle Appreciation
@@ -134,7 +134,7 @@ affinely independent points.
 </center>
 
 A simplicial complex is a nice way of combining simplices. In particular, a *simplicial complex*
-is a finite collection of simplices, $$K$$, such that (1) if $$\sigma \in K$$ and $$\tau\leq \sigma$$, then $$\tau \in K$$, and (2) if $$\sigma, \sigma'\in K$$, then $$\sigma\cap \sigma'$$ is either empty or a face of both. A *face* of a simplex is the convex hull of a subset of the 
+is a finite collection of simplices, $$K$$, such that (1) if $$\sigma \in K$$ and $$\tau\leq \sigma$$, then $$\tau \in K$$, and (2) if $$\sigma, \sigma'\in K$$, then $$\sigma\cap \sigma'$$ is either empty or a face of both. A *face* of a simplex is the convex hull of a subset of the
 vertices in the simplex.
 
 <center>
@@ -144,7 +144,7 @@ vertices in the simplex.
 ### Rips Complex
 
 Now we explain how to construct a Rips complex from a finite set of points, but first we must
-start with some preliminary definitions. The *diameter* of a set of points is the maximum distance between any two points in the set. An *abstract simplicial complex* is a finite collection of sets, $$A$$, such that if $$a\in A$$ and $$b\subset a$$ implies $$b\in A$$. The elements $$a\in A$$ are the simplices where dim$$(a)=$$card$$(a)-1$$. 
+start with some preliminary definitions. The *diameter* of a set of points is the maximum distance between any two points in the set. An *abstract simplicial complex* is a finite collection of sets, $$A$$, such that if $$a\in A$$ and $$b\subset a$$ implies $$b\in A$$. The elements $$a\in A$$ are the simplices where dim$$(a)=$$card$$(a)-1$$.
 
 <center>
 <embed width="80%" src="../../assets/tda-rips/asc.svg" type="image/svg+xml" />
@@ -177,7 +177,7 @@ empty set and ending with the full simplicial complex i.e.,
 $$\emptyset \subset K_0 \subset K_1 \subset ... \subset K_n=K.$$
 
 Going back to the Rips complex, we consider $$r$$ to be a free parameter. If we vary $$r$$, we
-get different Rips complexes. There is often not a best choice for $$r$$, so why not look at 
+get different Rips complexes. There is often not a best choice for $$r$$, so why not look at
 all of them!? Observe if we increase $$r$$, then we get a family of nested Rips complexes which
 gives rise to the *Rips filtration*.
 
@@ -239,7 +239,7 @@ library(TDA) # upload TDA package
 
 S <- cbind(c(0,1,2,3),c(0,3,-1,2)) # write S into R
 
-S_RipsFilt <- ripsFiltration(S, maxdimension = 2, maxscale = 5, 
+S_RipsFilt <- ripsFiltration(S, maxdimension = 2, maxscale = 5,
                              dist = "euclidean")
 ```
 
@@ -255,8 +255,8 @@ S_RipsFilt$cmplx[[10]] #Access vertices for the 10th simplex in the list
 S_RipsFilt$values[10] #Access filtration value for the 10th simplex in the list
 ```
 
-Our output tells us that we have a 2-simplex on vertices $$(0,0),(1,3),(3,2)$$ when $$r=\sqrt{13}$$. 
-This is exactly what we found when we worked through this example by hand. Accessing the other complex 
+Our output tells us that we have a 2-simplex on vertices $$(0,0),(1,3),(3,2)$$ when $$r=\sqrt{13}$$.
+This is exactly what we found when we worked through this example by hand. Accessing the other complex
 and filtration value elements will help us verify the rest of the filtration computation we did earlier.
 
 If we want to see an animation of the Rips filtration, we can run the following code. Note this function only works if the data set is two dimensional and the Euclidean distance is used.
@@ -264,12 +264,12 @@ If we want to see an animation of the Rips filtration, we can run the following 
 
 ```{r visualization_echo, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
 
-S_RipsFilt <- ripsFiltration(S, maxdimension = 2, 
+S_RipsFilt <- ripsFiltration(S, maxdimension = 2,
                              maxscale = 4.5, dist = "euclidean")
 
 class(S_RipsFilt) <- c(class(S_RipsFilt), "rips_filt")
 
-plot(S_RipsFilt, animate = TRUE, fn_out = 'rips_example.gif', 
+plot(S_RipsFilt, animate = TRUE, fn_out = 'rips_example.gif',
      lout = 80, interval = 0.2)
 
 ```
@@ -286,30 +286,30 @@ the Manhattan distance, $$d_M(\textbf{x},\textbf{y})$$ is defined as:
 $$d_M(\textbf{x},\textbf{y}):=\sum_{i=1}^{n}|x_i-y_i|.$$
 
 In order to compute the Rips filtration on $$S$$ for this metric, we need to create a distance
-matrix in R. We can do this using the following code. 
+matrix in R. We can do this using the following code.
 
 ```{r distance, echo = TRUE, message = TRUE}
-dist_matrix <- dist(S, method = "manhattan", diag = TRUE, upper = TRUE, p = 2) 
+dist_matrix <- dist(S, method = "manhattan", diag = TRUE, upper = TRUE, p = 2)
 ```
 
 Now when we use the ripsFiltration function, we will write dist_matrix as the first argument instead of $$S$$. Additionally, the fourth argument will change to dist = "arbitrary".
 
 ```{r rips_manhattan, echo = TRUE, message = TRUE}
 
-S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension = 2, 
-                                       maxscale = 5, dist = "arbitrary") 
-``` 
+S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension = 2,
+                                       maxscale = 5, dist = "arbitrary")
+```
 
-This time when we compute the Rips complex with $$r=\sqrt{13}$$ we get the following complex. 
+This time when we compute the Rips complex with $$r=\sqrt{13}$$ we get the following complex.
 
 ```{r visualization2_show, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
 
-S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension = 2, 
+S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension = 2,
                                        maxscale = sqrt(13), dist = "arbitrary")
 
 lim <- rep(c(-1, 3), 2)
 plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
-     main = "Rips Complex with Manhattan Distance for r = sqrt(13)", 
+     main = "Rips Complex with Manhattan Distance for r = sqrt(13)",
      xlab = "", ylab = "")
 for (idx in seq(along = S_RipsFilt_Manhattan[["cmplx"]])) {
   polygon(S[S_RipsFilt_Manhattan[["cmplx"]][[idx]], , drop = FALSE],
@@ -327,7 +327,7 @@ dev.off()
 <embed width="80%" src="../../assets/tda-rips/visualization2.svg" type="image/svg+xml" />
 </center>
 
-Hence VR$$(S, \sqrt{13})$$ with the Manhattan distance is a simplicial complex two edges, while with the Euclidean distance is a simplicial complex with two 2-simplices. 
+Hence VR$$(S, \sqrt{13})$$ with the Manhattan distance is a simplicial complex two edges, while with the Euclidean distance is a simplicial complex with two 2-simplices.
 
 ### Sightings of Bigfoot in Montana
 Lastly, we will work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their [website](http://www.bfro.net/). We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the dead zones where bigfoot has not been sighted in order to keep hikers safe from potential encounters.
@@ -335,22 +335,22 @@ Lastly, we will work through an example with real data! The Bigfoot Field Resear
 ```{r bigfootdataset, echo = TRUE, message = TRUE}
 
 #Latitude coordinates of Bigfoot sightings in MT
-latitude <- c(48.24750, 48.08350, 48.27750, 48.02611, 48.07834, 48.26880, 
-              48.21167, 48.12780, 48.11556, 48.26810, 48.14720, 48.93228, 
-              47.98170, 48.09853, 47.89250, 47.85730, 47.88950, 47.79111, 
-              47.78530, 48.18640, 48.07440, 48.00280, 47.85556, 47.97205, 
-              47.89010, 47.84650, 47.87725, 48.21095, 48.11509, 47.48500, 
-              47.79222, 48.22336, 47.86405, 48.10500, 48.13025, 48.02073, 
+latitude <- c(48.24750, 48.08350, 48.27750, 48.02611, 48.07834, 48.26880,
+              48.21167, 48.12780, 48.11556, 48.26810, 48.14720, 48.93228,
+              47.98170, 48.09853, 47.89250, 47.85730, 47.88950, 47.79111,
+              47.78530, 48.18640, 48.07440, 48.00280, 47.85556, 47.97205,
+              47.89010, 47.84650, 47.87725, 48.21095, 48.11509, 47.48500,
+              47.79222, 48.22336, 47.86405, 48.10500, 48.13025, 48.02073,
               47.79250)
 
 #Longitude coordinates of Bigfoot sightings in MT
-longitude <- c(-121.9425, -121.9683, -121.8078, -121.6406, -121.7363, 
-               -121.7050, -121.6769, -121.7692, -122.0958, -121.3314, 
-               -121.3819, -121.9995, -122.0447, -121.8135, -122.0111, 
-               -121.6352, -121.8134, -122.1914, -121.6647, -122.2612, 
-               -121.7915, -121.9572, -121.9697, -121.4008, -121.3676, 
-               -122.1357, -121.8943, -122.0262, -121.9677, -121.5287, 
-               -121.1958, -121.5777, -121.6738, -121.9050, -121.8510, 
+longitude <- c(-121.9425, -121.9683, -121.8078, -121.6406, -121.7363,
+               -121.7050, -121.6769, -121.7692, -122.0958, -121.3314,
+               -121.3819, -121.9995, -122.0447, -121.8135, -122.0111,
+               -121.6352, -121.8134, -122.1914, -121.6647, -122.2612,
+               -121.7915, -121.9572, -121.9697, -121.4008, -121.3676,
+               -122.1357, -121.8943, -122.0262, -121.9677, -121.5287,
+               -121.1958, -121.5777, -121.6738, -121.9050, -121.8510,
                -121.3552, -122.1676)
 
 #GPS coordinates of Bigfoot sightings in MT
@@ -362,8 +362,8 @@ We can plot the data using the following code.
 
 ```{r bigfootdataplot_show, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
 
-plot(bigfoot_sightingsMT[,1],bigfoot_sightingsMT[,2], xlab = "Latitude", 
-     ylab = "Longitude", main = "GPS coordinates of Bigfoot sightings 
+plot(bigfoot_sightingsMT[,1],bigfoot_sightingsMT[,2], xlab = "Latitude",
+     ylab = "Longitude", main = "GPS coordinates of Bigfoot sightings
      in Montana", pch=16)
 ```
 
@@ -377,16 +377,16 @@ plot(bigfoot_sightingsMT[,1],bigfoot_sightingsMT[,2], xlab = "Latitude", ylab = 
 <embed width="80%" src="../../assets/tda-rips/bigfoot.svg" type="image/svg+xml" />
 </center>
 
-Now let's compute the filtration and visualize it with an animation. 
+Now let's compute the filtration and visualize it with an animation.
 
 ```{r bigfootfiltration, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
 
-BigfootRipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension = 2, 
+BigfootRipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension = 2,
                                   maxscale = 1.6, dist = "euclidean")
 
 class(BigfootRipsFilt) <- c(class(BigfootRipsFilt), "rips_filt")
 
-plot(BigfootRipsFilt, animate = TRUE, fn_out = 'bigfoot_ex.gif', 
+plot(BigfootRipsFilt, animate = TRUE, fn_out = 'bigfoot_ex.gif',
      lout = 80, interval = 0.2)
 
 
