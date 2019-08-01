@@ -335,23 +335,24 @@ Lastly, we will work through an example with real data! The Bigfoot Field Resear
 ```{r bigfootdataset, echo = TRUE, message = TRUE}
 
 #Latitude coordinates of Bigfoot sightings in MT
-latitude <- c(48.24750, 48.08350, 48.27750, 48.02611, 48.07834, 48.26880,
-              48.21167, 48.12780, 48.11556, 48.26810, 48.14720, 48.93228,
-              47.98170, 48.09853, 47.89250, 47.85730, 47.88950, 47.79111,
-              47.78530, 48.18640, 48.07440, 48.00280, 47.85556, 47.97205,
-              47.89010, 47.84650, 47.87725, 48.21095, 48.11509, 47.48500,
-              47.79222, 48.22336, 47.86405, 48.10500, 48.13025, 48.02073,
-              47.79250)
+latitude <- c(45.31278,46.05292,45.97540,47.62167,48.03278,47.70667,
+              46.02962,47.66724,46.01833,46.97694,46.76389,45.12266,
+              48.27011,46.76472,46.18694,48.36139,45.22417,47.60413,
+              47.17833,45.28074,46.48392,47.57549,45.79220,45.61331,
+              48.68000,46.30766,47.07444,47.04333,47.07954,46.83285,
+              47.12808,46.59692,47.03222,47.06032,46.75889,46.96508,
+              46.52520,45.66722,45.82285,45.02620,45.37050)
 
 #Longitude coordinates of Bigfoot sightings in MT
-longitude <- c(-121.9425, -121.9683, -121.8078, -121.6406, -121.7363,
-               -121.7050, -121.6769, -121.7692, -122.0958, -121.3314,
-               -121.3819, -121.9995, -122.0447, -121.8135, -122.0111,
-               -121.6352, -121.8134, -122.1914, -121.6647, -122.2612,
-               -121.7915, -121.9572, -121.9697, -121.4008, -121.3676,
-               -122.1357, -121.8943, -122.0262, -121.9677, -121.5287,
-               -121.1958, -121.5777, -121.6738, -121.9050, -121.8510,
-               -121.3552, -122.1676)
+longitude <- c(-109.64490,-112.57100,-112.45540,-115.39030,-105.86420,
+               -104.19220,-113.11980,-108.68730,-110.33080,-113.83810,
+               -110.77810,-111.56300,-115.64180,-111.88610,-113.69250,
+               -113.12360,-111.12500,-113.75930,-111.97440,-109.55280,
+               -111.26440,-114.2650,-111.36370,-110.78970,-113.82000,
+               -113.14240,-111.96250,-112.70310,-112.56490,-112.70200,
+               -111.90940,-110.62680,-114.09060,-114.07170,-114.08000,
+               -114.07250,-113.59110,-110.80690,-114.01250,-106.83310,
+               -112.97070)
 
 #GPS coordinates of Bigfoot sightings in MT
 bigfoot_sightingsMT <- cbind(latitude, longitude)
@@ -396,7 +397,7 @@ plot(BigfootRipsFilt, animate = TRUE, fn_out = 'bigfoot_ex.gif',
 <embed width="70%" height="auto" src="../../assets/tda-rips/bigfoot_ex.gif"/>
 </center>
 
-**TODO: find which areas in Montana correspond to the dead zones and add a concluding remark.**
+As we watch the animation, we see that even at low filtration values, there are lots of simplices near the GPS coordinates of Missoula, MT which corresponds to several bigfoot sightings in that area. Furthermore, at a filtration value of one, we see that the area surrounding Helena, MT is a deadzone. If we assume that Bigfoot does not travel radially outwards more than one latitude/longitude unit, then this suggests that hiking in Helena could help avoid Bigfoot encounters. Lastly, there have not been many sightings in Eastern MT, so perhaps Bigfoot does not roam around in that part of the state. We have not fully solved the Bigfoot mystery but the Rips complex and Rips filtration helps us get one step closer!
 
 
 
