@@ -1,34 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="https://comptag.github.io/rpackage_tutorials/feed.xml" rel="self" type="application/atom+xml" /><link href="https://comptag.github.io/rpackage_tutorials/" rel="alternate" type="text/html" /><updated>2019-08-01T18:50:05+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/feed.xml</id><title type="html">R Package TDA Documentation</title><subtitle>Various tutorials on important techniques in topological data analysis. Tutorials made with the final goal in mind to use the R package TDA in order to actually implement each technique.</subtitle><entry><title type="html">Rips Filtration Tutorial for the R-TDA Package</title><link href="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html" rel="alternate" type="text/html" title="Rips Filtration Tutorial for the R-TDA Package" /><published>2019-07-22T00:00:00+00:00</published><updated>2019-07-22T00:00:00+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial</id><content type="html" xml:base="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html">&lt;script src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="https://comptag.github.io/rpackage_tutorials/feed.xml" rel="self" type="application/atom+xml" /><link href="https://comptag.github.io/rpackage_tutorials/" rel="alternate" type="text/html" /><updated>2019-08-02T00:07:42+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/feed.xml</id><title type="html">R Package TDA Documentation</title><subtitle>Various tutorials on important techniques in topological data analysis. Tutorials made with the final goal in mind to use the R package TDA in order to actually implement each technique.</subtitle><entry><title type="html">Rips Filtration Tutorial for the R-TDA Package</title><link href="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html" rel="alternate" type="text/html" title="Rips Filtration Tutorial for the R-TDA Package" /><published>2019-07-22T00:00:00+00:00</published><updated>2019-07-22T00:00:00+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial</id><content type="html" xml:base="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html">&lt;script src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
 
 &lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
-&lt;p&gt;Our ultimate goal is to understand Persistent Homology and be able to compute Persistence
-Diagrams using the R-TDA package. In order to get there, we must first understand filtrations.
-In this tutorial, we will work with the Vietoris Rips Filtration, or Rips Filtration for short.
-Suppose we are given a finite set of points in &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt; denoted by &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;. The set of
-points, &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;, is topologically uninteresting. How can we fix this? Yes, you guessed it - we
+&lt;p&gt;In this tutorial, we work with the Vietoris Rips Filtration, or Rips Filtration for short.
+Suppose we are given a finite set, &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;, of points in &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt;. The set of
+points is topologically uninteresting. How can we fix this? Yes, you guessed it: we
 can construct a Rips complex from the points in &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;! The Rips Filtration is a specific nested
 sequence of Rips complexes over &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; that can be later used to compute Persistent Homology.&lt;/p&gt;
 
 &lt;h1 id=&quot;objectives&quot;&gt;Objectives&lt;/h1&gt;
-&lt;p&gt;By the end of this tutorial you will be able to:&lt;/p&gt;
+&lt;p&gt;By the end of this tutorial you should be able to:&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;Define &lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;-simplices and simplicial complexes.&lt;/li&gt;
   &lt;li&gt;Compute a Rips Complex and Rips Filtration from a finite set of points in
 &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt; by hand.&lt;/li&gt;
-  &lt;li&gt;Name a few exciting applications of the Rips complexes and filtrations.&lt;/li&gt;
   &lt;li&gt;Compute a Rips Filtration from a finite set of points in &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt; using the R-TDA package.&lt;/li&gt;
+  &lt;li&gt;Name a few applications of the Rips complexes and filtrations.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h1 id=&quot;theory&quot;&gt;Theory&lt;/h1&gt;
 
-&lt;p&gt;First we breifly describe the mathematical foundations behind a Rips Filtration including
+&lt;p&gt;First, we breifly describe the mathematical foundations behind a Rips Filtration including
 simplicial complexes, filtrations, and the Rips complex. For more details on the theory,
 see &lt;a class=&quot;citation&quot; href=&quot;#edelsbrunner:2010&quot;&gt;(Edelsbrunner &amp;amp; Harer, 2010)&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h3 id=&quot;triangle-appreciation&quot;&gt;Triangle Appreciation&lt;/h3&gt;
 
-&lt;p&gt;We construct a Rips Complex from simplices of varying dimensions which are dimensional
+&lt;p&gt;We construct a Rips Complex from simplices of varying dimensions that are dimensional
 generalizations of triangles. More specifically, an &lt;em&gt;&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;-simplex&lt;/em&gt; is the convex hull of &lt;script type=&quot;math/tex&quot;&gt;n+1&lt;/script&gt;
 affinely independent points.&lt;/p&gt;
 
@@ -36,34 +34,40 @@ affinely independent points.&lt;/p&gt;
 &lt;embed width=&quot;70%&quot; src=&quot;../../assets/tda-rips/simplices.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
 &lt;/center&gt;
 
-&lt;p&gt;A simplicial complex is a nice way of combining simplices. In particular, a &lt;em&gt;simplicial complex&lt;/em&gt;
-is a finite collection of simplices, &lt;script type=&quot;math/tex&quot;&gt;K&lt;/script&gt;, such that (1) if &lt;script type=&quot;math/tex&quot;&gt;\sigma \in K&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;\tau\leq \sigma&lt;/script&gt;, then &lt;script type=&quot;math/tex&quot;&gt;\tau \in K&lt;/script&gt;, and (2) if &lt;script type=&quot;math/tex&quot;&gt;\sigma, \sigma'\in K&lt;/script&gt;, then &lt;script type=&quot;math/tex&quot;&gt;\sigma\cap \sigma'&lt;/script&gt; is either empty or a face of both. A &lt;em&gt;face&lt;/em&gt; of a simplex is the convex hull of a subset of the
-vertices in the simplex.&lt;/p&gt;
+&lt;p&gt;A simplicial complex is a nice way of combining simplices. A &lt;em&gt;face&lt;/em&gt; of a simplex is the convex 
+hull of a subset of the vertices in the simplex.In particular, a &lt;em&gt;simplicial complex&lt;/em&gt; is a finite
+collection of simplices, &lt;script type=&quot;math/tex&quot;&gt;K&lt;/script&gt;, such that (1) if &lt;script type=&quot;math/tex&quot;&gt;\sigma \in K&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;\tau\leq \sigma&lt;/script&gt;, then 
+&lt;script type=&quot;math/tex&quot;&gt;\tau \in K&lt;/script&gt;, and (2) if &lt;script type=&quot;math/tex&quot;&gt;\sigma, \sigma'\in K&lt;/script&gt;, then &lt;script type=&quot;math/tex&quot;&gt;\sigma\cap \sigma'&lt;/script&gt; is either empty 
+or a face of both.&lt;/p&gt;
 
 &lt;center&gt;
 &lt;embed width=&quot;40%&quot; src=&quot;../../assets/tda-rips/simplicialcomplex.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
 &lt;/center&gt;
 
-&lt;h3 id=&quot;rips-complex&quot;&gt;Rips Complex&lt;/h3&gt;
-
-&lt;p&gt;Now we explain how to construct a Rips complex from a finite set of points, but first we must
-start with some preliminary definitions. The &lt;em&gt;diameter&lt;/em&gt; of a set of points is the maximum distance between any two points in the set. An &lt;em&gt;abstract simplicial complex&lt;/em&gt; is a finite collection of sets, &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt;, such that if &lt;script type=&quot;math/tex&quot;&gt;a\in A&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;b\subset a&lt;/script&gt; implies &lt;script type=&quot;math/tex&quot;&gt;b\in A&lt;/script&gt;. The elements &lt;script type=&quot;math/tex&quot;&gt;a\in A&lt;/script&gt; are the simplices where dim&lt;script type=&quot;math/tex&quot;&gt;(a)=&lt;/script&gt;card&lt;script type=&quot;math/tex&quot;&gt;(a)-1&lt;/script&gt;.&lt;/p&gt;
+&lt;p&gt;An &lt;em&gt;abstract simplicial complex&lt;/em&gt; is a finite collection of sets, &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt;, such that if &lt;script type=&quot;math/tex&quot;&gt;a\in A&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;b\subset a&lt;/script&gt; implies &lt;script type=&quot;math/tex&quot;&gt;b\in A&lt;/script&gt;. The elements &lt;script type=&quot;math/tex&quot;&gt;a\in A&lt;/script&gt; are the simplices where dim&lt;script type=&quot;math/tex&quot;&gt;(a)=&lt;/script&gt;card&lt;script type=&quot;math/tex&quot;&gt;(a)-1&lt;/script&gt;. Here, card&lt;script type=&quot;math/tex&quot;&gt;(a)&lt;/script&gt; is the number of points in the set, &lt;script type=&quot;math/tex&quot;&gt;a&lt;/script&gt;.&lt;/p&gt;
 
 &lt;center&gt;
 &lt;embed width=&quot;80%&quot; src=&quot;../../assets/tda-rips/asc.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
 &lt;/center&gt;
 
-&lt;p&gt;Let &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; be finite set of points in &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt;. Let &lt;script type=&quot;math/tex&quot;&gt;r\geq 0&lt;/script&gt;. The Rips complex of &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; is the abstract simplicial complex of &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S, r)&lt;/script&gt;, which consists of all subsets of diameter at most &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;:&lt;/p&gt;
+&lt;h3 id=&quot;rips-complex&quot;&gt;Rips Complex&lt;/h3&gt;
+
+&lt;p&gt;Before explaining how to construct a Rips complex from a finite set of points, we give a 
+preliminary definition. The &lt;em&gt;diameter&lt;/em&gt; of a set of points is the maximum distance between any 
+two points in the set.&lt;/p&gt;
+
+&lt;p&gt;Let &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; be finite set of points in &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt;. Let &lt;script type=&quot;math/tex&quot;&gt;r\geq 0&lt;/script&gt;. The Rips complex of &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;
+and &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; is the abstract simplicial complex of &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S, r)&lt;/script&gt; consisting of all subsets
+of diameter at most &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;:&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\text{VR}(S, r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}.&lt;/script&gt;
 
-&lt;p&gt;Geometrically, this means we consider balls of radius, &lt;script type=&quot;math/tex&quot;&gt;\frac{r}{2}&lt;/script&gt;, centered at each point in
-&lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;. Whenever &lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt; balls have pairwise intersections, we add a &lt;script type=&quot;math/tex&quot;&gt;d-1&lt;/script&gt; simplex. For this
-tutorial, we will use the standard Euclidean distance (unless stated otherwise) to compute a Rips
-complex. However, one could use any metric.&lt;/p&gt;
+&lt;p&gt;Geometrically, this means we consider balls of radius &lt;script type=&quot;math/tex&quot;&gt;\frac{r}{2}&lt;/script&gt;, centered at each point in
+&lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;. Whenever &lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt; balls have pairwise intersections, we add a &lt;script type=&quot;math/tex&quot;&gt;d-1&lt;/script&gt; dimensional simplex. For this tutorial, we use the standard Euclidean distance (unless stated otherwise) to compute a Rips complex. However, one could use any metric.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Many people also define &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S, r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}&lt;/script&gt;.
-However, the algorithms used in the R-TDA package use the first definition.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Many people also define &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S, r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}&lt;/script&gt;. However, the algorithms used in the R-TDA package use the first definition.&lt;/p&gt;
+
+&lt;p&gt;Here are some examples of Rips complexes:&lt;/p&gt;
 
 &lt;center&gt;
 &lt;embed width=&quot;80%&quot; src=&quot;../../assets/tda-rips/ripscomplex.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
@@ -77,22 +81,20 @@ empty set and ending with the full simplicial complex i.e.,&lt;/p&gt;
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\emptyset \subset K_0 \subset K_1 \subset ... \subset K_n=K.&lt;/script&gt;
 
 &lt;p&gt;Going back to the Rips complex, we consider &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; to be a free parameter. If we vary &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;, we
-get different Rips complexes. There is often not a best choice for &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;, so why not look at
-all of them!? Observe if we increase &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;, then we get a family of nested Rips complexes which
-gives rise to the &lt;em&gt;Rips filtration&lt;/em&gt;.&lt;/p&gt;
+get different Rips complexes. In most data analysis situations, there is not a best choice for &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; that best describes the data, so why not look at all of them!? Observe if we increase &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; continuously, then we get a family of nested Rips complexes which gives rise to the &lt;em&gt;Rips filtration&lt;/em&gt;.&lt;/p&gt;
 
 &lt;p&gt;Let’s work through an example. Let &lt;script type=&quot;math/tex&quot;&gt;S:=\{(0,0),(1,3),(2,-1),(3,2)\}\subset \mathbb{R}^2&lt;/script&gt;. We
 want to compute a Rips filtration on &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; for all &lt;script type=&quot;math/tex&quot;&gt;r\geq 0&lt;/script&gt;. Observe:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;when &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{5}&lt;/script&gt;, the balls of radius &lt;script type=&quot;math/tex&quot;&gt;\frac{\sqrt{5}}{2}&lt;/script&gt; centered at &lt;script type=&quot;math/tex&quot;&gt;(0,0)&lt;/script&gt; and
+  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{5}&lt;/script&gt;, the balls of radius &lt;script type=&quot;math/tex&quot;&gt;\frac{\sqrt{5}}{2}&lt;/script&gt; centered at &lt;script type=&quot;math/tex&quot;&gt;(0,0)&lt;/script&gt; and
 &lt;script type=&quot;math/tex&quot;&gt;(2,-1)&lt;/script&gt; intersect which means we add a 1-simplex between &lt;script type=&quot;math/tex&quot;&gt;(0,0)&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;(2,-1)&lt;/script&gt;. Similarly,
 we add a 1-simplex between &lt;script type=&quot;math/tex&quot;&gt;(1,3)&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;(3,2)&lt;/script&gt;.&lt;/li&gt;
-  &lt;li&gt;when &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{10}&lt;/script&gt;, we add a two more 1-simplices between &lt;script type=&quot;math/tex&quot;&gt;(0,0), (1,3)&lt;/script&gt;, and &lt;script type=&quot;math/tex&quot;&gt;(2,-1),
+  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{10}&lt;/script&gt;, we add a two more 1-simplices between &lt;script type=&quot;math/tex&quot;&gt;(0,0), (1,3)&lt;/script&gt;, and &lt;script type=&quot;math/tex&quot;&gt;(2,-1),
 (3,2)&lt;/script&gt;.&lt;/li&gt;
-  &lt;li&gt;when &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{13}&lt;/script&gt;, we add two 2-simplices between &lt;script type=&quot;math/tex&quot;&gt;(0,0),(1,3),(2,-1)&lt;/script&gt; and
+  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{13}&lt;/script&gt;, we add two 2-simplices between &lt;script type=&quot;math/tex&quot;&gt;(0,0),(1,3),(2,-1)&lt;/script&gt; and
 &lt;script type=&quot;math/tex&quot;&gt;(1,3),(2,-1),(3,2)&lt;/script&gt;.&lt;/li&gt;
-  &lt;li&gt;when &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{17}&lt;/script&gt;, we add a 3-simplex.&lt;/li&gt;
+  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{17}&lt;/script&gt;, we add a 3-simplex.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;Here is an illustration of the Rips filtration on &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;.&lt;/p&gt;
@@ -104,26 +106,27 @@ we add a 1-simplex between &lt;script type=&quot;math/tex&quot;&gt;(1,3)&lt;/scr
 &lt;h1 id=&quot;applications-of-rips-complexes-and-filtrations&quot;&gt;Applications of Rips Complexes and Filtrations&lt;/h1&gt;
 
 &lt;p&gt;Now that we have discussed the theory, let’s talk about some of the applications! A Rips
-filtration is used on point cloud data. A common form of these types of data are location data.
+filtration is used on point cloud data or more generally on a data set where there is some notion of distance between all data points. A common form of these types of data are location data.
 For example:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Galaxy Data which provides coordinates of stars in different galaxies&lt;/li&gt;
-  &lt;li&gt;GPS coordinates of Airports on Earth&lt;/li&gt;
+  &lt;li&gt;Coordinates of galaxies in the universe&lt;/li&gt;
+  &lt;li&gt;GPS coordinates of airports on Earth&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;The Rips complex provides information on how close the data points are to each other. Furthermore, the
-holes in the complex can provide information on where data are not present. Lastly, the topological
-information given by taking a Rips filtration can be studied using Persistent Homology (see next tutorial)
-which is often used to analyze these types of data.&lt;/p&gt;
+&lt;p&gt;The Rips complex provides information on how close the data points are to each other. 
+Furthermore, the holes in the complex can provide information on where data are not present. 
+Lastly, the topological information given by taking a Rips filtration can be studied using
+Persistent Homology (see next tutorial), which is often used to analyze these types of data.&lt;/p&gt;
 
-&lt;p&gt;Another application is studying coverage in sensor networks. The problem is to look a set of sensors and
-find how much coverage the sensors provide. Vin De Silva and Robert Ghrist studied this problem using Rips
-complexes since the complex can be determined easily from pairwise communication data. See &lt;a class=&quot;citation&quot; href=&quot;#ghrist:2007&quot;&gt;(Silva &amp;amp; Ghrist, 2007)&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Another application is studying coverage in sensor networks &lt;a class=&quot;citation&quot; href=&quot;#ghrist:2007&quot;&gt;(Silva &amp;amp; Ghrist, 2007)&lt;/a&gt;. The 
+problem is to look a set of sensors and find how much coverage the sensors provide. Vin De 
+Silva and Robert Ghrist studied this problem using Rips complexes since the complex can be
+determined easily from pairwise communication data.&lt;/p&gt;
 
-&lt;p&gt;Furthermore, Rips complexes can are used in shape reconstruction in specific situations. This means in
-certain situations, the Rips complex of a point cloud, &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;, with threshold, &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;, has the same homotopy
-type as the union of balls centered around each point in &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; with radius &lt;script type=&quot;math/tex&quot;&gt;\frac{r}{2}&lt;/script&gt;. See &lt;a class=&quot;citation&quot; href=&quot;#attali:2013&quot;&gt;(Attali, Lieutier, &amp;amp; Salinas, 2013)&lt;/a&gt;. They are nice to use since these complexes do not favor a specific type of alignment of the
+&lt;p&gt;Furthermore, Rips complexes can are used in shape reconstruction. This means, under certain assumptions,
+the Rips complex of a point cloud, &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;, with threshold, &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;, has the same homotopy
+type as the union of balls centered around each point in &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; with radius &lt;script type=&quot;math/tex&quot;&gt;\frac{r}{2}&lt;/script&gt; &lt;a class=&quot;citation&quot; href=&quot;#attali:2013&quot;&gt;(Attali, Lieutier, &amp;amp; Salinas, 2013)&lt;/a&gt;. Rips complexes are nice to use since they do not favor a specific type of alignment of the
 input.&lt;/p&gt;
 
 &lt;p&gt;These are just a few of the applications. There are many more!&lt;/p&gt;
@@ -131,7 +134,8 @@ input.&lt;/p&gt;
 &lt;h1 id=&quot;computing-the-rips-filtration-using-the-r-tda-package&quot;&gt;Computing the Rips Filtration using the R-TDA Package&lt;/h1&gt;
 
 &lt;h3 id=&quot;toy-example&quot;&gt;Toy Example&lt;/h3&gt;
-&lt;p&gt;First, let’s go back to the example where &lt;script type=&quot;math/tex&quot;&gt;S:=\{(0,0),(1,3),(2,-1),(3,2)\}&lt;/script&gt;. We will compute the Rips filtration using the R-TDA package.&lt;/p&gt;
+&lt;p&gt;First, let’s go back to the example where &lt;script type=&quot;math/tex&quot;&gt;S=\{(0,0),(1,3),(2,-1),(3,2)\}&lt;/script&gt;. We compute the Rips 
+filtration using the R-TDA package.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;library&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TDA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;# upload TDA package&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 
@@ -260,7 +264,7 @@ matrix in R. We can do this using the following code.&lt;/p&gt;
      &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lout&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;80&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;interval&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;center&gt;
-&lt;embed width=&quot;70%&quot; height=&quot;auto&quot; src=&quot;../../assets/tda-rips/bigfoot_ex.gif&quot; /&gt;
+&lt;embed width=&quot;80%&quot; height=&quot;auto&quot; src=&quot;../../assets/tda-rips/bigfoot_ex.gif&quot; /&gt;
 &lt;/center&gt;
 
 &lt;p&gt;As we watch the animation, we see that even at low filtration values, there are lots of simplices near the GPS coordinates of Missoula, MT which corresponds to several bigfoot sightings in that area. Furthermore, at a filtration value of one, we see that the area surrounding Helena, MT is a deadzone. If we assume that Bigfoot does not travel radially outwards more than one latitude/longitude unit, then this suggests that hiking in Helena could help avoid Bigfoot encounters. Lastly, there have not been many sightings in Eastern MT, so perhaps Bigfoot does not roam around in that part of the state. We have not fully solved the Bigfoot mystery but the Rips complex and Rips filtration helps us get one step closer!&lt;/p&gt;
