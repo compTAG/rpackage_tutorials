@@ -24,9 +24,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.0199048"
-     inkscape:cx="302.24197"
-     inkscape:cy="78.150785"
+     inkscape:zoom="1.5381567"
+     inkscape:cx="428.22033"
+     inkscape:cy="96.76906"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -45,7 +45,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -86,7 +86,7 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:#000000;fill-opacity:0.10196078;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#ff7392;fill-opacity:0.48627451;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 369.13989,860.15379 76.73629,131.68937 -152.97751,-0.99014 z"
        id="path8143"
        inkscape:connector-curvature="0"
@@ -114,6 +114,13 @@
        cx="445.3811"
        cy="991.34808"
        r="6.4359469"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#ff7392;fill-opacity:0.48627451;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 592.34855,842.45784 -74.91485,95.21886 79.46575,77.3653 72.46436,-75.965 z"
+       id="path8235"
+       inkscape:connector-curvature="0"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <circle
@@ -169,7 +176,7 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:#000000;fill-opacity:0.21469739;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:4, 2;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#000000;fill-opacity:0.21469739;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000006;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:12.00000072,12.00000072;stroke-dashoffset:0;stroke-opacity:1"
        d="m 514.6913,938.3753 158.42332,1.48522"
        id="path8216"
        inkscape:connector-curvature="0"
@@ -181,13 +188,6 @@
        cx="596.87335"
        cy="1013.1313"
        r="6.4359469"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
-    <path
-       style="fill:#000000;fill-opacity:0.10230545;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 593.03812,842.6877 -74.91485,95.21887 79.46575,77.36533 72.46436,-75.96506 z"
-       id="path8235"
-       inkscape:connector-curvature="0"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <g
@@ -415,5 +415,15 @@
        d="m 593.09724,842.45127 75.74615,99.01457 -72.28064,73.27076 z"
        id="path8830"
        inkscape:connector-curvature="0" />
+    <path
+       style="fill:#ff7392;fill-opacity:0.4870317;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 367.36092,1224.3457 -131.68933,76.7363 0.99014,-152.9775 z"
+       id="path8143-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       inkscape:export-filename="/home/robin/repositories/rpackage_tutorials/content.png"
+       inkscape:transform-center-x="-95.051479"
+       inkscape:transform-center-y="-27.230193" />
   </g>
 </svg>
