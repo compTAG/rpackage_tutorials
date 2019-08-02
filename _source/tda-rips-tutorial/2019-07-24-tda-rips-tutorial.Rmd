@@ -133,7 +133,7 @@ affinely independent points.
 </center>
 
 A simplicial complex is a nice way of combining simplices. A *face* of a simplex is the convex 
-hull of a subset of the vertices in the simplex.In particular, a *simplicial complex* is a finite
+hull of a subset of the vertices in the simplex. A *simplicial complex* is a finite
 collection of simplices, $$K$$, such that (1) if $$\sigma \in K$$ and $$\tau\leq \sigma$$, then 
 $$\tau \in K$$, and (2) if $$\sigma, \sigma'\in K$$, then $$\sigma\cap \sigma'$$ is either empty 
 or a face of both. 
@@ -270,7 +270,14 @@ Our output tells us that we have a two-simplex on vertices $$(0,0),(1,3),(3,2)$$
 This is exactly what we found when we worked through this example by hand. Accessing the other complex
 and filtration value elements will help us verify the rest of the filtration computation we did earlier.
 
-If we want to see an animation of the Rips filtration, we can run the following code. Note this function only works if the data set is two dimensional and the Euclidean distance is used.
+If we want to see an animation of the Rips filtration, we can run the following code with a plot function. This function has arguments:
+* **filt** is the Rips filtration object
+* **animate** is a logical varibale stating TRUE if you want an animation of the filatration or FALSE if you do not want an animation 
+* **thresh** if "animate = FALSE" then thresh is the threshold value value for the Rips complex that will be plotted
+* **fn_out** if "animate = TRUE" then fn_out is the name of the file for the animation
+* **l_out** if "animate = TRUE" then l_out is the number of levels of radii used in the animation between 0 and 1.1 times the max distance between any two points
+
+Note this function only works if the data set is two dimensional and the Euclidean distance is used.
 
 
 ```{r visualization_echo, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
@@ -288,6 +295,18 @@ plot(S_RipsFilt, animate = TRUE, fn_out = 'rips_example.gif',
 
 <center>
 <img width="80%" src="../../assets/tda-rips/rips_example.gif"/>
+</center>
+
+Furthermore, we can look at the Rips complex at a threshold of $$\sqrt{13}$$, by adding the argument, "thresh = $$\sqrt{13}$$" and changing "animate = FALSE" to "animate = TRUE". 
+
+```{r toyex_complex, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
+
+plot(S_RipsFilt, thresh = sqrt(13), animate = FALSE)
+
+```
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/toycomplex.svg" type="image/svg+xml" />
 </center>
 
 ### Non Euclidean Distance Example
@@ -340,7 +359,7 @@ dev.off()
 <embed width="80%" src="../../assets/tda-rips/visualization2.svg" type="image/svg+xml" />
 </center>
 
-Hence VR$$(S, \sqrt{13})$$ with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with two two-simplices.
+Hence VR$$(S, \sqrt{13})$$ with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with four edges that join to form a cycle.
 
 ### Sightings of Bigfoot in Montana
 Lastly, we work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their [website](http://www.bfro.net/). We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the dead zones where bigfoot has not been sighted in order to keep hikers safe from potential encounters.
@@ -396,12 +415,12 @@ Now, let's compute the filtration and visualize it with an animation. In order t
 ```{r bigfootfiltration, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
 
 BigfootRipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension = 3,
-                                  maxscale = 1.6, dist = "euclidean")
+                                  maxscale = 1.5, dist = "euclidean")
 
 class(BigfootRipsFilt) <- c(class(BigfootRipsFilt), "rips_filt")
 
 plot(BigfootRipsFilt, animate = TRUE, fn_out = 'bigfoot.gif',
-     lout = 80, interval = 0.2)
+     lout = 120, interval = 0.3)
 
 
 ```
@@ -410,7 +429,7 @@ plot(BigfootRipsFilt, animate = TRUE, fn_out = 'bigfoot.gif',
 <embed width="80%" height="auto" src="../../assets/tda-rips/bigfoot.gif"/>
 </center>
 
-Furthermore, we can look at the Rips complex at a threshold of one, by adding the argument, "thresh = 1" and changing "animate = FALSE" to "animate = TRUE". 
+Furthermore, we can look at the Rips complex at a threshold of one.
 
 ```{r bigfootcomplex, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
 
