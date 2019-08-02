@@ -194,8 +194,17 @@ filtration using the R-TDA package.</p>
 
 <p>Great! So how do we interpret the S_RipsFilt object?</p>
 
-<p>The ripsFiltration function returns a list with a complex list, filtration values vector, a logical variable that states whether or not the values are in increasing order, and a matrix of the coordinates of the vertices if the Euclidean distance is used. The <script type="math/tex">i^{th}</script> element of the complex are the vertices of the <script type="math/tex">i^{th}</script> simplex. Additionally, the <script type="math/tex">i^{th}</script> entry of the filtration values is the filtration value for when the <script type="math/tex">i^{th}</script> simplex appears. See the documentation for this function with this <a href="https://rdrr.io/cran/TDA/man/ripsFiltration.html">link</a>.
- Let’s check this out.</p>
+<p>The ripsFiltration function returns a list:</p>
+
+<ul>
+  <li><strong>complx</strong> is a list where the <script type="math/tex">i^{th}</script> element is a vector of the vertices for the <script type="math/tex">i^{th}</script> simplex.</li>
+  <li><strong>values</strong> is a vector where the <script type="math/tex">i^{th}</script> entry is the filtration value for when the <script type="math/tex">i^{th}</script> simplex appears.</li>
+  <li><strong>increasing</strong>  is a logical variable that states TRUE if the filtration values in the values vector are increasing order and FALSE otherwise.</li>
+  <li><strong>coordinates</strong> is a matrix representing the coordinates of the vertices. The <script type="math/tex">i^{th}</script> row is the coordinate for the <script type="math/tex">i^{th}</script> vertex.</li>
+</ul>
+
+<p>See the documentation for this function with this <a href="https://rdrr.io/cran/TDA/man/ripsFiltration.html">link</a>.
+Let’s check this out.</p>
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">S_RipsFilt</span><span class="o">$</span><span class="n">cmplx</span><span class="p">[[</span><span class="m">10</span><span class="p">]]</span><span class="w"> </span><span class="c1">#Access vertices for the 10th simplex in the list</span></code></pre></figure>
 
@@ -205,7 +214,7 @@ filtration using the R-TDA package.</p>
 
 <figure class="highlight"><pre><code class="language-text" data-lang="text">## [1] 3.605551</code></pre></figure>
 
-<p>Our output tells us that we have a 2-simplex on vertices <script type="math/tex">(0,0),(1,3),(3,2)</script> when <script type="math/tex">r=\sqrt{13}</script>.
+<p>Our output tells us that we have a two-simplex on vertices <script type="math/tex">(0,0),(1,3),(3,2)</script> when <script type="math/tex">r=\sqrt{13}</script>.
 This is exactly what we found when we worked through this example by hand. Accessing the other complex
 and filtration value elements will help us verify the rest of the filtration computation we did earlier.</p>
 
@@ -224,22 +233,24 @@ and filtration value elements will help us verify the rest of the filtration com
 </center>
 
 <h3 id="non-euclidean-distance-example">Non Euclidean Distance Example</h3>
-<p>Now we will compute a Rips filtration on <script type="math/tex">S</script>, but this time using the Manhattan distance or <script type="math/tex">\ell_1</script> norm. Recall, that for points, <script type="math/tex">\textbf{x}=(x_1,...,x_n)</script> and <script type="math/tex">\textbf{y}=(y_1,...,y_n)\in \mathbb{R}^n</script>,
-the Manhattan distance, <script type="math/tex">d_M(\textbf{x},\textbf{y})</script> is defined as:</p>
+<p>Now we compute a Rips filtration on <script type="math/tex">S</script>, but this time using the Manhattan distance or <script type="math/tex">\ell_1</script> norm. Recall, that for points, <script type="math/tex">\textbf{x}=(x_1,...,x_n)</script> and <script type="math/tex">\textbf{y}=(y_1,...,y_n)\in \mathbb{R}^n</script>,
+the Manhattan distance, <script type="math/tex">d_1(\textbf{x},\textbf{y})</script> is defined as:</p>
 
-<script type="math/tex; mode=display">d_M(\textbf{x},\textbf{y}):=\sum_{i=1}^{n}|x_i-y_i|.</script>
+<script type="math/tex; mode=display">d_1(\textbf{x},\textbf{y}):=\sum_{i=1}^{n}|x_i-y_i|.</script>
 
-<p>In order to compute the Rips filtration on <script type="math/tex">S</script> for this metric, we need to create a distance
-matrix in R. We can do this using the following code.</p>
+<p>In order to compute the Rips filtration on <script type="math/tex">(S, d_1)</script>, we need to create a distance
+matrix in R. We can do this using the following code:</p>
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">dist_matrix</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">dist</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"manhattan"</span><span class="p">,</span><span class="w"> </span><span class="n">diag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">)</span></code></pre></figure>
 
-<p>Now when we use the ripsFiltration function, we will write dist_matrix as the first argument instead of <script type="math/tex">S</script>. Additionally, the fourth argument will change to dist = “arbitrary”.</p>
+<p>When we use the ripsFiltration function, we write dist_matrix as the first argument instead of <script type="math/tex">S</script>.
+Additionally, the fourth argument will change to dist = “arbitrary” to indicate that we are giving our own
+distance metric.</p>
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">S_RipsFilt_Manhattan</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ripsFiltration</span><span class="p">(</span><span class="n">dist_matrix</span><span class="p">,</span><span class="w"> </span><span class="n">maxdimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w">
                                        </span><span class="n">maxscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"arbitrary"</span><span class="p">)</span></code></pre></figure>
 
-<p>This time when we compute the Rips complex with <script type="math/tex">r=\sqrt{13}</script> we get the following complex.</p>
+<p>This time when we compute the Rips complex with <script type="math/tex">r=\sqrt{13}</script>, we get the following complex:</p>
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">S_RipsFilt_Manhattan</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ripsFiltration</span><span class="p">(</span><span class="n">dist_matrix</span><span class="p">,</span><span class="w"> </span><span class="n">maxdimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w">
                                        </span><span class="n">maxscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">sqrt</span><span class="p">(</span><span class="m">13</span><span class="p">),</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"arbitrary"</span><span class="p">)</span><span class="w">
@@ -263,10 +274,10 @@ matrix in R. We can do this using the following code.</p>
 <embed width="80%" src="../../assets/tda-rips/visualization2.svg" type="image/svg+xml" />
 </center>
 
-<p>Hence VR<script type="math/tex">(S, \sqrt{13})</script> with the Manhattan distance is a simplicial complex two edges, while with the Euclidean distance is a simplicial complex with two 2-simplices.</p>
+<p>Hence VR<script type="math/tex">(S, \sqrt{13})</script> with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with two two-simplices.</p>
 
 <h3 id="sightings-of-bigfoot-in-montana">Sightings of Bigfoot in Montana</h3>
-<p>Lastly, we will work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their <a href="http://www.bfro.net/">website</a>. We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the dead zones where bigfoot has not been sighted in order to keep hikers safe from potential encounters.</p>
+<p>Lastly, we work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their <a href="http://www.bfro.net/">website</a>. We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the dead zones where bigfoot has not been sighted in order to keep hikers safe from potential encounters.</p>
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#Latitude coordinates of Bigfoot sightings in MT</span><span class="w">
 </span><span class="n">latitude</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">45.31278</span><span class="p">,</span><span class="m">46.05292</span><span class="p">,</span><span class="m">45.97540</span><span class="p">,</span><span class="m">47.62167</span><span class="p">,</span><span class="m">48.03278</span><span class="p">,</span><span class="m">47.70667</span><span class="p">,</span><span class="w">
@@ -301,18 +312,26 @@ matrix in R. We can do this using the following code.</p>
 <embed width="80%" src="../../assets/tda-rips/bigfoot.svg" type="image/svg+xml" />
 </center>
 
-<p>Now let’s compute the filtration and visualize it with an animation.</p>
+<p>Now, let’s compute the filtration and visualize it with an animation. In order to speed up the runtime, we will set maxscale = 2.5 and maxdimension = 3.</p>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">BigfootRipsFilt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ripsFiltration</span><span class="p">(</span><span class="n">bigfoot_sightingsMT</span><span class="p">,</span><span class="w"> </span><span class="n">maxdimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w">
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">BigfootRipsFilt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ripsFiltration</span><span class="p">(</span><span class="n">bigfoot_sightingsMT</span><span class="p">,</span><span class="w"> </span><span class="n">maxdimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="p">,</span><span class="w">
                                   </span><span class="n">maxscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1.6</span><span class="p">,</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"euclidean"</span><span class="p">)</span><span class="w">
 
 </span><span class="nf">class</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="nf">class</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">),</span><span class="w"> </span><span class="s2">"rips_filt"</span><span class="p">)</span><span class="w">
 
-</span><span class="n">plot</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">fn_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'bigfoot_ex.gif'</span><span class="p">,</span><span class="w">
+</span><span class="n">plot</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">fn_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'bigfoot.gif'</span><span class="p">,</span><span class="w">
      </span><span class="n">lout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">80</span><span class="p">,</span><span class="w"> </span><span class="n">interval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.2</span><span class="p">)</span></code></pre></figure>
 
 <center>
-<embed width="80%" height="auto" src="../../assets/tda-rips/bigfoot_ex.gif" />
+<embed width="80%" height="auto" src="../../assets/tda-rips/bigfoot.gif" />
+</center>
+
+<p>Furthermore, we can look at the Rips complex at a threshold of one, by adding the argument, “thresh = 1” and changing “animate = FALSE” to “animate = TRUE”.</p>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">plot</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">thresh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span></code></pre></figure>
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/bigfootcomplex1.svg" type="image/svg+xml" />
 </center>
 
 <p>As we watch the animation, we see that even at low filtration values, there are lots of simplices near the GPS coordinates of Missoula, MT which corresponds to several bigfoot sightings in that area. Furthermore, at a filtration value of one, we see that the area surrounding Helena, MT is a deadzone. If we assume that Bigfoot does not travel radially outwards more than one latitude/longitude unit, then this suggests that hiking in Helena could help avoid Bigfoot encounters. Lastly, there have not been many sightings in Eastern MT, so perhaps Bigfoot does not roam around in that part of the state. We have not fully solved the Bigfoot mystery but the Rips complex and Rips filtration helps us get one step closer!</p>
