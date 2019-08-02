@@ -83,7 +83,7 @@ affinely independent points.</p>
 </center>
 
 <p>A simplicial complex is a nice way of combining simplices. A <em>face</em> of a simplex is the convex 
-hull of a subset of the vertices in the simplex.In particular, a <em>simplicial complex</em> is a finite
+hull of a subset of the vertices in the simplex. A <em>simplicial complex</em> is a finite
 collection of simplices, <script type="math/tex">K</script>, such that (1) if <script type="math/tex">\sigma \in K</script> and <script type="math/tex">\tau\leq \sigma</script>, then 
 <script type="math/tex">\tau \in K</script>, and (2) if <script type="math/tex">\sigma, \sigma'\in K</script>, then <script type="math/tex">\sigma\cap \sigma'</script> is either empty 
 or a face of both.</p>
@@ -218,7 +218,16 @@ Let’s check this out.</p>
 This is exactly what we found when we worked through this example by hand. Accessing the other complex
 and filtration value elements will help us verify the rest of the filtration computation we did earlier.</p>
 
-<p>If we want to see an animation of the Rips filtration, we can run the following code. Note this function only works if the data set is two dimensional and the Euclidean distance is used.</p>
+<p>If we want to see an animation of the Rips filtration, we can run the following code with a plot function. This function has arguments:</p>
+<ul>
+  <li><strong>filt</strong> is the Rips filtration object</li>
+  <li><strong>animate</strong> is a logical varibale stating TRUE if you want an animation of the filatration or FALSE if you do not want an animation</li>
+  <li><strong>thresh</strong> if “animate = FALSE” then thresh is the threshold value value for the Rips complex that will be plotted</li>
+  <li><strong>fn_out</strong> if “animate = TRUE” then fn_out is the name of the file for the animation</li>
+  <li><strong>l_out</strong> if “animate = TRUE” then l_out is the number of levels of radii used in the animation between 0 and 1.1 times the max distance between any two points</li>
+</ul>
+
+<p>Note this function only works if the data set is two dimensional and the Euclidean distance is used.</p>
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">S_RipsFilt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ripsFiltration</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">maxdimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w">
                              </span><span class="n">maxscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">4.5</span><span class="p">,</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"euclidean"</span><span class="p">)</span><span class="w">
@@ -230,6 +239,14 @@ and filtration value elements will help us verify the rest of the filtration com
 
 <center>
 <img width="80%" src="../../assets/tda-rips/rips_example.gif" />
+</center>
+
+<p>Furthermore, we can look at the Rips complex at a threshold of <script type="math/tex">\sqrt{13}</script>, by adding the argument, “thresh = <script type="math/tex">\sqrt{13}</script>” and changing “animate = FALSE” to “animate = TRUE”.</p>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">plot</span><span class="p">(</span><span class="n">S_RipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">thresh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">sqrt</span><span class="p">(</span><span class="m">13</span><span class="p">),</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span></code></pre></figure>
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/toycomplex.svg" type="image/svg+xml" />
 </center>
 
 <h3 id="non-euclidean-distance-example">Non Euclidean Distance Example</h3>
@@ -274,7 +291,7 @@ distance metric.</p>
 <embed width="80%" src="../../assets/tda-rips/visualization2.svg" type="image/svg+xml" />
 </center>
 
-<p>Hence VR<script type="math/tex">(S, \sqrt{13})</script> with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with two two-simplices.</p>
+<p>Hence VR<script type="math/tex">(S, \sqrt{13})</script> with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with four edges that join to form a cycle.</p>
 
 <h3 id="sightings-of-bigfoot-in-montana">Sightings of Bigfoot in Montana</h3>
 <p>Lastly, we work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their <a href="http://www.bfro.net/">website</a>. We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the dead zones where bigfoot has not been sighted in order to keep hikers safe from potential encounters.</p>
@@ -315,18 +332,18 @@ distance metric.</p>
 <p>Now, let’s compute the filtration and visualize it with an animation. In order to speed up the runtime, we will set maxscale = 2.5 and maxdimension = 3.</p>
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">BigfootRipsFilt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ripsFiltration</span><span class="p">(</span><span class="n">bigfoot_sightingsMT</span><span class="p">,</span><span class="w"> </span><span class="n">maxdimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="p">,</span><span class="w">
-                                  </span><span class="n">maxscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1.6</span><span class="p">,</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"euclidean"</span><span class="p">)</span><span class="w">
+                                  </span><span class="n">maxscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1.5</span><span class="p">,</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"euclidean"</span><span class="p">)</span><span class="w">
 
 </span><span class="nf">class</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="nf">class</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">),</span><span class="w"> </span><span class="s2">"rips_filt"</span><span class="p">)</span><span class="w">
 
 </span><span class="n">plot</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">fn_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'bigfoot.gif'</span><span class="p">,</span><span class="w">
-     </span><span class="n">lout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">80</span><span class="p">,</span><span class="w"> </span><span class="n">interval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.2</span><span class="p">)</span></code></pre></figure>
+     </span><span class="n">lout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">120</span><span class="p">,</span><span class="w"> </span><span class="n">interval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.3</span><span class="p">)</span></code></pre></figure>
 
 <center>
 <embed width="80%" height="auto" src="../../assets/tda-rips/bigfoot.gif" />
 </center>
 
-<p>Furthermore, we can look at the Rips complex at a threshold of one, by adding the argument, “thresh = 1” and changing “animate = FALSE” to “animate = TRUE”.</p>
+<p>Furthermore, we can look at the Rips complex at a threshold of one.</p>
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">plot</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">thresh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span></code></pre></figure>
 
