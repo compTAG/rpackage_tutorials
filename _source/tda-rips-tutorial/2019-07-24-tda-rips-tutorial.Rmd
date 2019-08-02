@@ -309,7 +309,7 @@ plot(S_RipsFilt, thresh = sqrt(13), animate = FALSE)
 <embed width="80%" src="../../assets/tda-rips/toycomplex.svg" type="image/svg+xml" />
 </center>
 
-### Non Euclidean Distance Example
+### Non-Euclidean Distance Example
 Now we compute a Rips filtration on $$S$$, but this time using the Manhattan distance or $$\ell_1$$ norm. Recall, that for points, $$\textbf{x}=(x_1,...,x_n)$$ and $$\textbf{y}=(y_1,...,y_n)\in \mathbb{R}^n$$,
 the Manhattan distance, $$d_1(\textbf{x},\textbf{y})$$ is defined as:
 
@@ -352,7 +352,6 @@ for (idx in seq(along = S_RipsFilt_Manhattan[["cmplx"]])) {
           col = NULL, xlim = lim[1:2], ylim = lim[3:4])
 }
 points(S, pch = 16)
-dev.off()
 ```
 
 <center>
@@ -387,7 +386,7 @@ longitude <- c(-109.64490,-112.57100,-112.45540,-115.39030,-105.86420,
                -112.97070)
 
 #GPS coordinates of Bigfoot sightings in MT
-bigfoot_sightingsMT <- cbind(latitude, longitude)
+bigfoot_sightingsMT <- cbind(longitude, latitude)
 
 ```
 
