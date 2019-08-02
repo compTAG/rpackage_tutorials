@@ -249,8 +249,15 @@ S_RipsFilt <- ripsFiltration(S, maxdimension = 2, maxscale = 5,
 
 Great! So how do we interpret the S_RipsFilt object?
 
-The ripsFiltration function returns a list with a complex list, filtration values vector, a logical variable that states whether or not the values are in increasing order, and a matrix of the coordinates of the vertices if the Euclidean distance is used. The $$i^{th}$$ element of the complex are the vertices of the $$i^{th}$$ simplex. Additionally, the $$i^{th}$$ entry of the filtration values is the filtration value for when the $$i^{th}$$ simplex appears. See the documentation for this function with this [link](https://rdrr.io/cran/TDA/man/ripsFiltration.html).
- Let's check this out.
+The ripsFiltration function returns a list:
+
+* **complx** is a list where the $$i^{th}$$ element is a vector of the vertices for the $$i^{th}$$ simplex.
+* **values** is a vector where the $$i^{th}$$ entry is the filtration value for when the $$i^{th}$$ simplex appears.
+* **increasing**  is a logical variable that states TRUE if the filtration values in the values vector are increasing order and FALSE otherwise. 
+* **coordinates** is a matrix representing the coordinates of the vertices. The $$i^{th}$$ row is the coordinate for the $$i^{th}$$ vertex.
+
+See the documentation for this function with this [link](https://rdrr.io/cran/TDA/man/ripsFiltration.html).
+Let's check this out.
 
 ```{r output, echo = TRUE, message = TRUE}
 
@@ -259,7 +266,7 @@ S_RipsFilt$cmplx[[10]] #Access vertices for the 10th simplex in the list
 S_RipsFilt$values[10] #Access filtration value for the 10th simplex in the list
 ```
 
-Our output tells us that we have a 2-simplex on vertices $$(0,0),(1,3),(3,2)$$ when $$r=\sqrt{13}$$.
+Our output tells us that we have a two-simplex on vertices $$(0,0),(1,3),(3,2)$$ when $$r=\sqrt{13}$$.
 This is exactly what we found when we worked through this example by hand. Accessing the other complex
 and filtration value elements will help us verify the rest of the filtration computation we did earlier.
 
@@ -284,19 +291,21 @@ plot(S_RipsFilt, animate = TRUE, fn_out = 'rips_example.gif',
 </center>
 
 ### Non Euclidean Distance Example
-Now we will compute a Rips filtration on $$S$$, but this time using the Manhattan distance or $$\ell_1$$ norm. Recall, that for points, $$\textbf{x}=(x_1,...,x_n)$$ and $$\textbf{y}=(y_1,...,y_n)\in \mathbb{R}^n$$,
-the Manhattan distance, $$d_M(\textbf{x},\textbf{y})$$ is defined as:
+Now we compute a Rips filtration on $$S$$, but this time using the Manhattan distance or $$\ell_1$$ norm. Recall, that for points, $$\textbf{x}=(x_1,...,x_n)$$ and $$\textbf{y}=(y_1,...,y_n)\in \mathbb{R}^n$$,
+the Manhattan distance, $$d_1(\textbf{x},\textbf{y})$$ is defined as:
 
-$$d_M(\textbf{x},\textbf{y}):=\sum_{i=1}^{n}|x_i-y_i|.$$
+$$d_1(\textbf{x},\textbf{y}):=\sum_{i=1}^{n}|x_i-y_i|.$$
 
-In order to compute the Rips filtration on $$S$$ for this metric, we need to create a distance
-matrix in R. We can do this using the following code.
+In order to compute the Rips filtration on $$(S, d_1)$$, we need to create a distance
+matrix in R. We can do this using the following code:
 
 ```{r distance, echo = TRUE, message = TRUE}
 dist_matrix <- dist(S, method = "manhattan", diag = TRUE, upper = TRUE, p = 2)
 ```
 
-Now when we use the ripsFiltration function, we will write dist_matrix as the first argument instead of $$S$$. Additionally, the fourth argument will change to dist = "arbitrary".
+When we use the ripsFiltration function, we write dist_matrix as the first argument instead of $$S$$.
+Additionally, the fourth argument will change to dist = "arbitrary" to indicate that we are giving our own
+distance metric.
 
 ```{r rips_manhattan, echo = TRUE, message = TRUE}
 
@@ -304,7 +313,7 @@ S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension = 2,
                                        maxscale = 5, dist = "arbitrary")
 ```
 
-This time when we compute the Rips complex with $$r=\sqrt{13}$$ we get the following complex.
+This time when we compute the Rips complex with $$r=\sqrt{13}$$, we get the following complex:
 
 ```{r visualization2_show, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
 
@@ -331,10 +340,10 @@ dev.off()
 <embed width="80%" src="../../assets/tda-rips/visualization2.svg" type="image/svg+xml" />
 </center>
 
-Hence VR$$(S, \sqrt{13})$$ with the Manhattan distance is a simplicial complex two edges, while with the Euclidean distance is a simplicial complex with two 2-simplices.
+Hence VR$$(S, \sqrt{13})$$ with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with two two-simplices.
 
 ### Sightings of Bigfoot in Montana
-Lastly, we will work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their [website](http://www.bfro.net/). We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the dead zones where bigfoot has not been sighted in order to keep hikers safe from potential encounters.
+Lastly, we work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their [website](http://www.bfro.net/). We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the dead zones where bigfoot has not been sighted in order to keep hikers safe from potential encounters.
 
 ```{r bigfootdataset, echo = TRUE, message = TRUE}
 
@@ -382,23 +391,35 @@ plot(bigfoot_sightingsMT[,1],bigfoot_sightingsMT[,2], xlab = "Latitude", ylab = 
 <embed width="80%" src="../../assets/tda-rips/bigfoot.svg" type="image/svg+xml" />
 </center>
 
-Now let's compute the filtration and visualize it with an animation.
+Now, let's compute the filtration and visualize it with an animation. In order to speed up the runtime, we will set maxscale = 2.5 and maxdimension = 3. 
 
 ```{r bigfootfiltration, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
 
-BigfootRipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension = 2,
+BigfootRipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension = 3,
                                   maxscale = 1.6, dist = "euclidean")
 
 class(BigfootRipsFilt) <- c(class(BigfootRipsFilt), "rips_filt")
 
-plot(BigfootRipsFilt, animate = TRUE, fn_out = 'bigfoot_ex.gif',
+plot(BigfootRipsFilt, animate = TRUE, fn_out = 'bigfoot.gif',
      lout = 80, interval = 0.2)
 
 
 ```
 
 <center>
-<embed width="80%" height="auto" src="../../assets/tda-rips/bigfoot_ex.gif"/>
+<embed width="80%" height="auto" src="../../assets/tda-rips/bigfoot.gif"/>
+</center>
+
+Furthermore, we can look at the Rips complex at a threshold of one, by adding the argument, "thresh = 1" and changing "animate = FALSE" to "animate = TRUE". 
+
+```{r bigfootcomplex, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
+
+plot(BigfootRipsFilt, thresh = 1, animate = FALSE)
+
+```
+
+<center>
+<embed width="80%" src="../../assets/tda-rips/bigfootcomplex1.svg" type="image/svg+xml" />
 </center>
 
 As we watch the animation, we see that even at low filtration values, there are lots of simplices near the GPS coordinates of Missoula, MT which corresponds to several bigfoot sightings in that area. Furthermore, at a filtration value of one, we see that the area surrounding Helena, MT is a deadzone. If we assume that Bigfoot does not travel radially outwards more than one latitude/longitude unit, then this suggests that hiking in Helena could help avoid Bigfoot encounters. Lastly, there have not been many sightings in Eastern MT, so perhaps Bigfoot does not roam around in that part of the state. We have not fully solved the Bigfoot mystery but the Rips complex and Rips filtration helps us get one step closer!
