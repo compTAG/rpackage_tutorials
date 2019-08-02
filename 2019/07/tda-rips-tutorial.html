@@ -48,14 +48,16 @@
   <div class="post-content e-content" itemprop="articleBody">
     <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
-<h1 id="introduction">Introduction</h1>
+<h2 id="introduction">Introduction</h2>
+
 <p>In this tutorial, we work with the Vietoris Rips Filtration, or Rips Filtration for short.
 Suppose we are given a finite set, <script type="math/tex">S</script>, of points in <script type="math/tex">\mathbb{R}^n</script>. The set of
 points is topologically uninteresting. How can we fix this? Yes, you guessed it: we
 can construct a Rips complex from the points in <script type="math/tex">S</script>! The Rips Filtration is a specific nested
 sequence of Rips complexes over <script type="math/tex">S</script> that can be later used to compute Persistent Homology.</p>
 
-<h1 id="objectives">Objectives</h1>
+<h2 id="objectives">Objectives</h2>
+
 <p>By the end of this tutorial you should be able to:</p>
 
 <ul>
@@ -66,7 +68,7 @@ sequence of Rips complexes over <script type="math/tex">S</script> that can be l
   <li>Name a few applications of the Rips complexes and filtrations.</li>
 </ul>
 
-<h1 id="theory">Theory</h1>
+<h2 id="theory">Theory</h2>
 
 <p>First, we breifly describe the mathematical foundations behind a Rips Filtration including
 simplicial complexes, filtrations, and the Rips complex. For more details on the theory,
@@ -151,7 +153,7 @@ we add a 1-simplex between <script type="math/tex">(1,3)</script> and <script ty
 <embed width="90%" src="../../assets/tda-rips/ripsfilt.svg" type="image/svg+xml" />
 </center>
 
-<h1 id="applications-of-rips-complexes-and-filtrations">Applications of Rips Complexes and Filtrations</h1>
+<h2 id="applications-of-rips-complexes-and-filtrations">Applications of Rips Complexes and Filtrations</h2>
 
 <p>Now that we have discussed the theory, let’s talk about some of the applications! A Rips
 filtration is used on point cloud data or more generally on a data set where there is some notion of distance between all data points. A common form of these types of data are location data.
@@ -179,7 +181,7 @@ input.</p>
 
 <p>These are just a few of the applications. There are many more!</p>
 
-<h1 id="computing-the-rips-filtration-using-the-r-tda-package">Computing the Rips Filtration using the R-TDA Package</h1>
+<h2 id="computing-the-rips-filtration-using-the-r-tda-package">Computing the Rips Filtration using the R-TDA Package</h2>
 
 <h3 id="toy-example">Toy Example</h3>
 <p>First, let’s go back to the example where <script type="math/tex">S=\{(0,0),(1,3),(2,-1),(3,2)\}</script>. We compute the Rips 
@@ -353,7 +355,7 @@ distance metric.</p>
 
 <p>As we watch the animation, we see that even at low filtration values, there are lots of simplices near the GPS coordinates of Missoula, MT which corresponds to several bigfoot sightings in that area. Furthermore, at a filtration value of one, we see that the area surrounding Helena, MT is a deadzone. If we assume that Bigfoot does not travel radially outwards more than one latitude/longitude unit, then this suggests that hiking in Helena could help avoid Bigfoot encounters. Lastly, there have not been many sightings in Eastern MT, so perhaps Bigfoot does not roam around in that part of the state. We have not fully solved the Bigfoot mystery but the Rips complex and Rips filtration helps us get one step closer!</p>
 
-<h1 id="references">References</h1>
+<h2 id="references">References</h2>
 
 <ol class="bibliography"><li><span id="edelsbrunner:2010">Edelsbrunner, H., &amp; Harer, J. (2010). <i>Computational Topology - an Introduction.</i> (pp. 1–241). American Mathematical Society.</span></li>
 <li><span id="ghrist:2007">Silva, V. de, &amp; Ghrist, R. (2007). Coverage in Sensor Networks via Persistent Homology. <i>Algebraic &amp; Geometric Topology</i>, <i>7</i>. https://doi.org/10.2140/agt.2007.7.339</span></li>
