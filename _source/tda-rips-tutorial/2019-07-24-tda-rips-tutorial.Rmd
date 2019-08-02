@@ -243,7 +243,7 @@ library(TDA) # upload TDA package
 
 S <- cbind(c(0,1,2,3),c(0,3,-1,2)) # write S into R
 
-S_RipsFilt <- ripsFiltration(S, maxdimension = 2, maxscale = 5,
+RipsFilt <- ripsFiltration(S, maxdimension = 2, maxscale = 5,
                              dist = "euclidean")
 ```
 
@@ -261,9 +261,9 @@ Let's check this out.
 
 ```{r output, echo = TRUE, message = TRUE}
 
-S_RipsFilt$cmplx[[10]] #Access vertices for the 10th simplex in the list
+RipsFilt$cmplx[[10]] #Access vertices for the 10th simplex in the list
 
-S_RipsFilt$values[10] #Access filtration value for the 10th simplex in the list
+RipsFilt$values[10] #Access filtration value for the 10th simplex in the list
 ```
 
 Our output tells us that we have a two-simplex on vertices $$(0,0),(1,3),(3,2)$$ when $$r=\sqrt{13}$$.
@@ -282,12 +282,9 @@ Note this function only works if the data set is two dimensional and the Euclide
 
 ```{r visualization_echo, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
 
-S_RipsFilt <- ripsFiltration(S, maxdimension = 2,
-                             maxscale = 4.5, dist = "euclidean")
+class(RipsFilt) <- c(class(RipsFilt), "rips_filt")
 
-class(S_RipsFilt) <- c(class(S_RipsFilt), "rips_filt")
-
-plot(S_RipsFilt, animate = TRUE, fn_out = 'rips_example.gif',
+plot(RipsFilt, animate = TRUE, fn_out = 'rips_example.gif',
      lout = 80, interval = 0.2)
 
 ```
@@ -301,7 +298,7 @@ Furthermore, we can look at the Rips complex at a threshold of $$\sqrt{13}$$, by
 
 ```{r toyex_complex, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
 
-plot(S_RipsFilt, thresh = sqrt(13), animate = FALSE)
+plot(RipsFilt, thresh = sqrt(13), animate = FALSE)
 
 ```
 
@@ -319,7 +316,7 @@ In order to compute the Rips filtration on $$(S, d_1)$$, we need to create a dis
 matrix in R. We can do this using the following code:
 
 ```{r distance, echo = TRUE, message = TRUE}
-dist_matrix <- dist(S, method = "manhattan", diag = TRUE, upper = TRUE, p = 2)
+DistMatrix <- dist(S, method = "manhattan", diag = TRUE, upper = TRUE, p = 2)
 ```
 
 When we use the ripsFiltration function, we write dist_matrix as the first argument instead of $$S$$.
@@ -328,7 +325,7 @@ distance metric.
 
 ```{r rips_manhattan, echo = TRUE, message = TRUE}
 
-S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension = 2,
+RipsFiltManhattan <- ripsFiltration(DistMatrix, maxdimension = 2,
                                        maxscale = 5, dist = "arbitrary")
 ```
 
@@ -336,19 +333,19 @@ This time when we compute the Rips complex with $$r=\sqrt{13}$$, we get the foll
 
 ```{r visualization2_show, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
 
-S_RipsFilt_Manhattan <- ripsFiltration(dist_matrix, maxdimension = 2,
+RipsFiltManhattan <- ripsFiltration(DistMatrix, maxdimension = 2,
                                        maxscale = sqrt(13), dist = "arbitrary")
 
 lim <- rep(c(-1, 3), 2)
 plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
      main = "Rips Complex with Manhattan Distance for r = sqrt(13)",
      xlab = "", ylab = "")
-for (idx in seq(along = S_RipsFilt_Manhattan[["cmplx"]])) {
-  polygon(S[S_RipsFilt_Manhattan[["cmplx"]][[idx]], , drop = FALSE],
+for (idx in seq(along = RipsFiltManhattan[["cmplx"]])) {
+  polygon(S[RipsFiltManhattan[["cmplx"]][[idx]], , drop = FALSE],
           col = "gray", border = NA, xlim = lim[1:2], ylim = lim[3:4])
 }
-for (idx in seq(along = S_RipsFilt_Manhattan[["cmplx"]])) {
-  polygon(S[S_RipsFilt_Manhattan[["cmplx"]][[idx]], , drop = FALSE],
+for (idx in seq(along = RipsFiltManhattan[["cmplx"]])) {
+  polygon(S[RipsFiltManhattan[["cmplx"]][[idx]], , drop = FALSE],
           col = NULL, xlim = lim[1:2], ylim = lim[3:4])
 }
 points(S, pch = 16)
@@ -386,7 +383,7 @@ longitude <- c(-109.64490,-112.57100,-112.45540,-115.39030,-105.86420,
                -112.97070)
 
 #GPS coordinates of Bigfoot sightings in MT
-bigfoot_sightingsMT <- cbind(longitude, latitude)
+BigfootSightingsMT <- cbind(longitude, latitude)
 
 ```
 
@@ -394,14 +391,14 @@ We can plot the data using the following code.
 
 ```{r bigfootdataplot_show, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
 
-plot(bigfoot_sightingsMT[,1],bigfoot_sightingsMT[,2], xlab = "Latitude",
+plot(BigfootSightingsMT[,1],BigfootSightingsMT[,2], xlab = "Latitude",
      ylab = "Longitude", main = "GPS coordinates of Bigfoot sightings
      in Montana", pch=16)
 ```
 
 ```{r bigfootdataplot_hide, echo = FALSE, message = FALSE, results = 'hide'}
 svg('../../assets/tda-rips/bigfoot.svg')
-plot(bigfoot_sightingsMT[,1],bigfoot_sightingsMT[,2], xlab = "Latitude", ylab = "Longitude",
+plot(BigfootSightingsMT[,1],BigfootSightingsMT[,2], xlab = "Latitude", ylab = "Longitude",
      main = "GPS coordinates of Bigfoot sightings in Montana", pch=16)
 ```
 
@@ -413,7 +410,7 @@ Now, let's compute the filtration and visualize it with an animation. In order t
 
 ```{r bigfootfiltration, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
 
-BigfootRipsFilt <- ripsFiltration(bigfoot_sightingsMT, maxdimension = 3,
+BigfootRipsFilt <- ripsFiltration(BigfootSightingsMT, maxdimension = 3,
                                   maxscale = 1.5, dist = "euclidean")
 
 class(BigfootRipsFilt) <- c(class(BigfootRipsFilt), "rips_filt")
