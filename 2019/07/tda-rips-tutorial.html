@@ -61,7 +61,7 @@ sequence of Rips complexes over <script type="math/tex">S</script> that can be l
 <p>By the end of this tutorial you should be able to:</p>
 
 <ul>
-  <li>Define <script type="math/tex">n</script>-simplices and simplicial complexes.</li>
+  <li>Define Abstract Simplicial Complexes.</li>
   <li>Compute a Rips Complex and Rips Filtration from a finite set of points in
 <script type="math/tex">\mathbb{R}^n</script> by hand.</li>
   <li>Compute a Rips Filtration from a finite set of points in <script type="math/tex">\mathbb{R}^n</script> using the R-TDA package.</li>
@@ -71,27 +71,16 @@ sequence of Rips complexes over <script type="math/tex">S</script> that can be l
 <h2 id="theory">Theory</h2>
 
 <p>First, we breifly describe the mathematical foundations behind a Rips Filtration including
-simplicial complexes, filtrations, and the Rips complex. For more details on the theory,
-see <a class="citation" href="#edelsbrunner:2010">(Edelsbrunner &amp; Harer, 2010)</a>.</p>
+simplicial complexes, filtrations, and the Rips complex. <em>Computation Topology: An Introduction</em> 
+provides more details on the theory. <a class="citation" href="#edelsbrunner:2010">(Edelsbrunner &amp; Harer, 2010)</a></p>
 
 <h3 id="triangle-appreciation">Triangle Appreciation</h3>
 
-<p>We construct a Rips Complex from simplices of varying dimensions that are dimensional
-generalizations of triangles. More specifically, an <em><script type="math/tex">n</script>-simplex</em> is the convex hull of <script type="math/tex">n+1</script>
-affinely independent points.</p>
+<p>We construct a Rips Complex from simplices of varying dimensions that are 
+generalizations of triangles of varying dimensions.</p>
 
 <center>
 <embed width="70%" src="../../assets/tda-rips/simplices.svg" type="image/svg+xml" />
-</center>
-
-<p>A simplicial complex is a nice way of combining simplices. A <em>face</em> of a simplex is the convex 
-hull of a subset of the vertices in the simplex. A <em>simplicial complex</em> is a finite
-collection of simplices, <script type="math/tex">K</script>, such that (1) if <script type="math/tex">\sigma \in K</script> and <script type="math/tex">\tau\leq \sigma</script>, then 
-<script type="math/tex">\tau \in K</script>, and (2) if <script type="math/tex">\sigma, \sigma'\in K</script>, then <script type="math/tex">\sigma\cap \sigma'</script> is either empty 
-or a face of both.</p>
-
-<center>
-<embed width="40%" src="../../assets/tda-rips/simplicialcomplex.svg" type="image/svg+xml" />
 </center>
 
 <p>An <em>abstract simplicial complex</em> is a finite collection of sets, <script type="math/tex">A</script>, such that if <script type="math/tex">a\in A</script> and <script type="math/tex">b\subset a</script> implies <script type="math/tex">b\in A</script>. The elements <script type="math/tex">a\in A</script> are the simplices where dim<script type="math/tex">(a)=</script>card<script type="math/tex">(a)-1</script>. Here, card<script type="math/tex">(a)</script> is the number of points in the set, <script type="math/tex">a</script>.</p>
@@ -113,7 +102,14 @@ of diameter at most <script type="math/tex">r</script>:</p>
 <script type="math/tex; mode=display">\text{VR}(S, r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}.</script>
 
 <p>Geometrically, this means we consider balls of radius <script type="math/tex">\frac{r}{2}</script>, centered at each point in
-<script type="math/tex">S</script>. Whenever <script type="math/tex">d</script> balls have pairwise intersections, we add a <script type="math/tex">d-1</script> dimensional simplex. For this tutorial, we use the standard Euclidean distance (unless stated otherwise) to compute a Rips complex. However, one could use any metric.</p>
+<script type="math/tex">S</script>. Whenever <script type="math/tex">d</script> balls have pairwise intersections, we add a <script type="math/tex">d-1</script> dimensional simplex. 
+For this tutorial, we use the standard Euclidean distance (unless stated otherwise) to compute a Rips
+complex. However, one could use any metric.</p>
+
+<p>You may be familiar with <em>contact graphs</em> where the vertices represent a geometric object such as a
+circle, curve, or polygon, and an edge between two vertices exists if the corresponding two objects
+intersect. The Rips complex is a generalization of contact graphs since Rips complexes can have more 
+than just vertices and edges.</p>
 
 <p><strong>Note:</strong> Many people also define <script type="math/tex">\text{VR}(S, r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}</script>. However, the algorithms used in the R-TDA package use the first definition.</p>
 
@@ -169,15 +165,16 @@ Furthermore, the holes in the complex can provide information on where data are 
 Lastly, the topological information given by taking a Rips filtration can be studied using
 Persistent Homology (see next tutorial), which is often used to analyze these types of data.</p>
 
-<p>Another application is studying coverage in sensor networks <a class="citation" href="#ghrist:2007">(Silva &amp; Ghrist, 2007)</a>. The 
-problem is to look a set of sensors and find how much coverage the sensors provide. Vin De 
-Silva and Robert Ghrist studied this problem using Rips complexes since the complex can be
-determined easily from pairwise communication data.</p>
+<p>Another application is studying coverage in sensor networks. The problem is to look a set 
+of sensors and find how much coverage the sensors provide.  Robert Ghrist and Vin de Silva 
+studied this problem using Rips complexes since the complex can be determined easily from 
+pairwise communication data. <a class="citation" href="#ghrist:2007">(Silva &amp; Ghrist, 2007)</a></p>
 
-<p>Furthermore, Rips complexes can are used in shape reconstruction. This means, under certain assumptions,
-the Rips complex of a point cloud, <script type="math/tex">S</script>, with threshold, <script type="math/tex">r</script>, has the same homotopy
-type as the union of balls centered around each point in <script type="math/tex">S</script> with radius <script type="math/tex">\frac{r}{2}</script> <a class="citation" href="#attali:2013">(Attali, Lieutier, &amp; Salinas, 2013)</a>. Rips complexes are nice to use since they do not favor a specific type of alignment of the
-input.</p>
+<p>Furthermore, Rips complexes can are used in shape reconstruction. Dominque Attali, Andr`{e} Lieutier, 
+and David Salinas proved that the Rips complex of a point cloud, <script type="math/tex">S</script>, at some threshold has 
+the same homotopy type as the union of balls centered around each point in <script type="math/tex">S</script> with radius
+<script type="math/tex">\frac{r}{2}</script> . <a class="citation" href="#attali:2013">(Attali, Lieutier, &amp; Salinas, 2013)</a> Rips complexes are nice to use for shape reconstruction 
+since they do not favor a specific type of alignment of the input.</p>
 
 <p>These are just a few of the applications. There are many more!</p>
 
@@ -222,11 +219,11 @@ and filtration value elements will help us verify the rest of the filtration com
 
 <p>If we want to see an animation of the Rips filtration, we can run the following code with a plot function. This function has arguments:</p>
 <ul>
-  <li><strong>filt</strong> is the Rips filtration object</li>
-  <li><strong>animate</strong> is a logical varibale stating TRUE if you want an animation of the filatration or FALSE if you do not want an animation</li>
-  <li><strong>thresh</strong> if “animate = FALSE” then thresh is the threshold value value for the Rips complex that will be plotted</li>
-  <li><strong>fn_out</strong> if “animate = TRUE” then fn_out is the name of the file for the animation</li>
-  <li><strong>l_out</strong> if “animate = TRUE” then l_out is the number of levels of radii used in the animation between 0 and 1.1 times the max distance between any two points</li>
+  <li><strong>filt</strong> is the Rips filtration object.</li>
+  <li><strong>animate</strong> is a logical varibale stating TRUE if you want an animation of the filatration or FALSE if you do not want an animation.</li>
+  <li><strong>thresh</strong>  is the threshold value value for the Rips complex that will be plotted if “animate = FALSE”.</li>
+  <li><strong>fn_out</strong>  is the name of the file for the animation if “animate = TRUE”.</li>
+  <li><strong>l_out</strong>  is the number of levels of radii used in the animation between 0 and 1.1 times the max distance between any two points if “animate = TRUE”.</li>
 </ul>
 
 <p>Note this function only works if the data set is two dimensional and the Euclidean distance is used.</p>
@@ -260,33 +257,34 @@ matrix in R. We can do this using the following code:</p>
 <figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">DistMatrix</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">dist</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"manhattan"</span><span class="p">,</span><span class="w"> </span><span class="n">diag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">)</span></code></pre></figure>
 
 <p>When we use the ripsFiltration function, we write dist_matrix as the first argument instead of <script type="math/tex">S</script>.
-Additionally, the fourth argument will change to dist = “arbitrary” to indicate that we are giving our own
-distance metric.</p>
+Additionally, the fourth argument will change to dist = “arbitrary” to indicate that we are giving our
+own distance metric.</p>
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">RipsFiltManhattan</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ripsFiltration</span><span class="p">(</span><span class="n">DistMatrix</span><span class="p">,</span><span class="w"> </span><span class="n">maxdimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w">
                                        </span><span class="n">maxscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"arbitrary"</span><span class="p">)</span></code></pre></figure>
 
 <p>This time when we compute the Rips complex with <script type="math/tex">r=\sqrt{13}</script>, we get the following complex:</p>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">RipsFiltManhattan</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ripsFiltration</span><span class="p">(</span><span class="n">DistMatrix</span><span class="p">,</span><span class="w"> </span><span class="n">maxdimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w">
-                                       </span><span class="n">maxscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">sqrt</span><span class="p">(</span><span class="m">13</span><span class="p">),</span><span class="w"> </span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"arbitrary"</span><span class="p">)</span><span class="w">
-
-</span><span class="n">lim</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">rep</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">-1</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">),</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="w">
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">lim</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">rep</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">-3</span><span class="p">,</span><span class="w"> </span><span class="m">5</span><span class="p">),</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="w">
 </span><span class="n">plot</span><span class="p">(</span><span class="kc">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"n"</span><span class="p">,</span><span class="w"> </span><span class="n">xlim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lim</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">],</span><span class="w"> </span><span class="n">ylim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lim</span><span class="p">[</span><span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="p">],</span><span class="w">
      </span><span class="n">main</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Rips Complex with Manhattan Distance for r = sqrt(13)"</span><span class="p">,</span><span class="w">
      </span><span class="n">xlab</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="n">ylab</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">""</span><span class="p">)</span><span class="w">
-</span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">seq</span><span class="p">(</span><span class="n">along</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RipsFiltManhattan</span><span class="p">[[</span><span class="s2">"cmplx"</span><span class="p">]]))</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="k">for</span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span><span class="o">:</span><span class="nf">length</span><span class="p">(</span><span class="n">S</span><span class="p">[,</span><span class="w"> </span><span class="m">1</span><span class="p">]))</span><span class="w"> </span><span class="p">{</span><span class="w">
+  </span><span class="n">draw.circle</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">],</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">],</span><span class="w"> </span><span class="n">radius</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">sqrt</span><span class="p">(</span><span class="m">13</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w">
+              </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rgb</span><span class="p">(</span><span class="m">0.1</span><span class="p">,</span><span class="w"> </span><span class="m">0.6</span><span class="p">,</span><span class="w"> </span><span class="m">0.1</span><span class="p">,</span><span class="w"> </span><span class="m">0.05</span><span class="p">))</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">seq</span><span class="p">(</span><span class="n">along</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RipsFiltManhattan</span><span class="p">[[</span><span class="s2">"cmplx"</span><span class="p">]][</span><span class="n">RipsFiltManhattan</span><span class="o">$</span><span class="n">values</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nf">sqrt</span><span class="p">(</span><span class="m">13</span><span class="p">)]))</span><span class="w"> </span><span class="p">{</span><span class="w">
   </span><span class="n">polygon</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">RipsFiltManhattan</span><span class="p">[[</span><span class="s2">"cmplx"</span><span class="p">]][[</span><span class="n">idx</span><span class="p">]],</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">drop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">],</span><span class="w">
           </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"gray"</span><span class="p">,</span><span class="w"> </span><span class="n">border</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">NA</span><span class="p">,</span><span class="w"> </span><span class="n">xlim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lim</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">],</span><span class="w"> </span><span class="n">ylim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lim</span><span class="p">[</span><span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="p">])</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">seq</span><span class="p">(</span><span class="n">along</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RipsFiltManhattan</span><span class="p">[[</span><span class="s2">"cmplx"</span><span class="p">]]))</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">seq</span><span class="p">(</span><span class="n">along</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RipsFiltManhattan</span><span class="p">[[</span><span class="s2">"cmplx"</span><span class="p">]][</span><span class="n">RipsFiltManhattan</span><span class="o">$</span><span class="n">values</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nf">sqrt</span><span class="p">(</span><span class="m">13</span><span class="p">)]))</span><span class="w"> </span><span class="p">{</span><span class="w">
   </span><span class="n">polygon</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">RipsFiltManhattan</span><span class="p">[[</span><span class="s2">"cmplx"</span><span class="p">]][[</span><span class="n">idx</span><span class="p">]],</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">drop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">],</span><span class="w">
           </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">xlim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lim</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">],</span><span class="w"> </span><span class="n">ylim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lim</span><span class="p">[</span><span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="p">])</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span><span class="n">points</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">pch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">16</span><span class="p">)</span></code></pre></figure>
 
 <center>
-<embed width="80%" src="../../assets/tda-rips/visualization2.svg" type="image/svg+xml" />
+<embed width="80%" src="../../assets/tda-rips/manhattan.svg" type="image/svg+xml" />
 </center>
 
 <p>Hence VR<script type="math/tex">(S, \sqrt{13})</script> with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with four edges that join to form a cycle.</p>
