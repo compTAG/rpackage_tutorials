@@ -108,7 +108,7 @@ sequence of Rips complexes over $$S$$ that can be later used to compute Persiste
 
 By the end of this tutorial you should be able to:
 
-* Define $$n$$-simplices and simplicial complexes.
+* Define Abstract Simplicial Complexes.
 * Compute a Rips Complex and Rips Filtration from a finite set of points in
 $$\mathbb{R}^n$$ by hand.
 * Compute a Rips Filtration from a finite set of points in $$\mathbb{R}^n$$ using the R-TDA package.
@@ -119,27 +119,16 @@ $$\mathbb{R}^n$$ by hand.
 
 
 First, we breifly describe the mathematical foundations behind a Rips Filtration including
-simplicial complexes, filtrations, and the Rips complex. For more details on the theory,
-see {% cite edelsbrunner:2010 %}.
+simplicial complexes, filtrations, and the Rips complex. *Computation Topology: An Introduction* 
+provides more details on the theory. {% cite edelsbrunner:2010 %}
 
 ### Triangle Appreciation
 
-We construct a Rips Complex from simplices of varying dimensions that are dimensional
-generalizations of triangles. More specifically, an *$$n$$-simplex* is the convex hull of $$n+1$$
-affinely independent points.
+We construct a Rips Complex from simplices of varying dimensions that are 
+generalizations of triangles of varying dimensions. 
 
 <center>
 <embed width="70%" src="../../assets/tda-rips/simplices.svg" type="image/svg+xml" />
-</center>
-
-A simplicial complex is a nice way of combining simplices. A *face* of a simplex is the convex 
-hull of a subset of the vertices in the simplex. A *simplicial complex* is a finite
-collection of simplices, $$K$$, such that (1) if $$\sigma \in K$$ and $$\tau\leq \sigma$$, then 
-$$\tau \in K$$, and (2) if $$\sigma, \sigma'\in K$$, then $$\sigma\cap \sigma'$$ is either empty 
-or a face of both. 
-
-<center>
-<embed width="40%" src="../../assets/tda-rips/simplicialcomplex.svg" type="image/svg+xml" />
 </center>
 
 An *abstract simplicial complex* is a finite collection of sets, $$A$$, such that if $$a\in A$$ and $$b\subset a$$ implies $$b\in A$$. The elements $$a\in A$$ are the simplices where dim$$(a)=$$card$$(a)-1$$. Here, card$$(a)$$ is the number of points in the set, $$a$$.
@@ -163,7 +152,14 @@ $$ \text{VR}(S, r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}. $$
 
 
 Geometrically, this means we consider balls of radius $$\frac{r}{2}$$, centered at each point in
-$$S$$. Whenever $$d$$ balls have pairwise intersections, we add a $$d-1$$ dimensional simplex. For this tutorial, we use the standard Euclidean distance (unless stated otherwise) to compute a Rips complex. However, one could use any metric.
+$$S$$. Whenever $$d$$ balls have pairwise intersections, we add a $$d-1$$ dimensional simplex. 
+For this tutorial, we use the standard Euclidean distance (unless stated otherwise) to compute a Rips
+complex. However, one could use any metric.
+
+You may be familiar with *contact graphs* where the vertices represent a geometric object such as a
+circle, curve, or polygon, and an edge between two vertices exists if the corresponding two objects
+intersect. The Rips complex is a generalization of contact graphs since Rips complexes can have more 
+than just vertices and edges. 
 
 **Note:** Many people also define $$\text{VR}(S, r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}$$. However, the algorithms used in the R-TDA package use the first definition.
 
@@ -218,16 +214,16 @@ Furthermore, the holes in the complex can provide information on where data are 
 Lastly, the topological information given by taking a Rips filtration can be studied using
 Persistent Homology (see next tutorial), which is often used to analyze these types of data.
 
-Another application is studying coverage in sensor networks {% cite ghrist:2007 %}. The 
-problem is to look a set of sensors and find how much coverage the sensors provide. Vin De 
-Silva and Robert Ghrist studied this problem using Rips complexes since the complex can be
-determined easily from pairwise communication data. 
+Another application is studying coverage in sensor networks. The problem is to look a set 
+of sensors and find how much coverage the sensors provide.  Robert Ghrist and Vin de Silva 
+studied this problem using Rips complexes since the complex can be determined easily from 
+pairwise communication data. {% cite ghrist:2007 %}
 
-Furthermore, Rips complexes can are used in shape reconstruction. This means, under certain assumptions,
-the Rips complex of a point cloud, $$S$$, with threshold, $$r$$, has the same homotopy
-type as the union of balls centered around each point in $$S$$ with radius $$\frac{r}{2}$$ {% cite
-attali:2013 %}. Rips complexes are nice to use since they do not favor a specific type of alignment of the
-input.
+Furthermore, Rips complexes can are used in shape reconstruction. Dominque Attali, Andr`{e} Lieutier, 
+and David Salinas proved that the Rips complex of a point cloud, $$S$$, at some threshold has 
+the same homotopy type as the union of balls centered around each point in $$S$$ with radius
+$$\frac{r}{2}$$ . {% cite attali:2013 %} Rips complexes are nice to use for shape reconstruction 
+since they do not favor a specific type of alignment of the input.
 
 These are just a few of the applications. There are many more!
 
@@ -271,11 +267,11 @@ This is exactly what we found when we worked through this example by hand. Acces
 and filtration value elements will help us verify the rest of the filtration computation we did earlier.
 
 If we want to see an animation of the Rips filtration, we can run the following code with a plot function. This function has arguments:
-* **filt** is the Rips filtration object
-* **animate** is a logical varibale stating TRUE if you want an animation of the filatration or FALSE if you do not want an animation 
-* **thresh** if "animate = FALSE" then thresh is the threshold value value for the Rips complex that will be plotted
-* **fn_out** if "animate = TRUE" then fn_out is the name of the file for the animation
-* **l_out** if "animate = TRUE" then l_out is the number of levels of radii used in the animation between 0 and 1.1 times the max distance between any two points
+* **filt** is the Rips filtration object.
+* **animate** is a logical varibale stating TRUE if you want an animation of the filatration or FALSE if you do not want an animation.
+* **thresh**  is the threshold value value for the Rips complex that will be plotted if "animate = FALSE".
+* **fn_out**  is the name of the file for the animation if "animate = TRUE".
+* **l_out**  is the number of levels of radii used in the animation between 0 and 1.1 times the max distance between any two points if "animate = TRUE".
 
 Note this function only works if the data set is two dimensional and the Euclidean distance is used.
 
@@ -320,8 +316,8 @@ DistMatrix <- dist(S, method = "manhattan", diag = TRUE, upper = TRUE, p = 2)
 ```
 
 When we use the ripsFiltration function, we write dist_matrix as the first argument instead of $$S$$.
-Additionally, the fourth argument will change to dist = "arbitrary" to indicate that we are giving our own
-distance metric.
+Additionally, the fourth argument will change to dist = "arbitrary" to indicate that we are giving our
+own distance metric.
 
 ```{r rips_manhattan, echo = TRUE, message = TRUE}
 
@@ -333,18 +329,19 @@ This time when we compute the Rips complex with $$r=\sqrt{13}$$, we get the foll
 
 ```{r visualization2_show, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
 
-RipsFiltManhattan <- ripsFiltration(DistMatrix, maxdimension = 2,
-                                       maxscale = sqrt(13), dist = "arbitrary")
-
-lim <- rep(c(-1, 3), 2)
+lim <- rep(c(-3, 5), 2)
 plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
      main = "Rips Complex with Manhattan Distance for r = sqrt(13)",
      xlab = "", ylab = "")
-for (idx in seq(along = RipsFiltManhattan[["cmplx"]])) {
+for(j in 1:length(S[, 1])) {
+  draw.circle(x = S[j, 1], y = S[j, 2], radius = sqrt(13) / 2,
+              col = rgb(0.1, 0.6, 0.1, 0.05))
+}
+for (idx in seq(along = RipsFiltManhattan[["cmplx"]][RipsFiltManhattan$values < sqrt(13)])) {
   polygon(S[RipsFiltManhattan[["cmplx"]][[idx]], , drop = FALSE],
           col = "gray", border = NA, xlim = lim[1:2], ylim = lim[3:4])
 }
-for (idx in seq(along = RipsFiltManhattan[["cmplx"]])) {
+for (idx in seq(along = RipsFiltManhattan[["cmplx"]][RipsFiltManhattan$values < sqrt(13)])) {
   polygon(S[RipsFiltManhattan[["cmplx"]][[idx]], , drop = FALSE],
           col = NULL, xlim = lim[1:2], ylim = lim[3:4])
 }
@@ -352,7 +349,7 @@ points(S, pch = 16)
 ```
 
 <center>
-<embed width="80%" src="../../assets/tda-rips/visualization2.svg" type="image/svg+xml" />
+<embed width="80%" src="../../assets/tda-rips/manhattan.svg" type="image/svg+xml" />
 </center>
 
 Hence VR$$(S, \sqrt{13})$$ with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with four edges that join to form a cycle.
