@@ -501,18 +501,18 @@ plot_rips_bigfoot(BigfootRipsFilt, animate = TRUE, fn_out = 'bigfoot.gif',
 <embed width="80%" height="auto" src="../../assets/tda-rips/bigfoot.gif"/>
 </center>
 
-Furthermore, we can look at the Rips complex at a threshold of one.
+Furthermore, we can look at the Rips complex at a threshold of 0.8. **TODO: change this plot so it is correct.**
 
 ```{r bigfootcomplex, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
 
-plot_rips_bigfoot(BigfootRipsFilt, thresh = 1, animate = FALSE)
+plot_rips_bigfoot(BigfootRipsFilt, thresh = 0.8, animate = FALSE)
 
 ```
 
 
 ```{r bigfootcomplex_hide, echo = FALSE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
 svg('../../assets/tda-rips/bigfootcomplex1.svg', height = 5, width = 10)
-plot_rips_bigfoot(BigfootRipsFilt, thresh = 1, animate = FALSE)
+plot_rips_bigfoot(BigfootRipsFilt, thresh = 0.8, animate = FALSE)
 dev.off()
 ```
 
@@ -521,7 +521,8 @@ dev.off()
 <embed width="80%" src="../../assets/tda-rips/bigfootcomplex1.svg" type="image/svg+xml" />
 </center>
 
-As we watch the animation, we see that even at low filtration values, there are lots of simplices near the GPS coordinates of Missoula, MT which corresponds to several bigfoot sightings in that area. Furthermore, at a filtration value of one, we see that the area surrounding Helena, MT is a deadzone. If we assume that Bigfoot does not travel radially outwards more than one latitude/longitude unit, then this suggests that hiking in Helena could help avoid Bigfoot encounters. Lastly, there have not been many sightings in Eastern MT, so perhaps Bigfoot does not roam around in that part of the state. We have not fully solved the Bigfoot mystery but the Rips complex and Rips filtration helps us get one step closer!
+As we watch the animation, we see that the Rips filtration captures geometric properties about the data set since simplices quickly arise in the filtraion in the locations that reported the most bigfoot sightings. Furthermore, we see the filtration also reveals some topological information about the data set. In particular, at a filtration value of 0.698812, five edges that form a cycle appear around the GPS coordinate (-111, 46). Furthermore, this cycle persists until the filtration value of 0.94698369. Considering the amount of land that is covered in 1 longitude/latitude unit, this cycle could tell us something meaningful about our data. Perhaps this hole is a deadzone where Bigfoot has yet to be found, or maybe this area is inaccessible to humans and that is why there has not been sightings. Regardless of the answer, this cycle provides us guidance for the next step to take to solve the Bigfoot mystery!
+
 
 
 
