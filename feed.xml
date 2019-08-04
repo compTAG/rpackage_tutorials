@@ -1,12 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="https://comptag.github.io/rpackage_tutorials/feed.xml" rel="self" type="application/atom+xml" /><link href="https://comptag.github.io/rpackage_tutorials/" rel="alternate" type="text/html" /><updated>2019-08-04T02:28:16+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/feed.xml</id><title type="html">R Package TDA Documentation</title><subtitle>Various tutorials on important techniques in topological data analysis. Tutorials made with the final goal in mind to use the R package TDA in order to actually implement each technique.</subtitle><entry><title type="html">Rips Filtration Tutorial for the R-TDA Package</title><link href="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html" rel="alternate" type="text/html" title="Rips Filtration Tutorial for the R-TDA Package" /><published>2019-07-22T00:00:00+00:00</published><updated>2019-07-22T00:00:00+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial</id><content type="html" xml:base="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html">&lt;script src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="https://comptag.github.io/rpackage_tutorials/feed.xml" rel="self" type="application/atom+xml" /><link href="https://comptag.github.io/rpackage_tutorials/" rel="alternate" type="text/html" /><updated>2019-08-04T02:28:38+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/feed.xml</id><title type="html">R Package TDA Documentation</title><subtitle>Various tutorials on important techniques in topological data analysis. Tutorials made with the final goal in mind to use the R package TDA in order to actually implement each technique.</subtitle><entry><title type="html">Rips Filtration Tutorial for the R-TDA Package</title><link href="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html" rel="alternate" type="text/html" title="Rips Filtration Tutorial for the R-TDA Package" /><published>2019-07-22T00:00:00+00:00</published><updated>2019-07-22T00:00:00+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial</id><content type="html" xml:base="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html">&lt;script src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
 
 &lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
-&lt;p&gt;In this tutorial, we work with the Vietoris Rips Filtration, or Rips Filtration for short.
-Suppose we are given a finite set, &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;, of points in &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt;. The set of
+&lt;p&gt;Suppose we are given a finite set, &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;, of points in &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt;. The set of
 points is topologically uninteresting. How can we fix this? Yes, you guessed it: we
-can construct a Rips complex from the points in &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;! The Rips Filtration is a specific nested
-sequence of Rips complexes over &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; that can be later used to compute Persistent Homology.&lt;/p&gt;
+can construct a Vietoris Rips (Rips) complex from the points in &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;! The Rips Filtration is 
+a specific nested sequence of Rips complexes over &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;. Both provide geometric and topological
+information about our point set. In this tutorial, we explore this idea and how Rips complex and
+filtration can be used to better understand data sets.&lt;/p&gt;
 
 &lt;h2 id=&quot;objectives&quot;&gt;Objectives&lt;/h2&gt;
 
@@ -14,7 +15,7 @@ sequence of Rips complexes over &lt;script type=&quot;math/tex&quot;&gt;S&lt;/sc
 
 &lt;ul&gt;
   &lt;li&gt;Define Abstract Simplicial Complexes.&lt;/li&gt;
-  &lt;li&gt;Compute a Rips Complex and Rips Filtration from a finite set of points in
+  &lt;li&gt;Compute a Rips complex and Rips filtration from a finite set of points in
 &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt; by hand.&lt;/li&gt;
   &lt;li&gt;Compute a Rips Filtration from a finite set of points in &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt; using the R-TDA package.&lt;/li&gt;
   &lt;li&gt;Name a few applications of the Rips complexes and filtrations.&lt;/li&gt;
@@ -24,18 +25,21 @@ sequence of Rips complexes over &lt;script type=&quot;math/tex&quot;&gt;S&lt;/sc
 
 &lt;p&gt;First, we breifly describe the mathematical foundations behind a Rips Filtration including
 simplicial complexes, filtrations, and the Rips complex. &lt;em&gt;Computation Topology: An Introduction&lt;/em&gt; 
-provides more details on the theory. &lt;a class=&quot;citation&quot; href=&quot;#edelsbrunner:2010&quot;&gt;(Edelsbrunner &amp;amp; Harer, 2010)&lt;/a&gt;&lt;/p&gt;
+provides more details on the theory &lt;a class=&quot;citation&quot; href=&quot;#edelsbrunner:2010&quot;&gt;(Edelsbrunner &amp;amp; Harer, 2010)&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h3 id=&quot;triangle-appreciation&quot;&gt;Triangle Appreciation&lt;/h3&gt;
 
-&lt;p&gt;We construct a Rips Complex from simplices of varying dimensions that are 
-generalizations of triangles of varying dimensions.&lt;/p&gt;
+&lt;p&gt;We construct a Rips complex from simplices of varying dimensions that are generalizations of triangles 
+of varying dimensions. More specifically, an &lt;em&gt;n-simplex&lt;/em&gt; is the smallest convex set of &lt;script type=&quot;math/tex&quot;&gt;n-1&lt;/script&gt; points,
+&lt;script type=&quot;math/tex&quot;&gt;v_0,...,v_{n-1}&lt;/script&gt; where &lt;script type=&quot;math/tex&quot;&gt;v_1-v_0,...,v_{n-1}-v_0&lt;/script&gt; are linearly independent.&lt;/p&gt;
 
 &lt;center&gt;
 &lt;embed width=&quot;70%&quot; src=&quot;../../assets/tda-rips/simplices.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
 &lt;/center&gt;
 
-&lt;p&gt;An &lt;em&gt;abstract simplicial complex&lt;/em&gt; is a finite collection of sets, &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt;, such that if &lt;script type=&quot;math/tex&quot;&gt;a\in A&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;b\subset a&lt;/script&gt; implies &lt;script type=&quot;math/tex&quot;&gt;b\in A&lt;/script&gt;. The elements &lt;script type=&quot;math/tex&quot;&gt;a\in A&lt;/script&gt; are the simplices where dim&lt;script type=&quot;math/tex&quot;&gt;(a)=&lt;/script&gt;card&lt;script type=&quot;math/tex&quot;&gt;(a)-1&lt;/script&gt;. Here, card&lt;script type=&quot;math/tex&quot;&gt;(a)&lt;/script&gt; is the number of points in the set, &lt;script type=&quot;math/tex&quot;&gt;a&lt;/script&gt;.&lt;/p&gt;
+&lt;p&gt;An &lt;em&gt;abstract simplicial complex&lt;/em&gt; is a finite collection of sets, &lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt;, that is closed under the subset
+relation, i.e., if &lt;script type=&quot;math/tex&quot;&gt;a\in A&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;b\subset a&lt;/script&gt;, then &lt;script type=&quot;math/tex&quot;&gt;b\in A&lt;/script&gt;. The elements &lt;script type=&quot;math/tex&quot;&gt;a\in A&lt;/script&gt; are the
+simplices where dim&lt;script type=&quot;math/tex&quot;&gt;(a):=&lt;/script&gt;card&lt;script type=&quot;math/tex&quot;&gt;(a)-1&lt;/script&gt;. Here, card&lt;script type=&quot;math/tex&quot;&gt;(a)&lt;/script&gt; is the number of points in the set, &lt;script type=&quot;math/tex&quot;&gt;a&lt;/script&gt;.&lt;/p&gt;
 
 &lt;center&gt;
 &lt;embed width=&quot;80%&quot; src=&quot;../../assets/tda-rips/asc.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
@@ -43,27 +47,22 @@ generalizations of triangles of varying dimensions.&lt;/p&gt;
 
 &lt;h3 id=&quot;rips-complex&quot;&gt;Rips Complex&lt;/h3&gt;
 
-&lt;p&gt;Before explaining how to construct a Rips complex from a finite set of points, we give a 
-preliminary definition. The &lt;em&gt;diameter&lt;/em&gt; of a set of points is the maximum distance between any 
-two points in the set.&lt;/p&gt;
-
 &lt;p&gt;Let &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; be finite set of points in &lt;script type=&quot;math/tex&quot;&gt;\mathbb{R}^n&lt;/script&gt;. Let &lt;script type=&quot;math/tex&quot;&gt;r\geq 0&lt;/script&gt;. The Rips complex of &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;
 and &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; is the abstract simplicial complex of &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S, r)&lt;/script&gt; consisting of all subsets
 of diameter at most &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;:&lt;/p&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\text{VR}(S, r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}.&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\text{VR}(S, r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\}&lt;/script&gt;
 
-&lt;p&gt;Geometrically, this means we consider balls of radius &lt;script type=&quot;math/tex&quot;&gt;\frac{r}{2}&lt;/script&gt;, centered at each point in
-&lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;. Whenever &lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt; balls have pairwise intersections, we add a &lt;script type=&quot;math/tex&quot;&gt;d-1&lt;/script&gt; dimensional simplex. 
-For this tutorial, we use the standard Euclidean distance (unless stated otherwise) to compute a Rips
-complex. However, one could use any metric.&lt;/p&gt;
+&lt;p&gt;where the &lt;em&gt;diameter&lt;/em&gt; of a set of points is the maximum distance between any two points in the set.&lt;/p&gt;
+
+&lt;p&gt;Geometrically, we can constuct the Rips complex by considering balls of radius &lt;script type=&quot;math/tex&quot;&gt;\frac{r}{2}&lt;/script&gt;, 
+centered at each point in &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;. Whenever &lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt; balls have pairwise intersections, we add a &lt;script type=&quot;math/tex&quot;&gt;d-1&lt;/script&gt;
+dimensional simplex.For this tutorial, we use the standard Euclidean distance (unless stated otherwise)
+to compute a Rips complex.&lt;/p&gt;
 
 &lt;p&gt;You may be familiar with &lt;em&gt;contact graphs&lt;/em&gt; where the vertices represent a geometric object such as a
 circle, curve, or polygon, and an edge between two vertices exists if the corresponding two objects
-intersect. The Rips complex is a generalization of contact graphs since Rips complexes can have more 
-than just vertices and edges.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Many people also define &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S, r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}&lt;/script&gt;. However, the algorithms used in the R-TDA package use the first definition.&lt;/p&gt;
+intersect. The Rips complex is a generalization of contact graphs.&lt;/p&gt;
 
 &lt;p&gt;Here are some examples of Rips complexes:&lt;/p&gt;
 
@@ -71,61 +70,67 @@ than just vertices and edges.&lt;/p&gt;
 &lt;embed width=&quot;80%&quot; src=&quot;../../assets/tda-rips/ripscomplex.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
 &lt;/center&gt;
 
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Many people also define &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S, r) :=\{\sigma\subset S \mid \text{diam}(\sigma)\leq 2r\}&lt;/script&gt;. However, the algorithms used in the R-TDA package use the first definition.&lt;/p&gt;
+
 &lt;h3 id=&quot;filtrations&quot;&gt;Filtrations&lt;/h3&gt;
 
 &lt;p&gt;A &lt;em&gt;filtration&lt;/em&gt; of a simplicial complex, &lt;script type=&quot;math/tex&quot;&gt;K&lt;/script&gt;, is a nested sequence of subcomplexes starting at the
-empty set and ending with the full simplicial complex i.e.,&lt;/p&gt;
+empty set and ending with the full simplicial complex, i.e.,&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\emptyset \subset K_0 \subset K_1 \subset ... \subset K_n=K.&lt;/script&gt;
 
 &lt;p&gt;Going back to the Rips complex, we consider &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; to be a free parameter. If we vary &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;, we
-get different Rips complexes. In most data analysis situations, there is not a best choice for &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; that best describes the data, so why not look at all of them!? Observe if we increase &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; continuously, then we get a family of nested Rips complexes which gives rise to the &lt;em&gt;Rips filtration&lt;/em&gt;.&lt;/p&gt;
+get different Rips complexes. In many data analysis situations, the value of &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt; that best describes
+the data is unknown or does not exist, so why not look at all of them!? Observe if we increase &lt;script type=&quot;math/tex&quot;&gt;r&lt;/script&gt;
+continuously, then we get a family of nested Rips complexes; the &lt;em&gt;Rips filtration&lt;/em&gt;.&lt;/p&gt;
 
 &lt;p&gt;Let’s work through an example. Let &lt;script type=&quot;math/tex&quot;&gt;S:=\{(0,0),(1,3),(2,-1),(3,2)\}\subset \mathbb{R}^2&lt;/script&gt;. We
-want to compute a Rips filtration on &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; for all &lt;script type=&quot;math/tex&quot;&gt;r\geq 0&lt;/script&gt;. Observe:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{5}&lt;/script&gt;, the balls of radius &lt;script type=&quot;math/tex&quot;&gt;\frac{\sqrt{5}}{2}&lt;/script&gt; centered at &lt;script type=&quot;math/tex&quot;&gt;(0,0)&lt;/script&gt; and
-&lt;script type=&quot;math/tex&quot;&gt;(2,-1)&lt;/script&gt; intersect which means we add a 1-simplex between &lt;script type=&quot;math/tex&quot;&gt;(0,0)&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;(2,-1)&lt;/script&gt;. Similarly,
-we add a 1-simplex between &lt;script type=&quot;math/tex&quot;&gt;(1,3)&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;(3,2)&lt;/script&gt;.&lt;/li&gt;
-  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{10}&lt;/script&gt;, we add a two more 1-simplices between &lt;script type=&quot;math/tex&quot;&gt;(0,0), (1,3)&lt;/script&gt;, and &lt;script type=&quot;math/tex&quot;&gt;(2,-1),
-(3,2)&lt;/script&gt;.&lt;/li&gt;
-  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{13}&lt;/script&gt;, we add two 2-simplices between &lt;script type=&quot;math/tex&quot;&gt;(0,0),(1,3),(2,-1)&lt;/script&gt; and
-&lt;script type=&quot;math/tex&quot;&gt;(1,3),(2,-1),(3,2)&lt;/script&gt;.&lt;/li&gt;
-  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{17}&lt;/script&gt;, we add a 3-simplex.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Here is an illustration of the Rips filtration on &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;.&lt;/p&gt;
+want to compute a Rips filtration on &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; for all &lt;script type=&quot;math/tex&quot;&gt;r\geq 0&lt;/script&gt;.&lt;/p&gt;
 
 &lt;center&gt;
 &lt;embed width=&quot;90%&quot; src=&quot;../../assets/tda-rips/ripsfilt.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
 &lt;/center&gt;
 
+&lt;p&gt;Observe:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+r&lt;\sqrt{5} %]]&gt;&lt;/script&gt;, none of the balls of radius &lt;script type=&quot;math/tex&quot;&gt;\frac{r}{2}&lt;/script&gt; intersect and so &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S,r&lt;/script&gt;) is
+four points.&lt;/li&gt;
+  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{5}&lt;/script&gt;, the balls of radius &lt;script type=&quot;math/tex&quot;&gt;\frac{\sqrt{5}}{2}&lt;/script&gt; centered at &lt;script type=&quot;math/tex&quot;&gt;(0,0)&lt;/script&gt; and
+&lt;script type=&quot;math/tex&quot;&gt;(2,-1)&lt;/script&gt; intersect which means we add a 1-simplex between &lt;script type=&quot;math/tex&quot;&gt;(0,0)&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;(2,-1)&lt;/script&gt;. Similarly,
+we add a 1-simplex between &lt;script type=&quot;math/tex&quot;&gt;(1,3)&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;(3,2)&lt;/script&gt;.&lt;/li&gt;
+  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r\in (\sqrt{5},\sqrt{10})&lt;/script&gt;, no additional balls of radius &lt;script type=&quot;math/tex&quot;&gt;\frac{r}{2}&lt;/script&gt; intersect which means &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S, r)=\text{VR}(S, \sqrt{5}&lt;/script&gt;).&lt;/li&gt;
+  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{10}&lt;/script&gt;, we add a two more 1-simplices between &lt;script type=&quot;math/tex&quot;&gt;(0,0), (1,3)&lt;/script&gt;, and &lt;script type=&quot;math/tex&quot;&gt;(2,-1),
+(3,2)&lt;/script&gt;.&lt;/li&gt;
+  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r \in (\sqrt{10},\sqrt{13})&lt;/script&gt;, &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S,r)=\text{VR}(S, \sqrt{10}).&lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{13}&lt;/script&gt;, we add two 2-simplices between &lt;script type=&quot;math/tex&quot;&gt;(0,0),(1,3),(2,-1)&lt;/script&gt; and
+&lt;script type=&quot;math/tex&quot;&gt;(1,3),(2,-1),(3,2)&lt;/script&gt;.&lt;/li&gt;
+  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r \in (\sqrt{13},\sqrt{17})&lt;/script&gt;, &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S,r)=\text{VR}(S, \sqrt{13}).&lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{17}&lt;/script&gt;, we add a 3-simplex.&lt;/li&gt;
+  &lt;li&gt;When &lt;script type=&quot;math/tex&quot;&gt;r&gt;\sqrt{17}&lt;/script&gt;, &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S,r)=\text{VR}(S, \sqrt{17}).&lt;/script&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
 &lt;h2 id=&quot;applications-of-rips-complexes-and-filtrations&quot;&gt;Applications of Rips Complexes and Filtrations&lt;/h2&gt;
 
 &lt;p&gt;Now that we have discussed the theory, let’s talk about some of the applications! A Rips
 filtration is used on point cloud data or more generally on a data set where there is some notion of distance between all data points. A common form of these types of data are location data.
-For example:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Coordinates of galaxies in the universe&lt;/li&gt;
-  &lt;li&gt;GPS coordinates of airports on Earth&lt;/li&gt;
-&lt;/ul&gt;
+For example, coordinates of galaxies in the Universe and GPS coordinates of airports on Earth.&lt;/p&gt;
 
 &lt;p&gt;The Rips complex provides information on how close the data points are to each other. 
 Furthermore, the holes in the complex can provide information on where data are not present. 
 Lastly, the topological information given by taking a Rips filtration can be studied using
-Persistent Homology (see next tutorial), which is often used to analyze these types of data.&lt;/p&gt;
+persistent homology (tutorial to come soon!).&lt;/p&gt;
 
 &lt;p&gt;Another application is studying coverage in sensor networks. The problem is to look a set 
 of sensors and find how much coverage the sensors provide.  Robert Ghrist and Vin de Silva 
 studied this problem using Rips complexes since the complex can be determined easily from 
-pairwise communication data. &lt;a class=&quot;citation&quot; href=&quot;#ghrist:2007&quot;&gt;(Silva &amp;amp; Ghrist, 2007)&lt;/a&gt;&lt;/p&gt;
+pairwise communication data &lt;a class=&quot;citation&quot; href=&quot;#ghrist:2007&quot;&gt;(Silva &amp;amp; Ghrist, 2007)&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;Furthermore, Rips complexes can are used in shape reconstruction. Dominque Attali, Andr`{e} Lieutier, 
+&lt;p&gt;Furthermore, Rips complexes can are used in shape reconstruction. Dominque Attali, Andre Lieutier, 
 and David Salinas proved that the Rips complex of a point cloud, &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;, at some threshold has 
 the same homotopy type as the union of balls centered around each point in &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; with radius
-&lt;script type=&quot;math/tex&quot;&gt;\frac{r}{2}&lt;/script&gt; . &lt;a class=&quot;citation&quot; href=&quot;#attali:2013&quot;&gt;(Attali, Lieutier, &amp;amp; Salinas, 2013)&lt;/a&gt; Rips complexes are nice to use for shape reconstruction 
+&lt;script type=&quot;math/tex&quot;&gt;\frac{r}{2}&lt;/script&gt;  &lt;a class=&quot;citation&quot; href=&quot;#attali:2013&quot;&gt;(Attali, Lieutier, &amp;amp; Salinas, 2013)&lt;/a&gt;. Rips complexes are nice to use for shape reconstruction 
 since they do not favor a specific type of alignment of the input.&lt;/p&gt;
 
 &lt;p&gt;These are just a few of the applications. There are many more!&lt;/p&gt;
@@ -150,7 +155,7 @@ filtration using the R-TDA package.&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;strong&gt;complx&lt;/strong&gt; is a list where the &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; element is a vector of the vertices for the &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; simplex.&lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;values&lt;/strong&gt; is a vector where the &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; entry is the filtration value for when the &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; simplex appears.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;increasing&lt;/strong&gt;  is a logical variable that states TRUE if the filtration values in the values vector are increasing order and FALSE otherwise.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;increasing&lt;/strong&gt;  is a logical variable that states TRUE if the filtration values in the values vector are increasing order and FALSE if the filtration values are in decreasing order.&lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;coordinates&lt;/strong&gt; is a matrix representing the coordinates of the vertices. The &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; row is the coordinate for the &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; vertex.&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -161,17 +166,18 @@ Let’s check this out.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;## [1] 4 2 1&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
+&lt;p&gt;Our output tells us that we have a two-simplex on vertices &lt;script type=&quot;math/tex&quot;&gt;(0,0),(1,3),(3,2)&lt;/script&gt;. Let’s see at which filtration value this appears.&lt;/p&gt;
+
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;RipsFilt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#Access filtration value for the 10th simplex in the list&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;## [1] 3.605551&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;Our output tells us that we have a two-simplex on vertices &lt;script type=&quot;math/tex&quot;&gt;(0,0),(1,3),(3,2)&lt;/script&gt; when &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{13}&lt;/script&gt;.
-This is exactly what we found when we worked through this example by hand. Accessing the other complex
-and filtration value elements will help us verify the rest of the filtration computation we did earlier.&lt;/p&gt;
+&lt;p&gt;So we have a two-simplex when &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{13}&lt;/script&gt;. By hand, we also computed VR&lt;script type=&quot;math/tex&quot;&gt;(S, \sqrt{13})&lt;/script&gt; to be a two simplex! Accessing the other complex and filtration value elements verifies the rest of the filtration computation we did earlier.&lt;/p&gt;
 
-&lt;p&gt;If we want to see an animation of the Rips filtration, we can run the following code with a plot function. This function has arguments:&lt;/p&gt;
+&lt;p&gt;If we want to see an animation of the Rips filtration, we can run the following code with a plot function. This function has input arguments:&lt;/p&gt;
+
 &lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;filt&lt;/strong&gt; is the Rips filtration object.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;filt&lt;/strong&gt; is the Rips filtration object. (So, Ripsfilt from above)&lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;animate&lt;/strong&gt; is a logical varibale stating TRUE if you want an animation of the filatration or FALSE if you do not want an animation.&lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;thresh&lt;/strong&gt;  is the threshold value value for the Rips complex that will be plotted if “animate = FALSE”.&lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;fn_out&lt;/strong&gt;  is the name of the file for the animation if “animate = TRUE”.&lt;/li&gt;
@@ -189,12 +195,12 @@ and filtration value elements will help us verify the rest of the filtration com
 &lt;img width=&quot;80%&quot; src=&quot;../../assets/tda-rips/rips_example.gif&quot; /&gt;
 &lt;/center&gt;
 
-&lt;p&gt;Furthermore, we can look at the Rips complex at a threshold of &lt;script type=&quot;math/tex&quot;&gt;\sqrt{13}&lt;/script&gt;, by adding the argument, “thresh = &lt;script type=&quot;math/tex&quot;&gt;\sqrt{13}&lt;/script&gt;” and changing “animate = FALSE” to “animate = TRUE”.&lt;/p&gt;
+&lt;p&gt;Furthermore, we can look at the Rips complex at a threshold of &lt;script type=&quot;math/tex&quot;&gt;\sqrt{14}&lt;/script&gt;, by adding the argument, “thresh = &lt;script type=&quot;math/tex&quot;&gt;\sqrt{14}&lt;/script&gt;” and changing “animate = FALSE” to “animate = TRUE”.&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RipsFilt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;thresh&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;animate&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RipsFilt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;thresh&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;animate&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;center&gt;
-&lt;embed width=&quot;80%&quot; src=&quot;../../assets/tda-rips/toycomplex.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
+&lt;embed width=&quot;80%&quot; src=&quot;../../assets/tda-rips/toycomplexx.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
 &lt;/center&gt;
 
 &lt;h3 id=&quot;non-euclidean-distance-example&quot;&gt;Non-Euclidean Distance Example&lt;/h3&gt;
@@ -208,26 +214,25 @@ matrix in R. We can do this using the following code:&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;DistMatrix&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;method&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;manhattan&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;diag&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;TRUE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;upper&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;TRUE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;When we use the ripsFiltration function, we write dist_matrix as the first argument instead of &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;.
+&lt;p&gt;When we use the ripsFiltration function, we write DistMatrix as the first argument instead of &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;.
 Additionally, the fourth argument will change to dist = “arbitrary” to indicate that we are giving our
 own distance metric.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;RipsFiltManhattan&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ripsFiltration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DistMatrix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxdimension&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
                                        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxscale&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dist&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;arbitrary&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;This time when we compute the Rips complex with &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{13}&lt;/script&gt;, we get the following complex:&lt;/p&gt;
+&lt;p&gt;This time when we compute the Rips complex with &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{14}&lt;/script&gt;, we get the following complex:&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;rep&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;-3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;NULL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;n&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-     &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Rips Complex with Manhattan Distance for r = sqrt(13)&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+     &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Rips Complex with Manhattan Distance for r = sqrt(14)&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
      &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlab&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylab&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;draw.circle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;radius&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-              &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;col&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.05&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;diamond&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;radius&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;col&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.05&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;along&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RipsFiltManhattan&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;cmplx&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RipsFiltManhattan&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
   &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;polygon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RipsFiltManhattan&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;cmplx&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]][[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-          &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;col&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;gray&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;NA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+          &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;col&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;pink&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;NA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylim&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;along&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RipsFiltManhattan&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;cmplx&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]][&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RipsFiltManhattan&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
   &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;polygon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RipsFiltManhattan&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;cmplx&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]][[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drop&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
@@ -239,7 +244,7 @@ own distance metric.&lt;/p&gt;
 &lt;embed width=&quot;80%&quot; src=&quot;../../assets/tda-rips/manhattan.svg&quot; type=&quot;image/svg+xml&quot; /&gt;
 &lt;/center&gt;
 
-&lt;p&gt;Hence VR&lt;script type=&quot;math/tex&quot;&gt;(S, \sqrt{13})&lt;/script&gt; with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with four edges that join to form a cycle.&lt;/p&gt;
+&lt;p&gt;Hence &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S, \sqrt{14})&lt;/script&gt; with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with two two-simplices.&lt;/p&gt;
 
 &lt;h3 id=&quot;sightings-of-bigfoot-in-montana&quot;&gt;Sightings of Bigfoot in Montana&lt;/h3&gt;
 &lt;p&gt;Lastly, we work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their &lt;a href=&quot;http://www.bfro.net/&quot;&gt;website&lt;/a&gt;. We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the dead zones where bigfoot has not been sighted in order to keep hikers safe from potential encounters.&lt;/p&gt;
