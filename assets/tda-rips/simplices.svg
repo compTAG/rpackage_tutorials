@@ -25,8 +25,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.5381567"
-     inkscape:cx="428.22033"
-     inkscape:cy="96.76906"
+     inkscape:cx="401.23998"
+     inkscape:cy="-59.261857"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -86,7 +86,7 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:#ff7392;fill-opacity:0.48627451;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#ffadb9;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 369.13989,860.15379 76.73629,131.68937 -152.97751,-0.99014 z"
        id="path8143"
        inkscape:connector-curvature="0"
@@ -117,7 +117,7 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:#ff7392;fill-opacity:0.48627451;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#ffadb9;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 592.34855,842.45784 -74.91485,95.21886 79.46575,77.3653 72.46436,-75.965 z"
        id="path8235"
        inkscape:connector-curvature="0"
@@ -417,7 +417,7 @@
        inkscape:connector-curvature="0" />
     <path
        style="fill:#ff7392;fill-opacity:0.4870317;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 367.36092,1224.3457 -131.68933,76.7363 0.99014,-152.9775 z"
+       d="m 413.52007,1189.2388 -131.68933,76.7363 0.99014,-152.9775 z"
        id="path8143-2"
        inkscape:connector-curvature="0"
        inkscape:export-xdpi="90"
@@ -425,5 +425,12 @@
        inkscape:export-filename="/home/robin/repositories/rpackage_tutorials/content.png"
        inkscape:transform-center-x="-95.051479"
        inkscape:transform-center-y="-27.230193" />
+    <path
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       style="fill:#ffadb9;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.62;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 406.40859,1084.1262 66.00371,138.4996 76.82398,-128.7614 z"
+       id="path18692"
+       inkscape:connector-curvature="0" />
   </g>
 </svg>
