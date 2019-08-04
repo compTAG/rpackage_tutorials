@@ -48,15 +48,6 @@
   <div class="post-content e-content" itemprop="articleBody">
     <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
-<figure class="highlight"><pre><code class="language-text" data-lang="text">## Warning in install.packages(p, dep = TRUE): installation of package
-## 'units' had non-zero exit status</code></pre></figure>
-
-<figure class="highlight"><pre><code class="language-text" data-lang="text">## Warning in install.packages(p, dep = TRUE): installation of package
-## 'sf' had non-zero exit status</code></pre></figure>
-
-<figure class="highlight"><pre><code class="language-text" data-lang="text">## Warning in install.packages(p, dep = TRUE): installation of package
-## 'rnaturalearth' had non-zero exit status</code></pre></figure>
-
 <h2 id="introduction">Introduction</h2>
 
 <p>Suppose we are given a finite set, <script type="math/tex">S</script>, of points in <script type="math/tex">\mathbb{R}^n</script>. The set of
@@ -358,15 +349,15 @@ own distance metric.</p>
 <embed width="80%" height="auto" src="../../assets/tda-rips/bigfoot.gif" />
 </center>
 
-<p>Furthermore, we can look at the Rips complex at a threshold of one.</p>
+<p>Furthermore, we can look at the Rips complex at a threshold of 0.8. <strong>TODO: change this plot so it is correct.</strong></p>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">plot_rips_bigfoot</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">thresh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">plot_rips_bigfoot</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">thresh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.8</span><span class="p">,</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span></code></pre></figure>
 
 <center>
 <embed width="80%" src="../../assets/tda-rips/bigfootcomplex1.svg" type="image/svg+xml" />
 </center>
 
-<p>As we watch the animation, we see that even at low filtration values, there are lots of simplices near the GPS coordinates of Missoula, MT which corresponds to several bigfoot sightings in that area. Furthermore, at a filtration value of one, we see that the area surrounding Helena, MT is a deadzone. If we assume that Bigfoot does not travel radially outwards more than one latitude/longitude unit, then this suggests that hiking in Helena could help avoid Bigfoot encounters. Lastly, there have not been many sightings in Eastern MT, so perhaps Bigfoot does not roam around in that part of the state. We have not fully solved the Bigfoot mystery but the Rips complex and Rips filtration helps us get one step closer!</p>
+<p>As we watch the animation, we see that the Rips filtration captures geometric properties about the data set since simplices quickly arise in the filtraion in the locations that reported the most bigfoot sightings. Furthermore, we see the filtration also reveals some topological information about the data set. In particular, at a filtration value of 0.698812, five edges that form a cycle appear around the GPS coordinate (-111, 46). Furthermore, this cycle persists until the filtration value of 0.94698369. Considering the amount of land that is covered in 1 longitude/latitude unit, this cycle could tell us something meaningful about our data. Perhaps this hole is a deadzone where Bigfoot has yet to be found, or maybe this area is inaccessible to humans and that is why there has not been sightings. Regardless of the answer, this cycle provides us guidance for the next step to take to solve the Bigfoot mystery!</p>
 
 <h2 id="references">References</h2>
 
