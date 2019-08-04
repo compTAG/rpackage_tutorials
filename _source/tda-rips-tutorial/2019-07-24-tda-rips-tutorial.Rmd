@@ -39,7 +39,9 @@ use_package('TDA')
 use_package("plotrix")
 use_package("animation")
 use_package("squash")
+use_package("maps")
 ```
+
 
 
 ```{r usr_fncs, echo = FALSE}
@@ -95,12 +97,75 @@ plot.rips_filt <- function(filt, thresh = 0.2, animate = FALSE, fn_out, lout, ..
     plot_fun(filt, r = thresh)
   }
 }
+
+plot_rips_bigfoot <- function(filt, thresh = 0.2, animate = FALSE, fn_out, lout, ...) {
+    data <- filt$coordinates
+    two_d_check <- dim(data)[2] == 2
+    # euclidean_check <- #TODO: need to pass euclidean distance into filtration object
+
+  plot_fun <- function(filt, r) {
+    data <- filt$coordinates
+    xlim <- range(data[, 1])
+    ylim <- range(data[, 2])
+    diff <- 0.1 * (xlim[2] - xlim[1])
+    xlim[1] <- xlim[1] - diff
+    xlim[2] <- xlim[2] + diff
+    diff <- 0.1 * (ylim[2] - ylim[1])
+    ylim[1] <- ylim[1] - diff
+    ylim[2] <- ylim[2] + diff
+    xmin <- min(data[, 1])
+    xmax <- max(data[, 1])
+    ymin <- min(data[, 2])
+    ymax <- max(data[, 2])
+    max_dist <- max(dist(data))
+    xlims = c(xmin - max_dist / 2, xmax + max_dist / 2)
+    ylims = c(ymin - max_dist / 2, ymax + max_dist / 2)
+    par(mar = c(0,0,0,0))
+    mt_range <- map("state", "Montana", plot = FALSE)$range
+    xrange <- diff(mt_range[1:2])
+    yrange <- diff(mt_range[3:4])
+    plot(NULL, bty = "n",
+         xlim = c(mt_range[1] - .1*xrange, mt_range[2] + .1*xrange),
+         ylim = c(mt_range[3] - .1 * yrange, mt_range[4] + .1 * yrange), pch=16)
+    map("state", region = "Montana", add = TRUE)
+#      plot(NULL, type = "n", xlim = xlims, ylim = ylims, main = "Rips Complex",
+#                xlab = "", ylab = "", asp = 1)
+
+      for(j in 1:length(data[, 1])) {
+        draw.circle(x = data[j, 1], y = data[j, 2], radius = r / 2,
+        col = rgb(0.1, 0.6, 0.1, 0.05))
+      }
+      for (idx in seq(along = filt[["cmplx"]][filt$values < r])) {
+        polygon(data[filt[["cmplx"]][[idx]], 1], data[filt[["cmplx"]][[idx]], 2],
+                col = "pink", border = NA, lwd = 1.5)
+      }
+      for (idx in seq(along = filt[["cmplx"]][filt$values < r])) {
+        polygon(data[filt[["cmplx"]][[idx]], 1], data[filt[["cmplx"]][[idx]], 2],
+                col = NULL, lwd = 1.5)
+      }
+      points(data[,1], data[,2], pch = 16)
+ }
+  if (!two_d_check) { #todo: add euclidean check w/ && euclidean_check
+    stop("Data needs to be 2-d")
+  }
+  if (animate) {
+    saveGIF({
+             for (i in seq(0, max(filt$values)*1.1, length.out = lout)){
+               plot_fun(filt, r = i)
+             }
+            },
+            movie.name = fn_out, ...)
+  } else {
+    plot_fun(filt, r = thresh)
+  }
+}
+
 ```
 ## Introduction
 
 Suppose we are given a finite set, $$S$$, of points in $$\mathbb{R}^n$$. The set of
 points is topologically uninteresting. How can we fix this? Yes, you guessed it: we
-can construct a Vietoris Rips (Rips) complex from the points in $$S$$! The Rips Filtration is 
+can construct a Vietoris Rips (Rips) complex from the points in $$S$$! The Rips Filtration is
 a specific nested sequence of Rips complexes over $$S$$. Both provide geometric and topological
 information about our point set. In this tutorial, we explore this idea and how Rips complex and
 filtration can be used to better understand data sets.
@@ -120,12 +185,12 @@ $$\mathbb{R}^n$$ by hand.
 
 
 First, we breifly describe the mathematical foundations behind a Rips Filtration including
-simplicial complexes, filtrations, and the Rips complex. *Computation Topology: An Introduction* 
-provides more details on the theory {% cite edelsbrunner:2010 %}. 
+simplicial complexes, filtrations, and the Rips complex. *Computation Topology: An Introduction*
+provides more details on the theory {% cite edelsbrunner:2010 %}.
 
 ### Triangle Appreciation
 
-We construct a Rips complex from simplices of varying dimensions that are generalizations of triangles 
+We construct a Rips complex from simplices of varying dimensions that are generalizations of triangles
 of varying dimensions. More specifically, an *n-simplex* is the smallest convex set of $$n-1$$ points,
 $$v_0,...,v_{n-1}$$ where $$v_1-v_0,...,v_{n-1}-v_0$$ are linearly independent.
 
@@ -152,10 +217,10 @@ $$ \text{VR}(S, r):=\{\sigma\subset S \mid \text{ diam}(\sigma)\leq r\} $$
 
 where the *diameter* of a set of points is the maximum distance between any two points in the set.
 
-Geometrically, we can constuct the Rips complex by considering balls of radius $$\frac{r}{2}$$, 
+Geometrically, we can constuct the Rips complex by considering balls of radius $$\frac{r}{2}$$,
 centered at each point in $$S$$. Whenever $$d$$ balls have pairwise intersections, we add a $$d-1$$
 dimensional simplex.For this tutorial, we use the standard Euclidean distance (unless stated otherwise)
-to compute a Rips complex. 
+to compute a Rips complex.
 
 You may be familiar with *contact graphs* where the vertices represent a geometric object such as a
 circle, curve, or polygon, and an edge between two vertices exists if the corresponding two objects
@@ -182,7 +247,7 @@ the data is unknown or does not exist, so why not look at all of them!? Observe 
 continuously, then we get a family of nested Rips complexes; the *Rips filtration*.
 
 Let's work through an example. Let $$S:=\{(0,0),(1,3),(2,-1),(3,2)\}\subset \mathbb{R}^2$$. We
-want to compute a Rips filtration on $$S$$ for all $$r\geq 0$$. 
+want to compute a Rips filtration on $$S$$ for all $$r\geq 0$$.
 
 <center>
 <embed width="90%" src="../../assets/tda-rips/ripsfilt.svg" type="image/svg+xml" />
@@ -191,7 +256,7 @@ want to compute a Rips filtration on $$S$$ for all $$r\geq 0$$.
 Observe:
 
 * When $$r<\sqrt{5}$$, none of the balls of radius $$\frac{r}{2}$$ intersect and so $$\text{VR}(S,r$$) is
-four points. 
+four points.
 * When $$r=\sqrt{5}$$, the balls of radius $$\frac{\sqrt{5}}{2}$$ centered at $$(0,0)$$ and
 $$(2,-1)$$ intersect which means we add a 1-simplex between $$(0,0)$$ and $$(2,-1)$$. Similarly,
 we add a 1-simplex between $$(1,3)$$ and $$(3,2)$$.
@@ -212,20 +277,20 @@ Now that we have discussed the theory, let's talk about some of the applications
 filtration is used on point cloud data or more generally on a data set where there is some notion of distance between all data points. A common form of these types of data are location data.
 For example, coordinates of galaxies in the Universe and GPS coordinates of airports on Earth.
 
-The Rips complex provides information on how close the data points are to each other. 
-Furthermore, the holes in the complex can provide information on where data are not present. 
+The Rips complex provides information on how close the data points are to each other.
+Furthermore, the holes in the complex can provide information on where data are not present.
 Lastly, the topological information given by taking a Rips filtration can be studied using
 persistent homology (tutorial to come soon!).
 
-Another application is studying coverage in sensor networks. The problem is to look a set 
-of sensors and find how much coverage the sensors provide.  Robert Ghrist and Vin de Silva 
-studied this problem using Rips complexes since the complex can be determined easily from 
+Another application is studying coverage in sensor networks. The problem is to look a set
+of sensors and find how much coverage the sensors provide.  Robert Ghrist and Vin de Silva
+studied this problem using Rips complexes since the complex can be determined easily from
 pairwise communication data {% cite ghrist:2007 %}.
 
-Furthermore, Rips complexes can are used in shape reconstruction. Dominque Attali, Andre Lieutier, 
-and David Salinas proved that the Rips complex of a point cloud, $$S$$, at some threshold has 
+Furthermore, Rips complexes can are used in shape reconstruction. Dominque Attali, Andre Lieutier,
+and David Salinas proved that the Rips complex of a point cloud, $$S$$, at some threshold has
 the same homotopy type as the union of balls centered around each point in $$S$$ with radius
-$$\frac{r}{2}$$  {% cite attali:2013 %}. Rips complexes are nice to use for shape reconstruction 
+$$\frac{r}{2}$$  {% cite attali:2013 %}. Rips complexes are nice to use for shape reconstruction
 since they do not favor a specific type of alignment of the input.
 
 These are just a few of the applications. There are many more!
@@ -234,7 +299,7 @@ These are just a few of the applications. There are many more!
 
 
 ### Toy Example
-First, let's go back to the example where $$S=\{(0,0),(1,3),(2,-1),(3,2)\}$$. We compute the Rips 
+First, let's go back to the example where $$S=\{(0,0),(1,3),(2,-1),(3,2)\}$$. We compute the Rips
 filtration using the R-TDA package.
 
 ```{r dataset, echo = TRUE, message = TRUE}
@@ -252,7 +317,7 @@ The ripsFiltration function returns a list:
 
 * **complx** is a list where the $$i^{th}$$ element is a vector of the vertices for the $$i^{th}$$ simplex.
 * **values** is a vector where the $$i^{th}$$ entry is the filtration value for when the $$i^{th}$$ simplex appears.
-* **increasing**  is a logical variable that states TRUE if the filtration values in the values vector are increasing order and FALSE if the filtration values are in decreasing order. 
+* **increasing**  is a logical variable that states TRUE if the filtration values in the values vector are increasing order and FALSE if the filtration values are in decreasing order.
 * **coordinates** is a matrix representing the coordinates of the vertices. The $$i^{th}$$ row is the coordinate for the $$i^{th}$$ vertex.
 
 See the documentation for this function with this [link](https://rdrr.io/cran/TDA/man/ripsFiltration.html).
@@ -296,7 +361,7 @@ plot(RipsFilt, animate = TRUE, fn_out = 'rips_example.gif',
 <img width="80%" src="../../assets/tda-rips/rips_example.gif"/>
 </center>
 
-Furthermore, we can look at the Rips complex at a threshold of $$\sqrt{14}$$, by adding the argument, "thresh = $$\sqrt{14}$$" and changing "animate = FALSE" to "animate = TRUE". 
+Furthermore, we can look at the Rips complex at a threshold of $$\sqrt{14}$$, by adding the argument, "thresh = $$\sqrt{14}$$" and changing "animate = FALSE" to "animate = TRUE".
 
 ```{r toyex_complex, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
 
@@ -392,23 +457,33 @@ BigfootSightingsMT <- cbind(longitude, latitude)
 We can plot the data using the following code.
 
 ```{r bigfootdataplot_show, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
-
+mt_range <- map("state", "Montana", plot = FALSE)$range
+xrange <- diff(mt_range[1:2])
+yrange <- diff(mt_range[3:4])
 plot(BigfootSightingsMT[,1],BigfootSightingsMT[,2], xlab = "Latitude",
      ylab = "Longitude", main = "GPS coordinates of Bigfoot sightings
-     in Montana", pch=16)
+     in Montana", xlim = c(mt_range[1] - .1*xrange, mt_range[2] + .1*xrange),
+     ylim = c(mt_range[3] - .1 * yrange, mt_range[4] + .1 * yrange), pch=16)
+map("state", "Montana", add = TRUE)
 ```
 
 ```{r bigfootdataplot_hide, echo = FALSE, message = FALSE, results = 'hide'}
-svg('../../assets/tda-rips/bigfoot.svg')
-plot(BigfootSightingsMT[,1],BigfootSightingsMT[,2], xlab = "Latitude", ylab = "Longitude",
-     main = "GPS coordinates of Bigfoot sightings in Montana", pch=16)
+mt_range <- map("state", "Montana", plot = FALSE)$range
+xrange <- diff(mt_range[1:2])
+yrange <- diff(mt_range[3:4])
+svg('../../assets/tda-rips/bigfoot.svg', height = 7, width = xrange/yrange*5)
+plot(BigfootSightingsMT[,1],BigfootSightingsMT[,2], xlab = "Latitude",
+     ylab = "Longitude", main = "GPS coordinates of Bigfoot sightings
+     in Montana", xlim = c(mt_range[1] - .1*xrange, mt_range[2] + .1*xrange),
+     ylim = c(mt_range[3] - .1 * yrange, mt_range[4] + .1 * yrange), pch=16)
+map("state", "Montana", add = TRUE)
 ```
 
 <center>
-<embed width="80%" src="../../assets/tda-rips/bigfoot.svg" type="image/svg+xml" />
+<embed width="100%" src="../../assets/tda-rips/bigfoot.svg" type="image/svg+xml" />
 </center>
 
-Now, let's compute the filtration and visualize it with an animation. In order to speed up the runtime, we will set maxscale = 2.5 and maxdimension = 3. 
+Now, let's compute the filtration and visualize it with an animation. In order to speed up the runtime, we will set maxscale = 2.5 and maxdimension = 3.
 
 ```{r bigfootfiltration, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
 
@@ -417,9 +492,8 @@ BigfootRipsFilt <- ripsFiltration(BigfootSightingsMT, maxdimension = 3,
 
 class(BigfootRipsFilt) <- c(class(BigfootRipsFilt), "rips_filt")
 
-plot(BigfootRipsFilt, animate = TRUE, fn_out = 'bigfoot.gif',
-     lout = 120, interval = 0.3)
-
+plot_rips_bigfoot(BigfootRipsFilt, animate = TRUE, fn_out = 'bigfoot.gif',
+     lout = 120, interval = 0.3, ani.height = 240, ani.width = 240*2)
 
 ```
 
@@ -431,9 +505,17 @@ Furthermore, we can look at the Rips complex at a threshold of one.
 
 ```{r bigfootcomplex, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
 
-plot(BigfootRipsFilt, thresh = 1, animate = FALSE)
+plot_rips_bigfoot(BigfootRipsFilt, thresh = 1, animate = FALSE)
 
 ```
+
+
+```{r bigfootcomplex_hide, echo = FALSE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
+svg('../../assets/tda-rips/bigfootcomplex1.svg', height = 5, width = 10)
+plot_rips_bigfoot(BigfootRipsFilt, thresh = 1, animate = FALSE)
+dev.off()
+```
+
 
 <center>
 <embed width="80%" src="../../assets/tda-rips/bigfootcomplex1.svg" type="image/svg+xml" />
