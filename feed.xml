@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="https://comptag.github.io/rpackage_tutorials/feed.xml" rel="self" type="application/atom+xml" /><link href="https://comptag.github.io/rpackage_tutorials/" rel="alternate" type="text/html" /><updated>2019-08-05T10:46:42+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/feed.xml</id><title type="html">R Package TDA Documentation</title><subtitle>Various tutorials on important techniques in topological data analysis. Tutorials made with the final goal in mind to use the R package TDA in order to actually implement each technique.</subtitle><entry><title type="html">Rips Filtration Tutorial for the R-TDA Package</title><link href="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html" rel="alternate" type="text/html" title="Rips Filtration Tutorial for the R-TDA Package" /><published>2019-07-22T00:00:00+00:00</published><updated>2019-07-22T00:00:00+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial</id><content type="html" xml:base="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html">&lt;script src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="https://comptag.github.io/rpackage_tutorials/feed.xml" rel="self" type="application/atom+xml" /><link href="https://comptag.github.io/rpackage_tutorials/" rel="alternate" type="text/html" /><updated>2019-08-05T10:47:30+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/feed.xml</id><title type="html">R Package TDA Documentation</title><subtitle>Various tutorials on important techniques in topological data analysis. Tutorials made with the final goal in mind to use the R package TDA in order to actually implement each technique.</subtitle><entry><title type="html">Rips Filtration Tutorial for the R-TDA Package</title><link href="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html" rel="alternate" type="text/html" title="Rips Filtration Tutorial for the R-TDA Package" /><published>2019-07-22T00:00:00+00:00</published><updated>2019-07-22T00:00:00+00:00</updated><id>https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial</id><content type="html" xml:base="https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html">&lt;script src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
 
 &lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
@@ -6,7 +6,7 @@
 points is topologically uninteresting. How can we fix this? Yes, you guessed it: we
 can construct a Vietoris Rips (Rips) complex from the points in &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;! The Rips Filtration is
 a specific nested sequence of Rips complexes over &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;. Both provide geometric and topological
-information about our point set. In this tutorial, we explore this idea and how Rips complex and
+information about our point set. In this tutorial, we explore this idea and how a Rips complex and
 filtration can be used to better understand data sets.&lt;/p&gt;
 
 &lt;h2 id=&quot;objectives&quot;&gt;Objectives&lt;/h2&gt;
@@ -122,12 +122,12 @@ Furthermore, the holes in the complex can provide information on where data are 
 Lastly, the topological information given by taking a Rips filtration can be studied using
 persistent homology (tutorial to come soon!).&lt;/p&gt;
 
-&lt;p&gt;Another application is studying coverage in sensor networks. The problem is to look a set
+&lt;p&gt;Another application is studying coverage in sensor networks. The problem is to look at a set
 of sensors and find how much coverage the sensors provide.  Robert Ghrist and Vin de Silva
 studied this problem using Rips complexes since the complex can be determined easily from
 pairwise communication data &lt;a class=&quot;citation&quot; href=&quot;#ghrist:2007&quot;&gt;(Silva &amp;amp; Ghrist, 2007)&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;Furthermore, Rips complexes can are used in shape reconstruction. Dominque Attali, Andre Lieutier,
+&lt;p&gt;Furthermore, Rips complexes can be used in shape reconstruction. Dominque Attali, Andre Lieutier,
 and David Salinas proved that the Rips complex of a point cloud, &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;, at some threshold has
 the same homotopy type as the union of balls centered around each point in &lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt; with radius
 &lt;script type=&quot;math/tex&quot;&gt;\frac{r}{2}&lt;/script&gt;  &lt;a class=&quot;citation&quot; href=&quot;#attali:2013&quot;&gt;(Attali, Lieutier, &amp;amp; Salinas, 2013)&lt;/a&gt;. Rips complexes are nice to use for shape reconstruction
@@ -148,15 +148,15 @@ filtration using the R-TDA package.&lt;/p&gt;
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RipsFilt&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ripsFiltration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxdimension&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxscale&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
                              &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dist&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;euclidean&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;Great! So how do we interpret the S_RipsFilt object?&lt;/p&gt;
+&lt;p&gt;Great! So how do we interpret the RipsFilt object?&lt;/p&gt;
 
 &lt;p&gt;The ripsFiltration function returns a list:&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;&lt;strong&gt;complx&lt;/strong&gt; is a list where the &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; element is a vector of the vertices for the &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; simplex.&lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;values&lt;/strong&gt; is a vector where the &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; entry is the filtration value for when the &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; simplex appears.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;increasing&lt;/strong&gt;  is a logical variable that states TRUE if the filtration values in the values vector are increasing order and FALSE if the filtration values are in decreasing order.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;coordinates&lt;/strong&gt; is a matrix representing the coordinates of the vertices. The &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; row is the coordinate for the &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; vertex.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;increasing&lt;/strong&gt;  is a logical variable that states TRUE if the filtration values in the values vector are in increasing order and FALSE if the filtration values are in decreasing order.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;coordinates&lt;/strong&gt; is a matrix representing the coordinates of the vertices. The &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; row is the coordinate for the &lt;script type=&quot;math/tex&quot;&gt;i^{th}&lt;/script&gt; vertex. Note the coordinates matrix appears only if the Euclidean distance is used.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;See the documentation for this function with this &lt;a href=&quot;https://rdrr.io/cran/TDA/man/ripsFiltration.html&quot;&gt;link&lt;/a&gt;.
@@ -172,7 +172,7 @@ Let’s check this out.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;## [1] 3.605551&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;So we have a two-simplex when &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{13}&lt;/script&gt;. By hand, we also computed VR&lt;script type=&quot;math/tex&quot;&gt;(S, \sqrt{13})&lt;/script&gt; to be a two simplex! Accessing the other complex and filtration value elements verifies the rest of the filtration computation we did earlier.&lt;/p&gt;
+&lt;p&gt;So we have a two-simplex when &lt;script type=&quot;math/tex&quot;&gt;r=\sqrt{13}&lt;/script&gt;. By hand, we also computed &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S, \sqrt{13})&lt;/script&gt; to be a two simplex! Accessing the other complex and filtration value elements verifies the rest of the filtration computation we did earlier.&lt;/p&gt;
 
 &lt;p&gt;If we want to see an animation of the Rips filtration, we can run the following code with a plot function. This function has input arguments:&lt;/p&gt;
 
@@ -195,7 +195,7 @@ Let’s check this out.&lt;/p&gt;
 &lt;img width=&quot;80%&quot; src=&quot;../../assets/tda-rips/rips_example.gif&quot; /&gt;
 &lt;/center&gt;
 
-&lt;p&gt;Furthermore, we can look at the Rips complex at a threshold of &lt;script type=&quot;math/tex&quot;&gt;\sqrt{14}&lt;/script&gt;, by adding the argument, “thresh = &lt;script type=&quot;math/tex&quot;&gt;\sqrt{14}&lt;/script&gt;” and changing “animate = FALSE” to “animate = TRUE”.&lt;/p&gt;
+&lt;p&gt;Furthermore, we can look at the Rips complex at a threshold of &lt;script type=&quot;math/tex&quot;&gt;\sqrt{14}&lt;/script&gt;, by adding the argument, thresh = &lt;script type=&quot;math/tex&quot;&gt;\sqrt{14}&lt;/script&gt; and changing animate = FALSE to animate = TRUE.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;plot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RipsFilt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;thresh&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;sqrt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;animate&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
@@ -247,7 +247,7 @@ own distance metric.&lt;/p&gt;
 &lt;p&gt;Hence &lt;script type=&quot;math/tex&quot;&gt;\text{VR}(S, \sqrt{14})&lt;/script&gt; with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with two two-simplices.&lt;/p&gt;
 
 &lt;h3 id=&quot;sightings-of-bigfoot-in-montana&quot;&gt;Sightings of Bigfoot in Montana&lt;/h3&gt;
-&lt;p&gt;Lastly, we work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their &lt;a href=&quot;http://www.bfro.net/&quot;&gt;website&lt;/a&gt;. We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the dead zones where bigfoot has not been sighted in order to keep hikers safe from potential encounters.&lt;/p&gt;
+&lt;p&gt;Lastly, we work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their &lt;a href=&quot;http://www.bfro.net/&quot;&gt;website&lt;/a&gt;. We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the where Bigfoot is and is not roaming. Finding the deadzones where Bigfoot is not present can help keep hikers safe from potential encounters.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#Latitude coordinates of Bigfoot sightings in MT&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;latitude&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;45.31278&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;46.05292&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;45.97540&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;47.62167&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;48.03278&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;47.70667&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
@@ -301,7 +301,7 @@ own distance metric.&lt;/p&gt;
 &lt;embed width=&quot;80%&quot; height=&quot;auto&quot; src=&quot;../../assets/tda-rips/bigfoot.gif&quot; /&gt;
 &lt;/center&gt;
 
-&lt;p&gt;Furthermore, we can look at the Rips complex at a threshold of 0.8. &lt;strong&gt;TODO: change this plot so it is correct.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Furthermore, we can look at the Rips complex at a threshold of 0.8.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;plot_rips_bigfoot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BigfootRipsFilt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;thresh&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;animate&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 

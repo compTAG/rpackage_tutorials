@@ -54,7 +54,7 @@
 points is topologically uninteresting. How can we fix this? Yes, you guessed it: we
 can construct a Vietoris Rips (Rips) complex from the points in <script type="math/tex">S</script>! The Rips Filtration is
 a specific nested sequence of Rips complexes over <script type="math/tex">S</script>. Both provide geometric and topological
-information about our point set. In this tutorial, we explore this idea and how Rips complex and
+information about our point set. In this tutorial, we explore this idea and how a Rips complex and
 filtration can be used to better understand data sets.</p>
 
 <h2 id="objectives">Objectives</h2>
@@ -170,12 +170,12 @@ Furthermore, the holes in the complex can provide information on where data are 
 Lastly, the topological information given by taking a Rips filtration can be studied using
 persistent homology (tutorial to come soon!).</p>
 
-<p>Another application is studying coverage in sensor networks. The problem is to look a set
+<p>Another application is studying coverage in sensor networks. The problem is to look at a set
 of sensors and find how much coverage the sensors provide.  Robert Ghrist and Vin de Silva
 studied this problem using Rips complexes since the complex can be determined easily from
 pairwise communication data <a class="citation" href="#ghrist:2007">(Silva &amp; Ghrist, 2007)</a>.</p>
 
-<p>Furthermore, Rips complexes can are used in shape reconstruction. Dominque Attali, Andre Lieutier,
+<p>Furthermore, Rips complexes can be used in shape reconstruction. Dominque Attali, Andre Lieutier,
 and David Salinas proved that the Rips complex of a point cloud, <script type="math/tex">S</script>, at some threshold has
 the same homotopy type as the union of balls centered around each point in <script type="math/tex">S</script> with radius
 <script type="math/tex">\frac{r}{2}</script>  <a class="citation" href="#attali:2013">(Attali, Lieutier, &amp; Salinas, 2013)</a>. Rips complexes are nice to use for shape reconstruction
@@ -196,15 +196,15 @@ filtration using the R-TDA package.</p>
 </span><span class="n">RipsFilt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ripsFiltration</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">maxdimension</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">maxscale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w">
                              </span><span class="n">dist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"euclidean"</span><span class="p">)</span></code></pre></figure>
 
-<p>Great! So how do we interpret the S_RipsFilt object?</p>
+<p>Great! So how do we interpret the RipsFilt object?</p>
 
 <p>The ripsFiltration function returns a list:</p>
 
 <ul>
   <li><strong>complx</strong> is a list where the <script type="math/tex">i^{th}</script> element is a vector of the vertices for the <script type="math/tex">i^{th}</script> simplex.</li>
   <li><strong>values</strong> is a vector where the <script type="math/tex">i^{th}</script> entry is the filtration value for when the <script type="math/tex">i^{th}</script> simplex appears.</li>
-  <li><strong>increasing</strong>  is a logical variable that states TRUE if the filtration values in the values vector are increasing order and FALSE if the filtration values are in decreasing order.</li>
-  <li><strong>coordinates</strong> is a matrix representing the coordinates of the vertices. The <script type="math/tex">i^{th}</script> row is the coordinate for the <script type="math/tex">i^{th}</script> vertex.</li>
+  <li><strong>increasing</strong>  is a logical variable that states TRUE if the filtration values in the values vector are in increasing order and FALSE if the filtration values are in decreasing order.</li>
+  <li><strong>coordinates</strong> is a matrix representing the coordinates of the vertices. The <script type="math/tex">i^{th}</script> row is the coordinate for the <script type="math/tex">i^{th}</script> vertex. Note the coordinates matrix appears only if the Euclidean distance is used.</li>
 </ul>
 
 <p>See the documentation for this function with this <a href="https://rdrr.io/cran/TDA/man/ripsFiltration.html">link</a>.
@@ -220,7 +220,7 @@ Let’s check this out.</p>
 
 <figure class="highlight"><pre><code class="language-text" data-lang="text">## [1] 3.605551</code></pre></figure>
 
-<p>So we have a two-simplex when <script type="math/tex">r=\sqrt{13}</script>. By hand, we also computed VR<script type="math/tex">(S, \sqrt{13})</script> to be a two simplex! Accessing the other complex and filtration value elements verifies the rest of the filtration computation we did earlier.</p>
+<p>So we have a two-simplex when <script type="math/tex">r=\sqrt{13}</script>. By hand, we also computed <script type="math/tex">\text{VR}(S, \sqrt{13})</script> to be a two simplex! Accessing the other complex and filtration value elements verifies the rest of the filtration computation we did earlier.</p>
 
 <p>If we want to see an animation of the Rips filtration, we can run the following code with a plot function. This function has input arguments:</p>
 
@@ -243,7 +243,7 @@ Let’s check this out.</p>
 <img width="80%" src="../../assets/tda-rips/rips_example.gif" />
 </center>
 
-<p>Furthermore, we can look at the Rips complex at a threshold of <script type="math/tex">\sqrt{14}</script>, by adding the argument, “thresh = <script type="math/tex">\sqrt{14}</script>” and changing “animate = FALSE” to “animate = TRUE”.</p>
+<p>Furthermore, we can look at the Rips complex at a threshold of <script type="math/tex">\sqrt{14}</script>, by adding the argument, thresh = <script type="math/tex">\sqrt{14}</script> and changing animate = FALSE to animate = TRUE.</p>
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">plot</span><span class="p">(</span><span class="n">RipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">thresh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">sqrt</span><span class="p">(</span><span class="m">14</span><span class="p">),</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span></code></pre></figure>
 
@@ -295,7 +295,7 @@ own distance metric.</p>
 <p>Hence <script type="math/tex">\text{VR}(S, \sqrt{14})</script> with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with two two-simplices.</p>
 
 <h3 id="sightings-of-bigfoot-in-montana">Sightings of Bigfoot in Montana</h3>
-<p>Lastly, we work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their <a href="http://www.bfro.net/">website</a>. We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the dead zones where bigfoot has not been sighted in order to keep hikers safe from potential encounters.</p>
+<p>Lastly, we work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their <a href="http://www.bfro.net/">website</a>. We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the where Bigfoot is and is not roaming. Finding the deadzones where Bigfoot is not present can help keep hikers safe from potential encounters.</p>
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#Latitude coordinates of Bigfoot sightings in MT</span><span class="w">
 </span><span class="n">latitude</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">45.31278</span><span class="p">,</span><span class="m">46.05292</span><span class="p">,</span><span class="m">45.97540</span><span class="p">,</span><span class="m">47.62167</span><span class="p">,</span><span class="m">48.03278</span><span class="p">,</span><span class="m">47.70667</span><span class="p">,</span><span class="w">
@@ -349,7 +349,7 @@ own distance metric.</p>
 <embed width="80%" height="auto" src="../../assets/tda-rips/bigfoot.gif" />
 </center>
 
-<p>Furthermore, we can look at the Rips complex at a threshold of 0.8. <strong>TODO: change this plot so it is correct.</strong></p>
+<p>Furthermore, we can look at the Rips complex at a threshold of 0.8.</p>
 
 <figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">plot_rips_bigfoot</span><span class="p">(</span><span class="n">BigfootRipsFilt</span><span class="p">,</span><span class="w"> </span><span class="n">thresh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.8</span><span class="p">,</span><span class="w"> </span><span class="n">animate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span></code></pre></figure>
 
