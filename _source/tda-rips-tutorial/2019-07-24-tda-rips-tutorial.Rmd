@@ -318,7 +318,7 @@ Great! So how do we interpret the RipsFilt object?
 The ripsFiltration function returns a list:
 
 * **complx** is a list where the $$i^{th}$$ element is a vector of the vertices for the $$i^{th}$$ simplex.
-* **values** is a vector where the $$i^{th}$$ entry is the filtration value for when the $$i^{th}$$ simplex appears.
+* **values** is a vector where the $$i^{th}$$ entry is the filtration value for the $$i^{th}$$ simplex.
 * **increasing**  is a logical variable that states TRUE if the filtration values in the values vector are in increasing order and FALSE if the filtration values are in decreasing order.
 * **coordinates** is a matrix representing the coordinates of the vertices. The $$i^{th}$$ row is the coordinate for the $$i^{th}$$ vertex. Note the coordinates matrix appears only if the Euclidean distance is used.
 
@@ -341,7 +341,7 @@ So we have a 2-simplex when $$r=\sqrt{13}$$. We also found this by hand! Accessi
 If we want to see an animation of the Rips filtration, we can run the following code with a plot function. This function has input arguments:
 
 * **filt** is the Rips filtration object. (So, Ripsfilt from above)
-* **animate** is a logical varibale stating TRUE if you want an animation of the filtration or FALSE if you do not want an animation.
+* **animate** is a logical variable stating TRUE if you want an animation of the filtration or FALSE if you do not want an animation.
 * **thresh**  is the threshold value for the Rips complex that will be plotted if animate = FALSE.
 * **fn_out**  is the name of the file for the animation if animate = TRUE.
 * **l_out**  is the number of levels of radii used in the animation between 0 and 1.1 times the max distance between any two points if animate = TRUE.
