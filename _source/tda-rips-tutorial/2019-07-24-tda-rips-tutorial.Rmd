@@ -185,7 +185,7 @@ $$\mathbb{R}^n$$ by hand.
 
 
 First, we breifly describe the mathematical foundations behind a Rips Filtration including
-simplicial complexes, filtrations, and the Rips complex. *Computation Topology: An Introduction*
+abstract simplicial complexes, filtrations, and the Rips complex. *Computation Topology: An Introduction*
 provides more details on the theory {% cite edelsbrunner:2010 %}.
 
 ### Triangle Appreciation
@@ -219,7 +219,7 @@ where the *diameter* of a set of points is the maximum distance between any two 
 
 Geometrically, we can constuct the Rips complex by considering balls of radius $$\frac{r}{2}$$,
 centered at each point in $$S$$. Whenever $$d$$ balls have pairwise intersections, we add a $$d-1$$
-dimensional simplex.For this tutorial, we use the standard Euclidean distance (unless stated otherwise)
+dimensional simplex. For this tutorial, we use the standard Euclidean distance (unless stated otherwise)
 to compute a Rips complex.
 
 You may be familiar with *contact graphs* where the vertices represent a geometric object such as a
@@ -307,7 +307,9 @@ library(TDA) # upload TDA package
 
 S <- cbind(c(0,1,2,3),c(0,3,-1,2)) # write S into R
 
-RipsFilt <- ripsFiltration(S, maxdimension = 2, maxscale = 5,
+# Compute Rips Filtration. maxdimension is max dim of homological features 
+# to be computed, maxscale is the filtration limit.
+RipsFilt <- ripsFiltration(S, maxdimension = 2, maxscale = 5, 
                              dist = "euclidean")
 ```
 
@@ -328,26 +330,29 @@ Let's check this out.
 RipsFilt$cmplx[[10]] #Access vertices for the 10th simplex in the list
 ```
 
-Our output tells us that we have a two-simplex on vertices $$(0,0),(1,3),(3,2)$$. Let's see at which filtration value this appears.
+Our output tells us that we have a 2-simplex on vertices $$(0,0),(1,3),(3,2)$$. Let's see at which filtration value this appears.
 
 ```{r output2, echo = TRUE, message = TRUE}
 RipsFilt$values[10] #Access filtration value for the 10th simplex in the list
 ```
 
-So we have a two-simplex when $$r=\sqrt{13}$$. By hand, we also computed $$\text{VR}(S, \sqrt{13})$$ to be a two simplex! Accessing the other complex and filtration value elements verifies the rest of the filtration computation we did earlier.
+So we have a 2-simplex when $$r=\sqrt{13}$$. We also found this by hand! Accessing the other complex and filtration value elements verifies the rest of the filtration computation we did earlier.
 
 If we want to see an animation of the Rips filtration, we can run the following code with a plot function. This function has input arguments:
 
 * **filt** is the Rips filtration object. (So, Ripsfilt from above)
-* **animate** is a logical varibale stating TRUE if you want an animation of the filatration or FALSE if you do not want an animation.
-* **thresh**  is the threshold value value for the Rips complex that will be plotted if "animate = FALSE".
-* **fn_out**  is the name of the file for the animation if "animate = TRUE".
-* **l_out**  is the number of levels of radii used in the animation between 0 and 1.1 times the max distance between any two points if "animate = TRUE".
+* **animate** is a logical varibale stating TRUE if you want an animation of the filtration or FALSE if you do not want an animation.
+* **thresh**  is the threshold value for the Rips complex that will be plotted if animate = FALSE.
+* **fn_out**  is the name of the file for the animation if animate = TRUE.
+* **l_out**  is the number of levels of radii used in the animation between 0 and 1.1 times the max distance between any two points if animate = TRUE.
 
 Note this function only works if the data set is two dimensional and the Euclidean distance is used.
 
 
 ```{r visualization_echo, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
+
+library(plotrix) # packages for plot function
+library(animation)
 
 class(RipsFilt) <- c(class(RipsFilt), "rips_filt")
 
@@ -400,6 +405,8 @@ This time when we compute the Rips complex with $$r=\sqrt{14}$$, we get the foll
 
 ```{r visualization2_show, echo = TRUE, message = FALSE, results='hide', eval = FALSE, fig.keep = 'none'}
 
+library(squash) # package for drawing diamonds
+
 lim <- rep(c(-3, 5), 2)
 plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
      main = "Rips Complex with Manhattan Distance for r = sqrt(14)",
@@ -407,11 +414,11 @@ plot(NULL, type = "n", xlim = lim[1:2], ylim = lim[3:4],
 for(j in 1:length(S[, 1])) {
   diamond(x = S[j, 1], y = S[j, 2], radius = sqrt(14) / 2, col = rgb(0.1, 0.6, 0.1, 0.05))
 }
-for (idx in seq(along = RipsFiltManhattan[["cmplx"]][RipsFiltManhattan$values < sqrt(13)])) {
+for (idx in seq(along = RipsFiltManhattan[["cmplx"]][RipsFiltManhattan$values < sqrt(14)])) {
   polygon(S[RipsFiltManhattan[["cmplx"]][[idx]], , drop = FALSE],
           col = "pink", border = NA, xlim = lim[1:2], ylim = lim[3:4])
 }
-for (idx in seq(along = RipsFiltManhattan[["cmplx"]][RipsFiltManhattan$values < sqrt(13)])) {
+for (idx in seq(along = RipsFiltManhattan[["cmplx"]][RipsFiltManhattan$values < sqrt(14)])) {
   polygon(S[RipsFiltManhattan[["cmplx"]][[idx]], , drop = FALSE],
           col = NULL, xlim = lim[1:2], ylim = lim[3:4])
 }
@@ -422,10 +429,10 @@ points(S, pch = 16)
 <embed width="80%" src="../../assets/tda-rips/manhattan.svg" type="image/svg+xml" />
 </center>
 
-Hence $$\text{VR}(S, \sqrt{14})$$ with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with two two-simplices.
+Hence $$\text{VR}(S, \sqrt{14})$$ with the Manhattan distance is a simplicial complex with two edges, while with the Euclidean distance is a simplicial complex with two 2-simplices.
 
 ### Sightings of Bigfoot in Montana
-Lastly, we work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their [website](http://www.bfro.net/). We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the where Bigfoot is and is not roaming. Finding the deadzones where Bigfoot is not present can help keep hikers safe from potential encounters. 
+Lastly, we work through an example with real data! The Bigfoot Field Researchers Organization (BFRO) is the only scientific research organization studying the Bigfoot/Sasquatch mystery. They publically provide all Bigfoot sighting reports on their [website](http://www.bfro.net/). We will compute the Rips filtration for Bigfoot sightings in Montana with the hope of finding the where Bigfoot is and is not roaming. Finding the deadzones where Bigfoot is not present could help keep hikers safe from potential encounters. 
 
 ```{r bigfootdataset, echo = TRUE, message = TRUE}
 
@@ -483,7 +490,7 @@ map("state", "Montana", add = TRUE)
 <embed width="100%" src="../../assets/tda-rips/bigfoot.svg" type="image/svg+xml" />
 </center>
 
-Now, let's compute the filtration and visualize it with an animation. In order to speed up the runtime, we will set maxscale = 2.5 and maxdimension = 3.
+Now, let's compute the filtration and visualize it with an animation. In order to speed up the computation, we will set maxscale = 2.5 and maxdimension = 3.
 
 ```{r bigfootfiltration, echo = TRUE, message = FALSE, results = 'hide', eval = FALSE, fig.keep = 'none'}
 
