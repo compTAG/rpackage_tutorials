@@ -1,0 +1,69 @@
+---
+layout: post
+title: "Bottleneck Distance"
+author: "Ben Holmgren"
+date: "October 20, 2019"
+---
+
+
+## Introduction
+
+By this point, you should have some familiarity with the concept of a filtration in TDA, and how we can describe the findings of a filtration through a persistence diagram. If you are unfamiliar or would like to review the concept of a filtration, a tutorial on Rips filtrations can be found at <https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html>. For a review of persistence diagrams, take a look at our tutorial at <https://comptag.github.io/rpackage_tutorials/2019/04/persistent_homology.html>.
+
+---
+
+## Objectives
+* Define bottleneck distance
+* Conceptualize the implications of a bottleneck distance on persistent homology
+* Compute a bottleneck distance by hand
+* Gain an idea of some applications of the bottleneck distance
+* Compute a bottleneck distance using **bottleneck** function in the TDA Package
+
+---
+
+## Definition
+Conceptually, we can view bottleneck distance as simply the distance between two persistence diagrams. 
+
+Formally, the bottleneck distance takes as an input two persistence diagrams, X and Y, and considers bijections *n* : X &rarr; Y and record the supremum between each. What does this mean? Consider the following two persistence diagrams, plotted on top of each other:
+
+```{r points, echo=FALSE}
+plot(0:10, 0:10, type = "n")
+x <- c(1,3,6,2,3)
+y <- c(4,5,6,9,10)
+
+a <- c(.5,3,5,2,2.75)
+b <- c(3,6,6,8.5,10)
+
+lines.default(1:10)
+
+
+for(i in 1:7){
+  points(a[i],b[i],pch=20)
+  points(x[i],y[i],pch=15)
+}
+```
+
+We can see that X, which is illustrated b circular points on the persistence diagram, and Y, which is illustrated by squares, have points which are logical to pair together. This is where we find a bijection, and can compare points based on their position respective to a corresponding point on another persistence diagram.
+
+Then, after locating pairs in the two persistence diagrams, we record the supremum, meaning in this context, record the distance between pairs when taking the most direct path.
+
+After locating and evaluating the pairs in our two persistence diagrams, we then calculate the infimum of all of our recorded values. The infimum in this context simply means the greatest distance we've recorded, so we can conceptualize the bottleneck distance to be the greatest distance originated from all of the 'logical' pairs in X and Y. 
+
+//TODO: add figure showing boxes around pairs which have sidelength = bottleneck distance to illustrate.
+
+---
+
+## Meaning of the Bottleneck Distance
+
+The bottleneck distance clearly provides a decent description of the similarity of two persistence diagrams. But what does this actually tell us about the topology of two different data sets?
+
+It turns out, quite a lot!
+
+From a bottleneck distance, we can see if the underlying structure of two data sets share important similarities. A massive bottleneck distance will tell us that our two data sets really aren't that similar topologically, because we will likely have a bijection which is not especially well suited, thus telling us that we have two fairly different persistence diagrams, telling us that features are born and, most importantly, die at times which differ to a large extent in a filtration. Obviously then, a small bottleneck distance gives us a concrete number which describes the closeness of two data sets, and verifies that features are born and die similarly in a filtration.
+
+## Why is this useful?
+
+The bottleneck is useful not only in that it provides a quantifiable measure of closeness between persistence diagrams, and therefore provides a measure of the closeness of the topology of two different data sets, but in that it is built upon a bijection, so that the orientation of the underlying data set doesn't really end up mattering so long as the filtration isn't directly affected. 
+
+## Examples..
+
