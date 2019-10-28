@@ -15,7 +15,7 @@ By this point, you should have some familiarity with the concept of a filtration
 ## Objectives
 * Define bottleneck distance
 * Conceptualize the implications of a bottleneck distance on persistent homology
-* Compute a bottleneck distance by hand
+* Be able to roughly compute a bottleneck distance by hand
 * Gain an idea of some applications of the bottleneck distance
 * Compute a bottleneck distance using **bottleneck** function in the TDA Package
 
@@ -24,32 +24,134 @@ By this point, you should have some familiarity with the concept of a filtration
 ## Definition
 Conceptually, we can view bottleneck distance as simply the distance between two persistence diagrams. 
 
-Formally, the bottleneck distance takes as an input two persistence diagrams, X and Y, and considers bijections *n* : X &rarr; Y and record the supremum between each. What does this mean? Consider the following two persistence diagrams, plotted on top of each other:
+Formally, the bottleneck distance takes as an input two persistence diagrams, G and H, and considers bijections *n* : G &rarr; H and records the infimum of the supremum between each. What does this mean? Consider the following two persistence diagrams. We can see that they don't actually look all that different from one another.
+
+```{r pds, echo=FALSE, out.width = '80%'}
+par(mfrow=c(1,2))
+
+plot(0:10, 0:10, main = "G", xlab = "", ylab = "", type = "n")
+x <- c(1,3,2,3)
+y <- c(4,5,9,10)
+lines(0:10, 0:10)
+
+for (i in 1:6) {
+  points(x[i], y[i], pch=15)
+}
+
+plot(0:10, 0:10, main = "H", xlab = "", ylab = "", type = "n")
+a <- c(.5,2.75,5.5,2,2.75)
+b <- c(3,5.75,6,8.5,10)
+lines(0:10, 0:10)
+
+for(i in 1:7){
+  points(a[i], b[i], pch=20)
+}
+
+```
+
+Now envision what would happen if we layered X and Y on top of each other. We'd gain a combined persistence diagram that looked something like this:
 
 ```{r points, echo=FALSE}
-plot(0:10, 0:10, type = "n")
-x <- c(1,3,6,2,3)
-y <- c(4,5,6,9,10)
+plot(0:10, 0:10, main = "Combined G H", xlab = "", ylab = "", type = "n")
+x <- c(1,3,2,3)
+y <- c(4,5,9,10)
 
-a <- c(.5,3,5,2,2.75)
-b <- c(3,6,6,8.5,10)
+a <- c(.5,2.75,5.5,2,2.75)
+b <- c(3,5.75,6,8.5,10)
 
-lines.default(1:10)
+lines(0:10, 0:10)
 
 
 for(i in 1:7){
-  points(a[i],b[i],pch=20)
-  points(x[i],y[i],pch=15)
+  points(a[i], b[i], pch=20)
+  points(x[i], y[i], pch=15)
 }
 ```
 
+
+
+
 We can see that X, which is illustrated b circular points on the persistence diagram, and Y, which is illustrated by squares, have points which are logical to pair together. This is where we find a bijection, and can compare points based on their position respective to a corresponding point on another persistence diagram.
 
-Then, after locating pairs in the two persistence diagrams, we record the supremum, meaning in this context, record the distance between pairs when taking the most direct path.
+Algorithmically, we can find this same conclusion by the following R pseudocode:
 
-After locating and evaluating the pairs in our two persistence diagrams, we then calculate the infimum of all of our recorded values. The infimum in this context simply means the greatest distance we've recorded, so we can conceptualize the bottleneck distance to be the greatest distance originated from all of the 'logical' pairs in X and Y. 
+```{inf_sup, echo = TRUE, eval = FALSE}
+# Calculate bottleneck distance with two persistence diagrams as input.
+function find_bottleneck_distance(PD1, PD2){
+  
+  # Create lists of all points in each persistence diagram
+  PD1_points <- c(x_1,x_2,...,x_len(vertices_in_PD1))
+  PD2_points <- c(y_1,y_2,...,y_len(vertices_in_PD1))
+  
+  # find the distance between all points
+  function find_distances(PD1_points, PD2_points){
+    
+    # Iterate through all combinations of points in PD1 and PD2 and calculate     their distance by maximum difference in a dimension, adding them to a        list of distances
+    for i in length(PD1_points){
+      for j in length(PD1_points){
+        # find the difference in each dimension from points in PD1 compared          to themselves
+        x_soln = |x_PD1[i] - x_PD1[j]|
+        y_soln = |y_PD1[i] - y_PD1[j]|
+        PD1_distances_array[i] = max(x_soln,y_soln)
+      }
+    }
+    
+    
+    for i in length(PD1_points){
+      for j in length(PD1_points){
+        # find the difference in each dimension from points in PD2 compared          to themselves
+        x_soln = |x_PD2[i] - x_PD2[j]|
+        y_soln = |y_PD2[i] - y_PD2[j]|
+        PD2_distances_array[i] = max(x_soln,y_soln)
+      }
+    }
+    
+    return c(PD1_distances_array, PD2_distances_array)
+  }
+  
+  function supremum(distances_array){
+    distances_array
+  }
+  
+  
+  distances_between_points <- find_distances(PD1_points, PD2_points)
+  
+  return infimum(supremum(distances_between_points))
+    
+}
 
-//TODO: add figure showing boxes around pairs which have sidelength = bottleneck distance to illustrate.
+```
+
+Where the supremum here will be the smallest distance in PD2 which is >= all distances in PD1. Then, we take the infimum of this, which is just the largest distance in PD1 and PD2 which is smaller than the supremum. This gives us the bottleneck distance.
+
+In this context, the definition simply means to provide the largest distance between "logical" pairs in the context of choosing one dimension of travel, and to return this as the bottleneck distance
+
+---
+
+This will end up generating the following image of persistence diagrams G and H if we utilize boxes to show the reach of the bottleneck distance from points:
+
+```{r rect_pts, echo=FALSE}
+plot(0:10, 0:10, main = "Combined G H", xlab = "", ylab = "", type = "n")
+x <- c(1,3,2,3)
+y <- c(4,5,9,10)
+
+a <- c(.5,2.75,5.5,2,2.75)
+b <- c(3,5.75,6,8.5,10)
+
+lines(0:10, 0:10)
+
+#compute bottleneck dist in this context
+bottleDist <- sqrt((.5 - 1)^2 + (3 - 4)^2)
+
+
+for(i in 1:7){
+  points(a[i], b[i], pch=20)
+  points(x[i], y[i], pch=15)
+  rect((a[i] - bottleDist), (b[i] - bottleDist), (a[i] + bottleDist), (b[i] + bottleDist))
+}
+```
+
+Now we can visualize G and H combined so that the squares surrounding points from H have sidelength of 2 * bottleneck distance. This can serve as a visual description of where vertex pairs must lie, and may help visualize the actual definition of the bottleneck distance.
 
 ---
 
@@ -59,7 +161,40 @@ The bottleneck distance clearly provides a decent description of the similarity 
 
 It turns out, quite a lot!
 
-From a bottleneck distance, we can see if the underlying structure of two data sets share important similarities. A massive bottleneck distance will tell us that our two data sets really aren't that similar topologically, because we will likely have a bijection which is not especially well suited, thus telling us that we have two fairly different persistence diagrams, telling us that features are born and, most importantly, die at times which differ to a large extent in a filtration. Obviously then, a small bottleneck distance gives us a concrete number which describes the closeness of two data sets, and verifies that features are born and die similarly in a filtration.
+The power of the bottleneck distance lies in its significance to the stability theorem. We won't get into that here, but essentially the meaning of the stability theorem suggests that bottleneck distances will correspond adequately to differences in persistence diagrams, which tells us in one simple value whether or not the structure of two data sets is reasonably similar, or overwhelmingly different.
+
+This is actually a very meaningful tool, because we can gain a value which tells us to some degree whether or not we can consider two data sets structurally similar. 
+
+---
+
+For example, when we're looking at two relatively similar data sets,
+
+```{r plot_stuff, echo=FALSE}
+x1 <- rnorm(100, sd = .75)
+plot(x1, pch = 18, xlab = "", ylab = "", ylim = c(-5,5))
+```
+
+```{r plot_more_stuff, echo=FALSE}
+x2 <- rnorm(100, mean = .1, sd = .75)
+plot(x2, pch = 16, xlab = "", ylab = "", ylim = c(-5,5))
+```
+
+We should have similar persistence diagrams for each data set under a rips filtration:
+```{r persists1, echo=FALSE}
+x1 <- rnorm(100, sd = .75)
+ripsDiag(x1)
+```
+
+```{r persists2, echo=FALSE}
+x2 <- rnorm(100, mean = .1, sd = .75)
+ripsDiag(x2)
+```
+
+```{r bottle_stuff}
+x1 <- rnorm(100, sd = .75)
+x2 <- rnorm(100, mean = .1, sd = .75)
+bottleneck(ripsDiag(x1),ripsDiag(x2))
+```
 
 ## Why is this useful?
 
