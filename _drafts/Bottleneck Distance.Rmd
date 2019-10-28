@@ -181,19 +181,19 @@ plot(x2, pch = 16, xlab = "", ylab = "", ylim = c(-5,5))
 
 We should have similar persistence diagrams for each data set under a rips filtration:
 ```{r persists1, echo=FALSE}
-x1 <- rnorm(100, sd = .75)
-ripsDiag(x1)
-```
+# x1 <- rnorm(100, sd = .75)
+# ripsDiag(x1)
+# ```
 
-```{r persists2, echo=FALSE}
-x2 <- rnorm(100, mean = .1, sd = .75)
-ripsDiag(x2)
-```
+# ```{r persists2, echo=FALSE}
+# x2 <- rnorm(100, mean = .1, sd = .75)
+# ripsDiag(x2)
+# ```
 
-```{r bottle_stuff}
-x1 <- rnorm(100, sd = .75)
-x2 <- rnorm(100, mean = .1, sd = .75)
-bottleneck(ripsDiag(x1),ripsDiag(x2))
+# ```{r bottle_stuff}
+# x1 <- rnorm(100, sd = .75)
+# x2 <- rnorm(100, mean = .1, sd = .75)
+# bottleneck(ripsDiag(x1),ripsDiag(x2))
 ```
 
 ## Why is this useful?
