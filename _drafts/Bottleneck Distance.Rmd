@@ -8,13 +8,13 @@ date: "October 20, 2019"
 
 ## Introduction
 
-By this point, you should have some familiarity with the concept of a filtration in TDA, and how we can describe the findings of a filtration through a persistence diagram. If you are unfamiliar or would like to review the concept of a filtration, a tutorial on Rips filtrations can be found at <https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html>. For a review of persistence diagrams, take a look at our tutorial at <https://comptag.github.io/rpackage_tutorials/2019/04/persistent_homology.html>.
+By this point, you should have some familiarity with the concept of a filtration in TDA, and how we can describe the findings of a filtration through a [persistence diagram](https://comptag.github.io/rpackage_tutorials/2019/04/persistent_homology.html). If you are unfamiliar or would like to review the concept of a filtration, a tutorial on Rips filtrations can be found at <https://comptag.github.io/rpackage_tutorials/2019/07/tda-rips-tutorial.html>. For a review of persistence diagrams, take a look at our tutorial at <https://comptag.github.io/rpackage_tutorials/2019/04/persistent_homology.html>.
 
 ---
 
 ## Objectives
 * Define bottleneck distance
-* Conceptualize the implications of a bottleneck distance on persistent homology
+* Conceptualize the implications of a bottleneck distance on the topological similarity of point cloud data
 * Be able to roughly compute a bottleneck distance by hand
 * Gain an idea of some applications of the bottleneck distance
 * Compute a bottleneck distance using **bottleneck** function in the TDA Package
@@ -22,7 +22,7 @@ By this point, you should have some familiarity with the concept of a filtration
 ---
 
 ## Definition
-Conceptually, we can view bottleneck distance as simply the distance between two persistence diagrams. 
+Conceptually, we can view bottleneck distance as the distance between two persistence diagrams. 
 
 Formally, the bottleneck distance takes as an input two persistence diagrams, G and H, and considers bijections *n* : G &rarr; H and records the infimum of the supremum between each. What does this mean? Consider the following two persistence diagrams. We can see that they don't actually look all that different from one another.
 
@@ -49,7 +49,7 @@ for(i in 1:7){
 
 ```
 
-Now envision what would happen if we layered X and Y on top of each other. We'd gain a combined persistence diagram that looked something like this:
+Now envision what would happen if we layered G and H on top of each other. We'd gain a combined persistence diagram that looked something like this:
 
 ```{r points, echo=FALSE}
 par(pty="s")
@@ -72,11 +72,11 @@ for(i in 1:7){
 
 
 
-We can see that X, which is illustrated b circular points on the persistence diagram, and Y, which is illustrated by squares, have points which are logical to pair together. This is where we find a bijection, and can compare points based on their position respective to a corresponding point on another persistence diagram.
+We can see that G, which is illustrated b circular points on the persistence diagram, and H, which is illustrated by squares, have points which are logical to pair together. This is where we find a bijection, and can compare points based on their position respective to a corresponding point on another persistence diagram.
 
 ---
 
-Algorithmically, the bottleneck distance is found by iteratively pairing vertices, and recording the pair with the smallest distance in each iteration. For example, using the above example:
+Algorithmically, the bottleneck distance is found by iteratively pairing vertices, and recording the pair with the largest distance in each iteration. For example, using the above example:
 
 ```{r pairs, echo=FALSE}
 par(pty="s")
@@ -89,14 +89,67 @@ b <- c(3,5.75,6,8.5,10)
 
 lines(0:10, 0:10)
 segments(.5,3,2,9, col = "purple")
-segments(2.75,5.75,1,4,col = "purple")
-segments(5.5,6,3,10,col = "purple")
-segments(2,8.5,3,5,col = "purple")
-segments(6.375,6.375,2.75,10,col = "purple")
+segments(2.75,5.75,1,4, col = "purple")
+segments(2,8.5,3,5, col = "purple")
+segments(3,10,2.75,10, col = "purple")
 
 #it1dist <- 1.75
 
 #rect((a[2] - it1dist), (b[2] - it1dist), (a[2] + it1dist), (b[2] + it1dist))
+
+for(i in 1:7){
+  points(a[i], b[i], pch=20)
+  points(x[i], y[i], pch=15)
+}
+```
+
+
+Our pairing looks great, but you may have noticed that not every vertex has a corresponding vertex to pair with.
+```{r matchDiag, echo=FALSE}
+par(pty="s")
+plot(0:10, 0:10, main = "Combined G H", xlab = "", ylab = "", type = "n")
+x <- c(1,3,2,3)
+y <- c(4,5,9,10)
+
+a <- c(.5,2.75,5.5,2,2.75)
+b <- c(3,5.75,6,8.5,10)
+
+lines(0:10, 0:10)
+segments(.5,3,2,9, col = "purple")
+segments(2.75,5.75,1,4, col = "purple")
+segments(2,8.5,3,5, col = "purple")
+segments(3,10,2.75,10, col = "purple")
+
+#it1dist <- 1.75
+
+rect((5), (5), (6.5), (6.5))
+
+for(i in 1:7){
+  points(a[i], b[i], pch=20)
+  points(x[i], y[i], pch=15)
+}
+```
+
+In the case of a mismatch, unpaired vertices are paired to the diagonal, and this distance is considered just as any other pairing. It is also important to note that the pairing takes place along a direct diagonal path to the persistence diagram's diagonal, as follows:
+```{r matchDiag2, echo=FALSE}
+par(pty="s")
+plot(0:10, 0:10, main = "Combined G H", xlab = "", ylab = "", type = "n")
+x <- c(1,3,2,3)
+y <- c(4,5,9,10)
+
+a <- c(.5,2.75,5.5,2,2.75)
+b <- c(3,5.75,6,8.5,10)
+
+lines(0:10, 0:10)
+segments(.5,3,2,9, col = "purple")
+segments(2.75,5.75,1,4, col = "purple")
+segments(5.5,6,5.75,5.75, col = "purple")
+segments(2,8.5,3,5, col = "purple")
+segments(3,10,2.75,10, col = "purple")
+
+#it1dist <- 1.75
+
+rect((5), (5), (6.5), (6.5))
 
 for(i in 1:7){
   points(a[i], b[i], pch=20)
@@ -117,12 +170,12 @@ b <- c(3,5.75,6,8.5,10)
 
 lines(0:10, 0:10)
 segments(.5,3,2,9, col = "purple")
-segments(2.75,5.75,1,4,col = "purple")
-segments(5.5,6,3,10,col = "purple")
-segments(2,8.5,3,5,col = "purple")
-segments(6.375,6.375,2.75,10,col = "purple")
+segments(2.75,5.75,1,4, col = "purple")
+segments(5.5,6,5.75,5.75, col = "purple")
+segments(2,8.5,3,5, col = "purple")
+segments(3,10,2.75,10, col = "purple")
 
-rect((1), (4), (a[2]), (b[2]))
+rect(a[1], b[1], (x[3]), (y[3]))
 
 for(i in 1:7){
   points(a[i], b[i], pch=20)
@@ -130,7 +183,7 @@ for(i in 1:7){
 }
 ```
 
-We can also probably tell that we could choose better pairings that would yield shorter distances. Let's try again, marking new pairings in red, and recording the next shortest distance that we find:
+We can also probably tell that we could choose better pairings that would yield shorter distances. Let's try again, marking new pairings in red, and recording the largest distance that we find for this iteration:
 
 ```{r rect2pairs, echo=FALSE}
 par(pty="s")
@@ -148,7 +201,7 @@ segments(2.75,10,3,10,col = "red")
 segments(2,8.5,3,5,col = "red")
 segments(5.75,5.75,5.5,6,col = "red")
 
-rect(2.75, 9.75, 3, 10.25)
+rect(a[4],b[4],x[2],y[2])
 
 for(i in 1:7){
   points(a[i], b[i], pch=20)
@@ -158,9 +211,7 @@ for(i in 1:7){
 
 This time, we find a few "good" pairs, whose partners are actually the closest corresponding vertex.
 
-Eventually, if we carry on this process and mark every possible pair, we will have a running list of shortest distances. For each vertex, we will also know which corresponding vertex is its closest pair. 
-
-Then, using the set of shortest distances as well of the set of best pairs for each vertex, we can find the bottleneck distance as the largest value in our set of shortest distances which is still included in the set of best pairs.
+Eventually, if we carry on this process and mark every possible pairing, we will have a complete set of longest matches. Considering all of the longest matches, our bottleneck distance is the shortest distance in this set. In other words, our bottleneck distance ends up being the largest distance in the "ideal" pairing, where each vertex is matched to its closest neighbor.
 
 ---
 
@@ -231,19 +282,19 @@ This is actually a very meaningful tool, because we can gain a value which tells
 
 ## Examples
 
-For example, consider the two relatively similar data sets, x1 and x2:
+For example, consider the two relatively similar data sets, *Nice Cycle* and *Angsty Cycle*:
 
 ```{r plot_good_circle, message=FALSE, echo=FALSE}
 library('TDA')
 library('spatstat')
 par(pty="s")
 x <- circleUnif(100,1.5)
-x1 <- as.ppp.data.frame(x,c(-2,2,-2,2))
-plot(x1, pch = 18, xlab = "", ylab = "")
+Nice_Cycle <- as.ppp.data.frame(x,c(-2,2,-2,2))
+plot(Nice_Cycle, pch = 18, xlab = "", ylab = "")
 
-xppp <- as.ppp.data.frame(x1,c(-2,2,-2,2))
-x2 <-rjitter(xppp,0.35)
-plot(x2, pch = 16, xlab = "", ylab = "")
+xppp <- as.ppp.data.frame(Nice_Cycle,c(-2,2,-2,2))
+Angsty_Cycle <-rjitter(xppp,0.25)
+plot(Angsty_Cycle, pch = 16, xlab = "", ylab = "")
 ```
 
 
@@ -251,13 +302,13 @@ We should have similar persistence diagrams for each data set under a rips filtr
 ```{r persists1, echo=FALSE}
  r1 <- ripsDiag(x,2,1)
  # change x2 to data frame to use in ripsdiag
- x2frame <- as.data.frame(x2)
+ x2frame <- as.data.frame(Angsty_Cycle)
  r2 <- ripsDiag(x2frame,2,1)
 
  par(mfrow=c(1,2))
  par(pty="s")
- plot(r1[["diagram"]], main = "x1")
- plot(r2[["diagram"]], main = "x2")
+ plot(r1[["diagram"]], main = "Nice Cycle")
+ plot(r2[["diagram"]], main = "Angsty Cycle")
  
 ```
 
@@ -272,24 +323,31 @@ We find a relatively small value, which tells us that our persistence diagrams r
 
 ---
 
-For a counterexample, consider again our dataset x1, and a completely different dataset x3:
+For a counterexample, consider again our dataset *Nice Cycle*, and a completely different dataset *Nice Cycle And a Buddy*:
 
-```{r plot_bad_circle, message=FALSE, echo=FALSE}
-plot(x1, pch = 18, xlab = "", ylab = "")
+```{r plot_dos_circles, message=FALSE, echo=FALSE}
+plot(Nice_Cycle, pch = 18, xlab = "", ylab = "")
+x <- circleUnif(100,0.75)
+newcirc <- x[, 1] + .75
+topcirc <- cbind(newcirc,x[,2])
+newcirc2 <- x[,1] -.75
+bottomcirc <- cbind((newcirc2),x[,2])
 
-x3 <- rnorm(100,sd=1)
-plot(x3, pch = 20, xlab = "", ylab = "")
+magiceight <- rbind(bottomcirc,topcirc)
+Nice_Cycle_and_a_Buddy <- as.ppp.data.frame(magiceight,c(-2,2,-2,2))
+
+plot(Nice_Cycle_and_a_Buddy, pch = 20, xlab = "", ylab = "")
 ```
 
 Conducting a Rips filtration on both point clouds, we find the persistence diagrams:
 
 ```{r persists2, echo=FALSE}
- r3 <- ripsDiag(x3,2,1)
+ r3 <- ripsDiag(magiceight,2,1)
 
  par(mfrow=c(1,2))
  par(pty="s")
- plot(r1[["diagram"]], main = "x1")
- plot(r3[["diagram"]], main = "x3")
+ plot(r1[["diagram"]], main = "Nice Cycle")
+ plot(r3[["diagram"]], main = "Nice Cycle and a Buddy")
  
 ```
 
@@ -299,19 +357,19 @@ And then using these persistence diagrams, we can compute the bottleneck distanc
  b <- bottleneck(r1[["diagram"]],r3[["diagram"]], dimension=0)
  b
 ```
-Roughly twice that of the distance between x1 and x2. Which tells us that x1 and x3 are significantly less similar and x1 and x2, as we would expect!
+Roughly twice that of the distance between *Nice Cycle* and *Angsty Cycle*. Which tells us that *Nice Cycle* and *Nice Cycle and a Buddy* are significantly less similar and *Nice Cycle* and *Angsty Cycle*, as we would expect!(Since the dataset *Nice Cycle and a Buddy* has one more cycle).
 As a result, we see that the bottleneck distance can be a robust mechanism to show the wholistic similarity of data in one concrete value!
 
 ---
-## Now, try for yourself
+## Now, try a simple example
 
 Using the following R code as a template, you should be able to compute the bottleneck distance on your own data and gain a numerical, wholistic descriptor of the difference in datasets:
 
 ```{r we_persist}
-# generate 50 points along the unit circle
+# generate 50 points along the unit circle (because topologists are really into circles)
 a <- circleUnif(50)
 
-# generate 55 points along a slightly smaller circle
+# generate 55 points along a slightly smaller circle (because topologists are reeeaaaally into circles)
 b <- circleUnif(55, r = 0.80)
 
 # compute a rips filtration on a
@@ -343,6 +401,9 @@ For more information on the bottleneck distance and it's uses, feel free to chec
 
 Recent algorithm which increases the efficiency of computation when comparing persistence diagrams:
 <http://www.geometrie.tugraz.at/kerber/kerber_papers/kmn-ghtcpd-16.pdf>
+
+//TODO: Find more .....
+
 
 
 
