@@ -49,6 +49,7 @@ GEM
       jekyll (~> 3.0)
     jekyll-seo-tag (2.6.0)
       jekyll (~> 3.3)
+    jekyll-swiss (1.0.0)
     jekyll-watch (2.2.1)
       listen (~> 3.0)
     kramdown (1.17.0)
@@ -86,6 +87,7 @@ DEPENDENCIES
   jekyll (~> 3.8.5)
   jekyll-feed (~> 0.6)
   jekyll-scholar (~> 5.15.0)
+  jekyll-swiss
   minima (~> 2.0)
   tzinfo-data
 
