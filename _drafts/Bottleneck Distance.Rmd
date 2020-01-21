@@ -328,10 +328,11 @@ For a counterexample, consider again our dataset *Nice Cycle*, and a completely 
 ```{r plot_dos_circles, message=FALSE, echo=FALSE}
 plot(Nice_Cycle, pch = 18, xlab = "", ylab = "")
 x <- circleUnif(100,0.75)
+y <- circleUnif(100,1)
 newcirc <- x[, 1] + .75
 topcirc <- cbind(newcirc,x[,2])
-newcirc2 <- x[,1] -.75
-bottomcirc <- cbind((newcirc2),x[,2])
+newcirc2 <- y[,1] -1
+bottomcirc <- cbind((newcirc2),y[,2])
 
 magiceight <- rbind(bottomcirc,topcirc)
 Nice_Cycle_and_a_Buddy <- as.ppp.data.frame(magiceight,c(-2,2,-2,2))
