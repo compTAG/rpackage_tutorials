@@ -1,5 +1,7 @@
 # R package TDA tutorial
 
+[![Build Status](https://travis-ci.com/jordans1882/rpackage_tutorials.svg?branch=master)](https://travis-ci.com/jordans1882/rpackage_tutorials)
+
 ## Developing new tutorials
 
 Tutorials are written in Rmarkdown and compiled into a website using
