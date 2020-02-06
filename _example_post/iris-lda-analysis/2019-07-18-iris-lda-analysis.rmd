@@ -1,7 +1,10 @@
 ---
-layout: post
-title:  "Analysis of Iris Dataset"
+title: "Analysis of Iris Dataset"
 author: "Jordan Schupbach"
+output:
+  html_document:
+    df_print: paged
+layout: post
 ---
 
 {% include lib/mathjax.html %}
